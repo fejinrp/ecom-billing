@@ -216,14 +216,16 @@
                                         <td class="py-2 lg:pl-2 col-span-2 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Product / Line Description</label>
                                             <div class="flex gap-2">
-                                                <input type="text" 
-                                                       name="productName[]" 
-                                                       x-model="item.productName"
+                                                <select name="productName[]" 
+                                                       :value="item.productName"
                                                        required
-                                                       list="quotation-product-suggestions"
-                                                       @input="onCustomProductInput(index)"
-                                                       placeholder="Type custom or select suggestion..."
+                                                       @change="item.productName = $event.target.value; onCustomProductInput(index)"
                                                        class="w-full px-3 py-2 bg-slate-950 border border-slate-850 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-indigo-500 uppercase">
+                                                    <option value="">-- Select Product --</option>
+                                                    <template x-for="p in products" :key="p.id">
+                                                        <option :value="p.productname.toUpperCase()" x-text="p.productname"></option>
+                                                    </template>
+                                                </select>
                                             </div>
                                             <input type="hidden" name="hsnsac[]" x-model="item.hsnsac">
                                             <input type="hidden" name="gst[]" x-model="item.gst">

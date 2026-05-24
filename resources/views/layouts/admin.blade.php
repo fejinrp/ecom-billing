@@ -257,11 +257,7 @@
                 <!-- Logo Header -->
                 <div class="admin-sidebar-header flex h-20 items-center justify-between px-6">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                        <img src="{{ route('admin.logo') }}" class="h-9 w-auto" alt="MTL Mart Logo">
-                        <div class="leading-none border-l border-slate-300 dark:border-slate-800 pl-2">
-                            <span class="block text-[11px] font-bold tracking-wider text-slate-900 dark:text-slate-100 uppercase leading-none">MART</span>
-                            <span class="block text-[8px] text-slate-500 uppercase tracking-widest font-semibold mt-0.5">ERP Management</span>
-                        </div>
+                        <img src="{{ asset('assets/logo.png') }}" class="h-auto max-w-32 dark:brightness-0 dark:invert transition-all" alt="MTL Mart Logo">
                     </a>
                     <button class="lg:hidden p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" @click="sidebarOpen = false">
                         <i class="fa-solid fa-xmark text-lg"></i>

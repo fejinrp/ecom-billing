@@ -1,0 +1,371 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    /* Premium Harmonious Light Mode Theme Colors */
+    --color-slate-50: #f8fafc;
+    --color-slate-100: #f1f5f9;
+    --color-slate-200: #e2e8f0;
+    --color-slate-300: #cbd5e1;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #64748b;
+    --color-slate-600: #475569;
+    --color-slate-700: #334155;
+    --color-slate-750: #1e293b;
+    --color-slate-800: #1e293b;
+    --color-slate-850: #111827;
+    --color-slate-900: #0f172a;
+    --color-slate-950: #020617;
+
+    --color-emerald-50: #f0fdf4;
+    --color-emerald-100: #dcfce7;
+    --color-emerald-200: #bbf7d0;
+    --color-emerald-300: #86efac;
+    --color-emerald-400: #16a34a;
+    --color-emerald-500: #22c55e;
+    --color-emerald-600: #16a34a;
+    --color-emerald-700: #15803d;
+    --color-emerald-800: #166534;
+    --color-emerald-900: #14532d;
+    --color-emerald-950: #052e16;
+
+    --color-amber-50: #fffbeb;
+    --color-amber-100: #fef3c7;
+    --color-amber-200: #fde68a;
+    --color-amber-300: #fcd34d;
+    --color-amber-400: #d97706;
+    --color-amber-500: #f59e0b;
+    --color-amber-600: #d97706;
+    --color-amber-700: #b45309;
+    --color-amber-800: #92400e;
+    --color-amber-900: #78350f;
+    --color-amber-950: #451a03;
+
+    --color-cyan-50: #ecfeff;
+    --color-cyan-100: #cffafe;
+    --color-cyan-200: #a5f3fc;
+    --color-cyan-300: #67e8f9;
+    --color-cyan-400: #0891b2;
+    --color-cyan-500: #06b6d4;
+    --color-cyan-600: #0891b2;
+    --color-cyan-700: #0e7490;
+    --color-cyan-800: #155e75;
+    --color-cyan-900: #164e63;
+    --color-cyan-950: #083344;
+
+    --color-red-50: #fef2f2;
+    --color-red-100: #fee2e2;
+    --color-red-200: #fecaca;
+    --color-red-300: #fca5a5;
+    --color-red-400: #dc2626;
+    --color-red-500: #ef4444;
+    --color-red-600: #dc2626;
+    --color-red-700: #b91c1c;
+    --color-red-800: #991b1b;
+    --color-red-900: #7f1d1d;
+    --color-red-950: #450a0a;
+
+    --color-rose-50: #fff1f2;
+    --color-rose-100: #ffe4e6;
+    --color-rose-200: #fecdd3;
+    --color-rose-300: #fda4af;
+    --color-rose-400: #db2777;
+    --color-rose-500: #f43f5e;
+    --color-rose-600: #e11d48;
+    --color-rose-700: #be123c;
+    --color-rose-800: #9f1239;
+    --color-rose-900: #881337;
+    --color-rose-950: #4c0519;
+}
+
+html.dark {
+    /* Premium High-Contrast Dark Mode Theme Colors */
+    --color-slate-950: #090e17; /* Slate base dark background */
+    --color-slate-900: #111827; /* Rich container background */
+    --color-slate-850: #1f2937; /* Elevated card/inner element background */
+    --color-slate-800: #374151; /* Borders and dividers */
+    --color-slate-750: #4b5563;
+    --color-slate-700: #6b7280;
+    --color-slate-600: #9ca3af;
+    --color-slate-500: #d1d5db;
+    --color-slate-400: #e5e7eb;
+    --color-slate-300: #f3f4f6;
+    --color-slate-200: #f9fafb;
+    --color-slate-100: #ffffff;
+    --color-slate-5: #090e17;
+
+    --color-emerald-950: #022c22;
+    --color-emerald-900: #064e3b;
+    --color-emerald-800: #065f46;
+    --color-emerald-700: #047857;
+    --color-emerald-600: #059669;
+    --color-emerald-500: #10b981;
+    --color-emerald-400: #34d399; /* Radiant green */
+    --color-emerald-300: #6ee7b7;
+    --color-emerald-200: #a7f3d0;
+    --color-emerald-100: #d1fae5;
+    --color-emerald-50: #ecfdf5;
+
+    --color-amber-950: #451a03;
+    --color-amber-900: #78350f;
+    --color-amber-800: #92400e;
+    --color-amber-700: #b45309;
+    --color-amber-600: #d97706;
+    --color-amber-500: #f59e0b;
+    --color-amber-400: #fbbf24; /* Radiant gold */
+    --color-amber-300: #fcd34d;
+    --color-amber-200: #fde68a;
+    --color-amber-100: #fef3c7;
+    --color-amber-50: #fffbeb;
+
+    --color-cyan-950: #083344;
+    --color-cyan-900: #164e63;
+    --color-cyan-800: #155e75;
+    --color-cyan-700: #0e7490;
+    --color-cyan-600: #0891b2;
+    --color-cyan-500: #06b6d4;
+    --color-cyan-400: #22d3ee; /* Radiant cyan */
+    --color-cyan-300: #67e8f9;
+    --color-cyan-200: #a5f3fc;
+    --color-cyan-100: #cffafe;
+    --color-cyan-50: #ecfeff;
+
+    --color-red-950: #450a0a;
+    --color-red-900: #7f1d1d;
+    --color-red-800: #991b1b;
+    --color-red-700: #b91c1c;
+    --color-red-600: #dc2626;
+    --color-red-500: #ef4444;
+    --color-red-400: #f87171; /* Radiant red */
+    --color-red-300: #fca5a5;
+    --color-red-200: #fecaca;
+    --color-red-100: #fee2e2;
+    --color-red-50: #fef2f2;
+
+    --color-rose-950: #4c0519;
+    --color-rose-900: #881337;
+    --color-rose-800: #9f1239;
+    --color-rose-700: #be123c;
+    --color-rose-600: #e11d48;
+    --color-rose-500: #f43f5e;
+    --color-rose-400: #f472b6; /* Radiant rose */
+    --color-rose-300: #fda4af;
+    --color-rose-200: #fecdd3;
+    --color-rose-100: #ffe4e6;
+    --color-rose-50: #fff1f2;
+}
+
+/* ── Global Utilities ── */
+
+/* Body scroll lock when modal is open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Fade-in animation used by admin pages */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+    animation: fadeIn 0.35s ease-out both;
+}
+
+/* Modal card scale-up entrance */
+@keyframes modalSlideUp {
+    from { opacity: 0; transform: scale(0.95) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-modalSlideUp {
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ==========================================================================
+   ── Premium Admin Theme Overrides (Uniformity & Dark/Light Compatibility) ──
+   ========================================================================== */
+
+/* Scoped variables for admin cards & headers */
+.admin-shell, .admin-modal {
+    --admin-card-bg-light: rgba(255, 255, 255, 0.85);
+    --admin-card-bg-dark: rgba(15, 23, 42, 0.55);
+    --admin-card-border-light: rgba(148, 163, 184, 0.16);
+    --admin-card-border-dark: rgba(148, 163, 184, 0.14);
+}
+
+/* Global inputs, selects, textareas override in Admin to prevent contrast clashes */
+.admin-shell input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+.admin-shell select,
+.admin-shell textarea,
+.admin-modal input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+.admin-modal select,
+.admin-modal textarea {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.admin-shell input:focus,
+.admin-shell select:focus,
+.admin-shell textarea:focus,
+.admin-modal input:focus,
+.admin-modal select:focus,
+.admin-modal textarea:focus {
+    border-color: #003BFF !important; /* Exact Brand Royal Blue */
+    box-shadow: 0 0 0 2px rgba(0, 59, 255, 0.1) !important;
+}
+
+/* Dark mode inputs, selects, textareas in Admin */
+html.dark .admin-shell input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+html.dark .admin-shell select,
+html.dark .admin-shell textarea,
+html.dark .admin-modal input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+html.dark .admin-modal select,
+html.dark .admin-modal textarea {
+    background-color: #090e17 !important; /* Premium deep dark slate */
+    border-color: #374151 !important; /* Slate 800 */
+    color: #f3f4f6 !important; /* Light text */
+}
+
+html.dark .admin-shell input:focus,
+html.dark .admin-shell select:focus,
+html.dark .admin-shell textarea:focus,
+html.dark .admin-modal input:focus,
+html.dark .admin-modal select:focus,
+html.dark .admin-modal textarea:focus {
+    border-color: #003BFF !important;
+    box-shadow: 0 0 0 2px rgba(0, 59, 255, 0.25) !important;
+}
+
+/* Premium form label readability */
+.admin-shell label,
+.admin-modal label {
+    color: #475569 !important; /* Slate-600 */
+    font-weight: 600 !important;
+}
+
+html.dark .admin-shell label,
+html.dark .admin-modal label {
+    color: #94a3b8 !important; /* Slate-400 */
+}
+
+/* Table overrides in light mode inside admin shell */
+.admin-shell thead.bg-slate-950,
+.admin-shell thead.bg-slate-900\/60 {
+    background-color: #f8fafc !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+}
+.admin-shell thead th {
+    color: #475569 !important; /* Slate-600 */
+    font-weight: 700 !important;
+}
+.admin-shell tbody tr {
+    border-color: #cbd5e1 !important;
+}
+.admin-shell tbody td {
+    color: #334155 !important;
+}
+.admin-shell tbody tr.hover\:bg-slate-800\/30:hover,
+.admin-shell tbody tr:hover {
+    background-color: rgba(0, 59, 255, 0.03) !important;
+}
+
+/* Dark mode overrides for cards, tables, rows */
+html.dark .admin-shell .bg-slate-900\/30 {
+    background-color: rgba(15, 23, 42, 0.3) !important;
+    border-color: rgba(148, 163, 184, 0.14) !important;
+}
+html.dark .admin-shell .text-slate-355,
+html.dark .admin-shell .text-slate-300 {
+    color: #cbd5e1 !important;
+}
+html.dark .admin-shell .text-slate-400 {
+    color: #94a3b8 !important;
+}
+html.dark .admin-shell thead.bg-slate-950,
+html.dark .admin-shell thead.bg-slate-900\/60 {
+    background-color: #090e17 !important;
+    border-bottom: 2px solid #1f2937 !important;
+}
+html.dark .admin-shell thead th {
+    color: #94a3b8 !important;
+}
+html.dark .admin-shell tbody tr {
+    border-color: #1f2937 !important;
+}
+html.dark .admin-shell tbody td {
+    color: #cbd5e1 !important;
+}
+html.dark .admin-shell tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* ==========================================================================
+   ── Centralized Light Theme Stability Safety-Nets & Card-Table Overrides ──
+   ========================================================================== */
+
+/* Universal table card / row responsive background overrides for Light Mode */
+html:not(.dark) .admin-shell tbody tr {
+    background-color: #ffffff !important;
+    border-color: rgba(148, 163, 184, 0.16) !important;
+}
+html:not(.dark) .admin-shell tbody tr:hover {
+    background-color: rgba(0, 59, 255, 0.02) !important;
+}
+@media (min-width: 1024px) {
+    html:not(.dark) .admin-shell tbody tr {
+        background-color: transparent !important;
+    }
+}
+
+/* Light mode overrides for hardcoded dark-slate container elements */
+html:not(.dark) .admin-shell .bg-slate-900\/50,
+html:not(.dark) .admin-shell .bg-slate-900\/40,
+html:not(.dark) .admin-shell .bg-slate-900\/30,
+html:not(.dark) .admin-shell .bg-slate-900\/20,
+html:not(.dark) .admin-shell .bg-slate-950,
+html:not(.dark) .admin-shell .bg-slate-950\/70,
+html:not(.dark) .admin-shell .bg-slate-950\/40,
+html:not(.dark) .admin-modal .bg-slate-900,
+html:not(.dark) .admin-modal .bg-slate-950 {
+    background-color: #ffffff !important;
+}
+
+html:not(.dark) .admin-shell .border-slate-800,
+html:not(.dark) .admin-shell .border-slate-800\/80,
+html:not(.dark) .admin-shell .border-slate-800\/60,
+html:not(.dark) .admin-shell .border-slate-800\/50,
+html:not(.dark) .admin-shell .border-slate-850,
+html:not(.dark) .admin-modal .border-slate-800 {
+    border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+/* Accessible text overrides for slate color classes in light mode */
+html:not(.dark) .admin-shell .text-slate-100,
+html:not(.dark) .admin-shell .text-slate-200,
+html:not(.dark) .admin-shell .text-slate-300,
+html:not(.dark) .admin-shell .text-slate-400 {
+    color: #334155 !important;
+}
+html:not(.dark) .admin-shell .text-slate-500,
+html:not(.dark) .admin-shell .text-slate-600 {
+    color: #475569 !important;
+}
+
+/* Table Button Overrides in Light Mode */
+html:not(.dark) .admin-shell tbody td button.bg-slate-800,
+html:not(.dark) .admin-shell tbody td a.bg-slate-800 {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0 !important;
+    color: #475569 !important;
+}
+html:not(.dark) .admin-shell tbody td button.bg-slate-800:hover,
+html:not(.dark) .admin-shell tbody td a.bg-slate-800:hover {
+    background-color: #e2e8f0 !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+

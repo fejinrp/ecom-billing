@@ -31,7 +31,7 @@
             }
 
             // Admin surface mode: default to card mode across all admin pages
-            var adminUiMode = localStorage.getItem('admin-ui-mode') || 'card';
+            var adminUiMode = localStorage.getItem('admin-ui-mode') || 'flat';
             document.documentElement.dataset.adminUiMode = adminUiMode === 'flat' ? 'flat' : 'card';
         </script>
         <meta charset="utf-8">

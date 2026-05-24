@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Providers;
+use Illuminate\Support\Facades\URL;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -22,5 +23,9 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Hash::extend('md5_bcrypt', function () {
             return new \App\Hashing\Md5BcryptHasher();
         });
+
+        if (env('APP_ENV') === 'production') {
+        URL::forceScheme('https');
+    }
     }
 }

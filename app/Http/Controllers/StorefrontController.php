@@ -37,6 +37,38 @@ class StorefrontController extends Controller
     }
 
     /**
+     * Get real-time search suggestions
+     */
+    public function searchSuggestions(Request $request)
+    {
+        $search = $request->input('query');
+        if (empty($search) || strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('status', 1)
+            ->where(function($q) use ($search) {
+                $q->where('productname', 'like', "%{$search}%")
+                  ->orWhere('productdes', 'like', "%{$search}%");
+            })
+            ->orderBy('id', 'desc')
+            ->limit(6)
+            ->get();
+
+        $suggestions = $products->map(function($product) {
+            return [
+                'id' => $product->id,
+                'name' => html_entity_decode($product->productname, ENT_QUOTES, 'UTF-8'),
+                'price' => number_format($product->display_price, 2),
+                'image' => $product->primary_image_url ?: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f3f4f6"/><circle cx="50" cy="50" r="20" fill="%23d1d5db"/></svg>',
+                'url' => route('storefront.product', $product->id)
+            ];
+        });
+
+        return response()->json($suggestions);
+    }
+
+    /**
      * Category Products List
      */
     public function category($catName, Request $request)
@@ -46,12 +78,73 @@ class StorefrontController extends Controller
         // Find category
         $category = Category::where('cat_name', $catName)->firstOrFail();
         
-        $products = Product::where('status', 1)
-            ->where('catid', $category->cat_id)
-            ->orderBy('id', 'desc')
-            ->paginate(12);
+        $query = Product::where('status', 1)->where('catid', $category->cat_id);
+        
+        if ($request->filled('price_range')) {
+            $range = $request->input('price_range');
+            if ($range == 'under_1000') {
+                $query->where('display_price', '<', 1000);
+            } elseif ($range == '1000_5000') {
+                $query->whereBetween('display_price', [1000, 5000]);
+            } elseif ($range == 'over_5000') {
+                $query->where('display_price', '>', 5000);
+            }
+        }
+
+        $sort = $request->input('sort', 'relevance');
+        if ($sort == 'price_low_high') {
+            $query->orderBy('display_price', 'asc');
+        } elseif ($sort == 'price_high_low') {
+            $query->orderBy('display_price', 'desc');
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+        
+        $products = $query->paginate(16);
             
         return view('storefront.category', compact('categories', 'category', 'products'));
+    }
+
+    /**
+     * General Shop / Search Listing Page
+     */
+    public function shop(Request $request)
+    {
+        $categories = Category::orderBy('cat_name', 'asc')->get();
+        
+        $query = Product::where('status', 1);
+        
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('productname', 'like', "%{$search}%")
+                  ->orWhere('productdes', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->filled('price_range')) {
+            $range = $request->input('price_range');
+            if ($range == 'under_1000') {
+                $query->where('display_price', '<', 1000);
+            } elseif ($range == '1000_5000') {
+                $query->whereBetween('display_price', [1000, 5000]);
+            } elseif ($range == 'over_5000') {
+                $query->where('display_price', '>', 5000);
+            }
+        }
+
+        $sort = $request->input('sort', 'relevance');
+        if ($sort == 'price_low_high') {
+            $query->orderBy('display_price', 'asc');
+        } elseif ($sort == 'price_high_low') {
+            $query->orderBy('display_price', 'desc');
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+        
+        $products = $query->paginate(16);
+        
+        return view('storefront.shop', compact('categories', 'products'));
     }
 
     /**
@@ -149,6 +242,15 @@ class StorefrontController extends Controller
         }
         
         session()->put('cart', $cart);
+        
+        session()->flash('added_item', [
+            'id' => $product->id,
+            'name' => $product->productname,
+            'quantity' => $qty,
+            'price' => floatval($product->display_price),
+            'image' => $product->pimagef,
+            'unit' => $product->unit == 2 ? 'BOX' : ($product->unit == 3 ? 'PKT' : 'PCS')
+        ]);
         
         return redirect()->route('storefront.cart')->with('success', 'Product added to cart!');
     }

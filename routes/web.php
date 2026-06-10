@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Auth;
 
 // Public E-Commerce Storefront Routes
 Route::get('/', [StorefrontController::class, 'index'])->name('storefront.index');
+Route::get('/api/search-suggestions', [StorefrontController::class, 'searchSuggestions'])->name('storefront.search_suggestions');
+Route::get('/shop', [StorefrontController::class, 'shop'])->name('storefront.shop');
 Route::get('/category/{name}', [StorefrontController::class, 'category'])->name('storefront.category');
 Route::get('/product/{id}', [StorefrontController::class, 'product'])->name('storefront.product');
 Route::get('/cart', [StorefrontController::class, 'cart'])->name('storefront.cart');

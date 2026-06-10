@@ -11,319 +11,211 @@
     @endphp
 
     <!-- Breadcrumbs -->
-    <nav class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mb-8 flex-wrap text-slate-500 dark:text-slate-400">
-        <a href="{{ route('storefront.index') }}" class="text-blue-600 dark:text-indigo-400 hover:text-blue-500 dark:hover:text-indigo-300 transition-colors">Store</a>
-        <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 dark:text-slate-600"></i>
+    <nav class="flex items-center gap-2 text-[11px] font-medium tracking-wide mb-6 flex-wrap text-slate-500">
+        <a href="{{ route('storefront.index') }}" class="hover:text-[#0059e3] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[8px] text-slate-400"></i>
         @if ($product->category)
-            <a href="{{ route('storefront.category', $product->category->cat_name) }}" class="text-blue-600 dark:text-indigo-400 hover:text-blue-500 dark:hover:text-indigo-300 transition-colors">
+            <a href="{{ route('storefront.category', $product->category->cat_name) }}" class="hover:text-[#0059e3] transition-colors">
                 {{ $product->category->cat_name }}
             </a>
-            <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 dark:text-slate-600"></i>
+            <i class="fa-solid fa-chevron-right text-[8px] text-slate-400"></i>
         @endif
-        <span class="text-slate-500 dark:text-slate-400 truncate max-w-[200px]">{{ $productName }}</span>
+        <span class="text-slate-700 font-bold truncate max-w-[200px]">{{ $productName }}</span>
     </nav>
 
-    <!-- Product Layout Grid -->
-    <div class="rounded-[2rem] border border-slate-200/70 dark:border-slate-800/70 bg-gradient-to-br from-white/80 via-white/55 to-slate-50/80 dark:from-slate-950/45 dark:via-slate-950/30 dark:to-slate-900/40 p-4 sm:p-6 lg:p-8 shadow-2xl shadow-slate-900/5 mb-16">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10 items-start">
+    <!-- Product Details Main Layout (Snapdeal Grid Structure) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
 
         <!-- ============================================================
-             LEFT COLUMN — Image + Trust Badges (5 cols on lg)
+             LEFT SIDE: Product Media, Delivery Check & Actions
              ============================================================ -->
-        <div class="flex flex-col gap-4 lg:col-span-5 xl:col-span-5 min-w-0">
-
-            <!-- Main Product Image Showcase -->
-            <div class="relative rounded-3xl overflow-hidden bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 aspect-square lg:aspect-[4/3] xl:aspect-square flex items-center justify-center p-5 sm:p-8 shadow-2xl shadow-blue-500/5 group">
-                <!-- Glow layer -->
-                <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                <div class="absolute -right-16 -top-16 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
+        <div class="lg:col-span-5 space-y-5">
+            <!-- Main Showcase Image Container -->
+            <div class="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl aspect-square flex items-center justify-center p-6 shadow-sm">
                 @if ($product->pimagef)
                     <img src="{{ $product->primary_image_url }}"
                          alt="{{ $productName }}"
-                         onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;800&quot; height=&quot;800&quot; viewBox=&quot;0 0 800 800&quot;><rect width=&quot;800&quot; height=&quot;800&quot; fill=&quot;%230f172a&quot;/><rect x=&quot;240&quot; y=&quot;210&quot; width=&quot;320&quot; height=&quot;280&quot; rx=&quot;36&quot; fill=&quot;%231e293b&quot;/><path d=&quot;M400 300l-96 70h192z&quot; fill=&quot;%2394a3b8&quot;/><circle cx=&quot;400&quot; cy=&quot;430&quot; r=&quot;36&quot; fill=&quot;%2394a3b8&quot;/></svg>'"
-                        class="max-h-[92%] max-w-[92%] object-contain group-hover:scale-[1.04] transition-transform duration-700 relative z-10">
+                         class="max-h-[90%] max-w-[90%] object-contain"
+                         id="main-product-img">
                 @else
-                    <div class="flex flex-col items-center gap-4 text-slate-700 dark:text-slate-400">
-                        <div class="w-20 h-20 rounded-3xl bg-slate-100 dark:bg-slate-900/80 flex items-center justify-center border border-slate-200 dark:border-slate-800">
-                            <i class="fa-solid fa-cubes text-5xl text-slate-500 dark:text-slate-600"></i>
-                        </div>
-                        <span class="text-xs uppercase tracking-widest font-black text-slate-500 dark:text-slate-400">Image Pending Upload</span>
+                    <div class="flex flex-col items-center gap-2 text-slate-400">
+                        <i class="fa-solid fa-box-open text-5xl"></i>
+                        <span class="text-[10px] uppercase font-bold tracking-wider">No Image Available</span>
                     </div>
                 @endif
 
-                <!-- Stock Tag -->
-                <div class="absolute top-4 left-4 z-20">
-                    @if ($product->tqty > 0)
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-lg backdrop-blur-md">
-                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> IN STOCK &amp; READY TO SHIP
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 shadow-lg backdrop-blur-md">
-                            <span class="w-2 h-2 bg-rose-400 rounded-full"></span> TEMPORARILY OUT OF STOCK
-                        </span>
-                    @endif
-                </div>
+                <!-- Discount percentage overlay badge -->
+                @if ($discountPercent > 0)
+                    <div class="absolute top-4 left-4 bg-[#0059e3] text-white text-xs font-black px-2.5 py-1 rounded shadow-sm">
+                        {{ $discountPercent }}% OFF
+                    </div>
+                @endif
             </div>
 
-            <!-- Trust & Certification Badges -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
-                <div class="flex items-center gap-3 p-4 bg-white/90 dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl shadow-sm">
-                    <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base">
-                        <i class="fa-solid fa-shield-halved"></i>
+            <!-- Form & Buy Actions -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+                @if ($product->tqty > 0)
+                    <form action="{{ route('storefront.cart.add', $product->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        <div class="flex items-center gap-3">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-330">Quantity:</label>
+                            <div class="flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2 h-9 shadow-inner"
+                                 x-data="{ qty: 1, maxStock: {{ $product->tqty }} }">
+                                <button type="button" @click="if(qty > 1) qty--" class="w-6 h-6 text-slate-500 hover:text-slate-800 cursor-pointer"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                                <input type="number" name="quantity" x-model="qty" readonly class="w-10 bg-transparent border-none text-center font-bold text-slate-900 dark:text-white outline-none focus:ring-0 text-sm py-0">
+                                <button type="button" @click="if(qty < maxStock) qty++" class="w-6 h-6 text-slate-500 hover:text-slate-800 cursor-pointer"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                            </div>
+                            <span class="text-[11px] text-slate-500 font-medium">({{ $product->tqty }} units left)</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <!-- ADD TO CART -->
+                            <button type="submit" class="h-12 border border-slate-850 dark:border-slate-700 hover:bg-slate-800 hover:text-white text-slate-800 dark:text-slate-200 text-xs font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer bg-transparent">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span>Add to Cart</span>
+                            </button>
+
+                            <!-- BUY NOW -->
+                            <button type="submit" name="checkout_direct" value="1" class="h-12 text-white text-xs font-black uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md" style="background-color: #0059e3;">
+                                <i class="fa-solid fa-bolt"></i>
+                                <span>Buy Now</span>
+                            </button>
+                        </div>
+                    </form>
+                @else
+                    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-600 rounded-lg flex items-center gap-2.5 text-xs font-bold justify-center">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>OUT OF STOCK / SOLD OUT</span>
                     </div>
-                    <div>
-                        <span class="block text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">MTL Certified</span>
-                        <span class="block text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">100% genuine import. Real-time serial match.</span>
+                @endif
+            </div>
+
+            <!-- Delivery & Pinchecker widget -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-3">
+                <span class="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Delivery Services</span>
+                <div class="flex items-center gap-2">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-location-dot absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" placeholder="Enter Delivery Pincode" class="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-xs outline-none bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
                     </div>
+                    <button class="px-4 py-2 border border-[#0059e3] text-[#0059e3] hover:bg-[#0059e3] hover:text-white transition-all rounded-lg text-xs font-bold cursor-pointer bg-transparent">Check</button>
                 </div>
-                <div class="flex items-center gap-3 p-4 bg-white/90 dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl shadow-sm">
-                    <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-base">
-                        <i class="fa-solid fa-truck-fast"></i>
-                    </div>
-                    <div>
-                        <span class="block text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">Express Logistics</span>
-                        <span class="block text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">Insured courier. Pan-India dispatch ready.</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-4 bg-white/90 dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl shadow-sm">
-                    <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-amber-500/10 border border-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400 text-base">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </div>
-                    <div>
-                        <span class="block text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">1-Year Warranty</span>
-                        <span class="block text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">Corporate warranty backed by import receipt.</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-4 bg-white/90 dark:bg-slate-900/70 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl shadow-sm">
-                    <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-purple-500/10 border border-purple-500/15 flex items-center justify-center text-purple-600 dark:text-purple-400 text-base">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <div>
-                        <span class="block text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">GST Invoice</span>
-                        <span class="block text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">Full CGST/SGST/IGST credit-eligible bills.</span>
-                    </div>
+                <div class="text-[10px] text-slate-500 space-y-1">
+                    <p class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-500"></i> Free Shipping on all orders</p>
+                    <p class="flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-500"></i> 7 Days Easy Returns available</p>
                 </div>
             </div>
         </div>
 
         <!-- ============================================================
-             RIGHT COLUMN — Product Details, Price, Form (7 cols on lg)
+             RIGHT SIDE: Product Specifications, Pricing, Overview
              ============================================================ -->
-        <div class="flex flex-col gap-6 lg:col-span-7 xl:col-span-7 min-w-0">
+        <div class="lg:col-span-7 space-y-6">
 
-            <!-- Brand / Subcategory / Rating Row -->
-            <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Title & Rating Info -->
+            <div class="space-y-2.5">
                 @if ($product->brand)
-                    <span class="px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest max-w-full">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-[#0059e3] bg-blue-50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-blue-150 dark:border-blue-900/40">
                         {{ $product->brand->brand_name }}
                     </span>
                 @endif
-                @if ($product->subcategory)
-                    <span class="px-3 py-1 rounded-lg bg-slate-100/80 dark:bg-slate-900/80 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest max-w-full">
-                        {{ $product->subcategory->sub_cat }}
-                    </span>
-                @endif
-                @if ($product->category)
-                    <span class="px-3 py-1 rounded-lg bg-slate-100/80 dark:bg-slate-900/70 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 text-[10px] font-bold uppercase tracking-widest max-w-full">
-                        {{ $product->category->cat_name }}
-                    </span>
-                @endif
-
-                <div class="flex items-center gap-0.5 text-amber-500 text-xs ml-0 sm:ml-auto">
-                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    <span class="text-slate-500 dark:text-slate-400 font-bold ml-2 text-[10px] uppercase tracking-wide">5.0 Verified</span>
-                </div>
-            </div>
-
-            <!-- Product Name -->
-            <div>
-                <h1 class="text-2xl sm:text-3xl xl:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight mb-2">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">
                     {{ $productName }}
                 </h1>
-                @if ($productDescription)
-                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                        {{ Str::limit($productDescription, 200) }}
-                    </p>
-                @endif
+                <div class="flex items-center gap-1.5 text-xs">
+                    <div class="flex items-center gap-0.5 text-amber-500">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <span class="text-slate-400 dark:text-slate-500">|</span>
+                    <span class="text-slate-600 dark:text-slate-400 font-semibold">5.0 Verified Ratings</span>
+                </div>
             </div>
 
-            <!-- Technical Specifications Grid -->
-            <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl overflow-hidden shadow-sm shadow-slate-900/5">
-                <div class="px-5 py-3.5 border-b border-slate-200/70 dark:border-slate-800/70">
-                    <h3 class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Technical Specifications</h3>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-slate-800">
-                    <div class="p-4 min-w-0">
-                        <span class="block text-[8px] text-slate-500 dark:text-slate-500 uppercase tracking-widest font-black mb-1">Unit Type</span>
-                        <span class="block font-black text-slate-900 dark:text-slate-100 text-sm uppercase break-words">
-                            {{ $product->unit == 2 ? 'BOX' : ($product->unit == 3 ? 'PKT' : 'PCS') }}
+            <!-- Pricing Box -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm space-y-4">
+                <div class="flex flex-wrap items-baseline gap-3">
+                    <span class="text-3xl font-black text-[#0059e3] font-mono">
+                        Rs. {{ \App\Helpers\NumberHelper::indianFormat($sellingRate) }}
+                    </span>
+                    @if ($product->mrp > $sellingRate)
+                        <span class="text-sm text-slate-400 line-through">
+                            MRP Rs. {{ \App\Helpers\NumberHelper::indianFormat($product->mrp) }}
                         </span>
-                    </div>
-                    <div class="p-4 min-w-0">
-                        <span class="block text-[8px] text-slate-500 dark:text-slate-500 uppercase tracking-widest font-black mb-1">HSN / SAC Code</span>
-                        <span class="block font-black text-slate-900 dark:text-slate-100 text-sm font-mono break-all">{{ $product->hsnsac ?: '84713010' }}</span>
-                    </div>
-                    <div class="p-4 min-w-0">
-                        <span class="block text-[8px] text-slate-500 dark:text-slate-500 uppercase tracking-widest font-black mb-1">Tax Bracket</span>
-                        <span class="block font-black text-indigo-400 text-sm font-mono break-words">{{ intval($product->gst) }}% GST</span>
-                    </div>
-                    <div class="p-4 min-w-0">
-                        <span class="block text-[8px] text-slate-500 dark:text-slate-500 uppercase tracking-widest font-black mb-1">Stock Available</span>
-                        <span class="block font-black text-sm {{ $product->tqty > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} break-words">
-                            {{ $product->tqty > 0 ? $product->tqty . ' Units' : 'Sold Out' }}
+                        <span class="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/10">
+                            {{ $discountPercent }}% OFF
                         </span>
+                    @endif
+                </div>
+
+                <div class="text-[11px] text-slate-500 space-y-1 border-t border-slate-100 dark:border-slate-800 pt-3">
+                    <p>Inclusive of {{ $gstRate }}% GST (CGST/SGST/IGST credit invoice available)</p>
+                    <p>Free Delivery across all Indian states and pin codes.</p>
+                </div>
+            </div>
+
+            <!-- Offers & Promotions -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-3">
+                <span class="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-350">Offers & Discounts</span>
+                <div class="space-y-2 text-xs">
+                    <div class="flex items-start gap-2.5 p-2 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800/80 rounded-lg">
+                        <i class="fa-solid fa-percent text-blue-500 mt-0.5"></i>
+                        <div>
+                            <span class="font-bold block">Direct Bank Remittance Offer</span>
+                            <span class="text-slate-500">Pay directly via bank transfer / UPI to get instant order verification and dispatch priority.</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Price Breakdown Panel -->
-            <div class="rounded-3xl border border-slate-200/70 dark:border-slate-800 bg-white/90 dark:bg-slate-900/80 p-6 shadow-sm shadow-slate-900/5">
-                <span class="block text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-3">{{ $product->display_price_label }}</span>
-                <div class="text-4xl sm:text-5xl font-black text-blue-600 dark:text-indigo-400 leading-none">
-                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($sellingRate) }}
+            <!-- Specs Table -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+                <div class="px-5 py-3 border-b border-slate-150 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Specifications & Details</span>
                 </div>
-                @if ($product->mrp > $sellingRate)
-                    <div class="mt-2 text-sm text-slate-500 dark:text-slate-400 line-through">
-                        MRP Rs. {{ \App\Helpers\NumberHelper::indianFormat($product->mrp) }}
-                    </div>
-                    <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-[0.25em]">
-                        <i class="fa-solid fa-tag text-[9px]"></i>
-                        Save {{ $discountPercent }}%
-                    </div>
-                    <div class="mt-2 text-[10px] text-slate-500 dark:text-slate-400">
-                        You save Rs. {{ \App\Helpers\NumberHelper::indianFormat($discountAmount, 0) }}
-                    </div>
-                @endif
-
-                <div class="mt-5 pt-5 border-t border-slate-200/70 dark:border-slate-800 space-y-1.5 text-sm text-slate-600 dark:text-slate-400">
-                    <div>GST rate: <span class="font-black text-slate-900 dark:text-white">{{ $gstRate }}%</span></div>
-                    <div>{{ strtoupper(request()->has('state') && request('state') == 'TAMIL NADU' ? 'CGST / SGST' : 'IGST') }} applied at checkout.</div>
-                </div>
+                <table class="w-full text-xs text-left divide-y divide-slate-150 dark:divide-slate-800">
+                    <tbody class="divide-y divide-slate-150 dark:divide-slate-800">
+                        <tr class="grid grid-cols-2 p-3.5">
+                            <td class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Brand / Manufacturer</td>
+                            <td class="font-semibold text-slate-900 dark:text-slate-100">{{ $product->brand ? $product->brand->brand_name : 'Import' }}</td>
+                        </tr>
+                        <tr class="grid grid-cols-2 p-3.5">
+                            <td class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">HSN / SAC Code</td>
+                            <td class="font-semibold text-slate-900 dark:text-slate-100 font-mono">{{ $product->hsnsac ?: '84713010' }}</td>
+                        </tr>
+                        <tr class="grid grid-cols-2 p-3.5">
+                            <td class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Tax Rate (GST)</td>
+                            <td class="font-semibold text-slate-900 dark:text-slate-100 font-mono">{{ $gstRate }}%</td>
+                        </tr>
+                        <tr class="grid grid-cols-2 p-3.5">
+                            <td class="font-bold text-slate-500 uppercase tracking-wider text-[10px]">Packaging Unit</td>
+                            <td class="font-semibold text-slate-900 dark:text-slate-100 uppercase">{{ $product->unit == 2 ? 'BOX' : ($product->unit == 3 ? 'PKT' : 'PCS') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <!-- Full Product Description -->
+            <!-- Product Description Overview -->
             @if ($productDescription)
-                <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl overflow-hidden shadow-sm shadow-slate-900/5">
-                    <div class="px-5 py-3.5 border-b border-slate-200/70 dark:border-slate-800/70">
-                        <h3 class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Product Overview &amp; Specifications</h3>
-                    </div>
-                    <div class="p-5">
-                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">{{ $productDescription }}</p>
-                    </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm space-y-3">
+                    <span class="block text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Product Description</span>
+                    <p class="text-xs leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line">{{ $productDescription }}</p>
                 </div>
             @endif
 
-            <!-- Add to Cart Form -->
-            <div class="pt-2">
-                @if ($product->tqty > 0)
-                    <form action="{{ route('storefront.cart.add', $product->id) }}" method="POST" class="space-y-4">
-                        @csrf
-                        <!-- Quantity Selector + Cart Button -->
-                        <div class="flex flex-col sm:flex-row items-stretch gap-3">
-                            <!-- Qty Stepper -->
-                            <div class="flex items-center bg-white dark:bg-slate-950/70 border border-slate-200/70 dark:border-slate-800 rounded-xl px-2 h-14 gap-1 shadow-sm"
-                                 x-data="{ qty: 1, maxStock: {{ $product->tqty }} }">
-                                <button type="button"
-                                        @click="if(qty > 1) qty--"
-                                        class="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                                    <i class="fa-solid fa-minus text-xs"></i>
-                                </button>
-                                <input type="number"
-                                       name="quantity"
-                                       x-model="qty"
-                                       readonly
-                                       class="w-14 bg-transparent border-none text-center font-black text-slate-900 dark:text-white outline-none focus:ring-0 text-base font-mono">
-                                <button type="button"
-                                        @click="if(qty < maxStock) qty++"
-                                        class="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-                                    <i class="fa-solid fa-plus text-xs"></i>
-                                </button>
-                            </div>
+        </div>
+    </div>
 
-                            <!-- Add to Cart Button -->
-                            <button type="submit"
-                                    class="flex-1 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black uppercase tracking-widest text-xs rounded-xl shadow-xl shadow-indigo-600/15 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 cursor-pointer">
-                                <i class="fa-solid fa-cart-plus text-base"></i>
-                                <span>Add to Cart</span>
-                            </button>
-                        </div>
-
-                        <!-- Stock Info -->
-                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-center">
-                            <i class="fa-solid fa-circle-info text-slate-500 dark:text-slate-600 mr-1"></i>
-                            {{ $product->tqty }} unit{{ $product->tqty > 1 ? 's' : '' }} available in warehouse stock
-                        </p>
-                    </form>
-                @else
-                    <div class="p-5 bg-rose-500/8 border border-rose-500/20 rounded-2xl flex items-center justify-center gap-3 text-rose-600 dark:text-rose-400">
-                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
-                        <div>
-                            <span class="block text-xs font-black uppercase tracking-wider">Currently Out of Stock</span>
-                            <span class="block text-[10px] text-rose-500/70 dark:text-rose-400/70 mt-0.5">Contact us for pre-order or restocking inquiries.</span>
-                        </div>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Contact / Remittance Info Block -->
-            <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl p-5 shadow-sm shadow-slate-900/5">
-                <h4 class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">Direct Purchase &amp; Remittance</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600 dark:text-slate-400">
-                    <div class="flex items-start gap-3">
-                        <i class="fa-solid fa-phone text-blue-600 dark:text-indigo-400 mt-0.5 text-sm"></i>
-                        <div>
-                            <span class="block text-[9px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-0.5">Call Us</span>
-                            <span>+91 99442 28686</span>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <i class="fa-solid fa-envelope text-blue-600 dark:text-indigo-400 mt-0.5 text-sm"></i>
-                        <div>
-                            <span class="block text-[9px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-0.5">Email</span>
-                            <span>support@mtlmart.com</span>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <i class="fa-solid fa-building-columns text-blue-600 dark:text-indigo-400 mt-0.5 text-sm"></i>
-                        <div>
-                            <span class="block text-[9px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-0.5">Bank Transfer</span>
-                            <span class="font-mono text-[10px]">IOB: 2869020000000349</span>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <i class="fa-solid fa-location-dot text-blue-600 dark:text-indigo-400 mt-0.5 text-sm"></i>
-                        <div>
-                            <span class="block text-[9px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-0.5">Corporate Address</span>
-                            <span>SUS Building, Marthandam, TN 629154</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- end details section -->
-        </div><!-- end responsive grid -->
-    </div><!-- end hero shell -->
-
-    <!-- ============================================================
-         RELATED PRODUCTS SECTION
-         ============================================================ -->
+    <!-- Related Products -->
     @if (count($relatedProducts) > 0)
-        <div class="border-t border-slate-200/70 dark:border-slate-800/70 pt-12 mb-4">
-            <div class="flex items-center justify-between mb-8">
+        <div class="border-t border-slate-200 dark:border-slate-800 pt-10 mb-8">
+            <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase">Related Hardware</h2>
-                    <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">More from the same category</p>
+                    <h3 class="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">Related Products</h3>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mt-0.5">Explore matches from the same collection</p>
                 </div>
-                @if ($product->category)
-                    <a href="{{ route('storefront.category', $product->category->cat_name) }}"
-                       class="hidden sm:flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer">
-                        View All <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                    </a>
-                @endif
             </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 @foreach ($relatedProducts as $rel)
                     <x-product-card :product="$rel" />
                 @endforeach

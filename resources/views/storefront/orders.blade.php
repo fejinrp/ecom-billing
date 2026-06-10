@@ -14,7 +14,7 @@
 
     <!-- ── Header ── -->
     <div class="mb-8">
-        <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.35em] text-blue-600 dark:text-indigo-400 mb-3">
+        <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.35em] text-[#0059e3] mb-3">
             <a href="{{ route('storefront.index') }}" class="hover:underline">Home</a>
             <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 dark:text-slate-600"></i>
             <span class="text-slate-500 dark:text-slate-400">Orders</span>
@@ -34,18 +34,18 @@
         <div class="lg:col-span-3 space-y-6">
             <!-- Profile Card -->
             <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-[1.75rem] p-6 shadow-lg shadow-slate-900/5 text-center relative overflow-hidden">
-                <div class="absolute -right-12 -top-12 w-28 h-28 bg-blue-600/5 dark:bg-indigo-600/5 rounded-full blur-xl"></div>
-                <div class="absolute -left-10 -bottom-10 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl"></div>
+                <div class="absolute -right-12 -top-12 w-28 h-28 bg-blue-600/5 rounded-full blur-xl"></div>
+                <div class="absolute -left-10 -bottom-10 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl"></div>
                 
                 <div class="relative z-10 space-y-4">
                     <!-- Avatar circle -->
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-2xl mx-auto shadow-lg shadow-blue-500/20 uppercase font-outfit">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0059e3] to-[#0040a6] text-white flex items-center justify-center font-black text-2xl mx-auto shadow-lg shadow-blue-500/20 uppercase font-outfit">
                         {{ substr(Auth::user()->uname ?: Auth::user()->name ?: 'C', 0, 1) }}
                     </div>
                     
                     <div>
                         <h2 class="text-base font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">{{ Auth::user()->uname ?: Auth::user()->name }}</h2>
-                        <span class="inline-flex mt-1 items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-50 dark:bg-indigo-500/10 text-blue-600 dark:text-indigo-400 border border-blue-100 dark:border-indigo-500/15">
+                        <span class="inline-flex mt-1 items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-500/10 text-[#0059e3] border border-blue-100 dark:border-blue-500/15">
                             Valued Customer
                         </span>
                     </div>
@@ -69,11 +69,11 @@
 
             <!-- Quick Links -->
             <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-[1.5rem] p-4 shadow-lg shadow-slate-900/5 space-y-1">
-                <a href="{{ route('storefront.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-blue-600 dark:hover:text-white transition-all uppercase tracking-wider">
-                    <i class="fa-solid fa-store text-blue-600 dark:text-indigo-400 w-4"></i> Shop Components
+                <a href="{{ route('storefront.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-[#0059e3] transition-all uppercase tracking-wider">
+                    <i class="fa-solid fa-store text-[#0059e3] w-4"></i> Shop Components
                 </a>
-                <a href="{{ route('storefront.cart') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-blue-600 dark:hover:text-white transition-all uppercase tracking-wider">
-                    <i class="fa-solid fa-cart-shopping text-blue-600 dark:text-indigo-400 w-4"></i> Shopping Cart
+                <a href="{{ route('storefront.cart') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-[#0059e3] transition-all uppercase tracking-wider">
+                    <i class="fa-solid fa-cart-shopping text-[#0059e3] w-4"></i> Shopping Cart
                 </a>
             </div>
         </div>
@@ -85,8 +85,8 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <!-- Widget 1: Total Orders Count -->
                 <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-[1.5rem] p-5 shadow-lg shadow-slate-900/5 flex items-center gap-4 relative overflow-hidden">
-                    <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-blue-600/5 rounded-full blur-md"></div>
-                    <div class="w-11 h-11 bg-blue-50 dark:bg-slate-950 text-blue-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-lg border border-blue-100 dark:border-slate-850">
+                    <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-blue-500/5 rounded-full blur-md"></div>
+                    <div class="w-11 h-11 bg-blue-50 dark:bg-slate-950 text-[#0059e3] rounded-xl flex items-center justify-center text-lg border border-blue-100 dark:border-slate-800">
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                     <div>
@@ -119,8 +119,8 @@
 
                 <!-- Widget 3: Account Dispatch Health -->
                 <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-[1.5rem] p-5 shadow-lg shadow-slate-900/5 flex items-center gap-4 relative overflow-hidden">
-                    <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-orange-600/5 rounded-full blur-md"></div>
-                    <div class="w-11 h-11 bg-orange-50 dark:bg-slate-950 text-orange-500 dark:text-orange-400 rounded-xl flex items-center justify-center text-lg border border-orange-100 dark:border-slate-850">
+                    <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-blue-600/5 rounded-full blur-md"></div>
+                    <div class="w-11 h-11 bg-blue-50 dark:bg-slate-950 text-[#0059e3] rounded-xl flex items-center justify-center text-lg border border-blue-100 dark:border-slate-805">
                         <i class="fa-solid fa-truck-fast"></i>
                     </div>
                     <div>
@@ -138,7 +138,7 @@
                             <h3 class="text-xs font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Orders Table</h3>
                             <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Clean invoice rows with print and inspect actions.</p>
                         </div>
-                        <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 dark:text-indigo-400 border border-blue-500/20">
+                        <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-[#0059e3] border border-blue-500/20">
                             {{ $orders->total() }} items
                         </span>
                     </div>
@@ -174,7 +174,7 @@
                                         <td class="py-5 px-6 font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                             {{ date('d-m-Y', strtotime($ord->order_date)) }}
                                         </td>
-                                        <td class="py-5 px-6 text-right font-mono font-black text-blue-600 dark:text-indigo-400 text-sm whitespace-nowrap">
+                                        <td class="py-5 px-6 text-right font-mono font-black text-[#0059e3] text-sm whitespace-nowrap">
                                             Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->grand_total) }}
                                         </td>
                                         <td class="py-5 px-6 text-center">
@@ -199,10 +199,10 @@
                                         </td>
                                         <td class="py-5 px-6 text-right">
                                             <div class="inline-flex items-center gap-2">
-                                                <a href="{{ route('storefront.order_details', $ord->order_id) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-[10px] font-black uppercase tracking-widest transition-all">
+                                                <a href="{{ route('storefront.order_details', $ord->order_id) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0059e3] dark:hover:text-blue-400 text-[10px] font-black uppercase tracking-widest transition-all">
                                                     Inspect
                                                 </a>
-                                                <a href="{{ route('storefront.order_print', $ord->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-600/10 hover:bg-blue-600 dark:bg-indigo-600/10 dark:hover:bg-indigo-600 text-blue-600 dark:text-indigo-400 hover:text-white border border-blue-500/20 dark:border-indigo-500/20 transition-all" title="Print Invoice Record">
+                                                <a href="{{ route('storefront.order_print', $ord->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 hover:bg-[#0059e3] dark:bg-blue-500/10 dark:hover:bg-blue-600 text-[#0059e3] dark:text-blue-400 hover:text-white border border-blue-500/20 dark:border-blue-500/20 transition-all" title="Print Invoice Record">
                                                     <i class="fa-solid fa-print text-[11px]"></i>
                                                 </a>
                                             </div>
@@ -236,7 +236,7 @@
                                 <div class="grid grid-cols-2 gap-3">
                                     <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 p-3">
                                         <span class="block text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Grand Total</span>
-                                        <span class="block mt-1 text-sm font-black text-blue-600 dark:text-indigo-400 font-mono">Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->grand_total) }}</span>
+                                        <span class="block mt-1 text-sm font-black text-[#0059e3] dark:text-blue-400 font-mono">Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->grand_total) }}</span>
                                     </div>
                                     <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 p-3">
                                         <span class="block text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Payment</span>
@@ -263,7 +263,7 @@
                                         <a href="{{ route('storefront.order_details', $ord->order_id) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest">
                                             Inspect
                                         </a>
-                                        <a href="{{ route('storefront.order_print', $ord->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-600/10 dark:bg-indigo-600/10 text-blue-600 dark:text-indigo-400 border border-blue-500/20 dark:border-indigo-500/20" title="Print Invoice Record">
+                                        <a href="{{ route('storefront.order_print', $ord->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/10 text-[#0059e3] dark:text-blue-400 border border-blue-500/20 dark:border-blue-500/20" title="Print Invoice Record">
                                             <i class="fa-solid fa-print text-[11px]"></i>
                                         </a>
                                     </div>
@@ -286,10 +286,10 @@
                         <i class="fa-solid fa-receipt"></i>
                     </div>
                     <h3 class="text-lg font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight">No Transactions Registered</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-450 mt-2 leading-relaxed">
+                    <p class="text-xs text-slate-500 dark:text-slate-455 mt-2 leading-relaxed">
                         You have not placed any custom computing components or corporate supply transactions under this customer profile yet.
                     </p>
-                    <a href="{{ route('storefront.index') }}" class="inline-block mt-6 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-blue-500/10">
+                    <a href="{{ route('storefront.index') }}" class="inline-block mt-6 px-6 py-3 bg-[#0059e3] hover:bg-[#0040a6] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-blue-500/10">
                         Shop Components Now
                     </a>
                 </div>

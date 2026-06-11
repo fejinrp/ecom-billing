@@ -106,7 +106,7 @@
 
             <!-- High-Density Product Grid (4 Columns) -->
             @if (count($products) > 0)
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach ($products as $prod)
                         <x-product-card :product="$prod" />
                     @endforeach

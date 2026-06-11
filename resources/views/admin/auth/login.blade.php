@@ -555,10 +555,8 @@
             <div class="brand-panel">
                 <!-- Logo -->
                 <div class="brand-logo">
-                    <div class="logo-icon">M</div>
-                    <div>
-                        <div class="logo-text">MTL Mart</div>
-                        <span class="logo-badge">ERP Platform</span>
+                    <div class="w-20 h-20 rounded-2xl bg-white flex items-center justify-center p-2 shadow-lg" style="border-radius: 16px; background: white; display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; box-shadow: 0 6px 20px rgba(0,0,0,0.15);">
+                        <img src="{{ asset('assets/logo.png') }}" class="w-full h-full object-contain" alt="MTL Mart Logo">
                     </div>
                 </div>
 

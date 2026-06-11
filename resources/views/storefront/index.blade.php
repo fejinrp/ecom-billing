@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- ── Snapdeal Circular Category Row ── -->
-    <div class="mb-4 bg-white dark:bg-slate-950  dark:border-slate-850 rounded-2xl p-4  overflow-x-auto custom-scrollbar">
+    <div id="sf-category-scroll-container" class="mb-4 bg-white dark:bg-slate-950 dark:border-slate-850 rounded-2xl p-4 overflow-x-auto custom-scrollbar">
         <div class="flex items-center gap-8 min-w-max justify-start md:justify-center">
             @if (isset($categories) && count($categories) > 0)
                 @foreach ($categories as $index => $cat)
@@ -26,6 +26,59 @@
             @endif
         </div>
     </div>
+
+    <!-- Category Auto-Scroll Controller -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('sf-category-scroll-container');
+            if (!container) return;
+
+            let scrollSpeed = 0.4; // Pixels per step (slow motion)
+            let intervalTime = 20; // Step interval in milliseconds (~50fps)
+            let scrollInterval = null;
+            let isHovered = false;
+            let direction = 1; // 1 = right, -1 = left
+
+            function startScrolling() {
+                if (scrollInterval) return;
+                scrollInterval = setInterval(() => {
+                    if (isHovered) return;
+                    
+                    // Check if container overflows
+                    if (container.scrollWidth <= container.clientWidth) {
+                        return; // Do not scroll if there is no overflow
+                    }
+
+                    container.scrollLeft += scrollSpeed * direction;
+
+                    // Bounce back and forth when reaching either end
+                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                        direction = -1;
+                    } else if (container.scrollLeft <= 0) {
+                        direction = 1;
+                    }
+                }, intervalTime);
+            }
+
+            function stopScrolling() {
+                if (scrollInterval) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                }
+            }
+
+            // Start loop
+            startScrolling();
+
+            // Hover listeners
+            container.addEventListener('mouseenter', () => { isHovered = true; });
+            container.addEventListener('mouseleave', () => { isHovered = false; });
+            
+            // Touch listeners for mobile
+            container.addEventListener('touchstart', () => { isHovered = true; });
+            container.addEventListener('touchend', () => { isHovered = false; });
+        });
+    </script>
 
     <style>
         .snapdeal-slider {
@@ -112,33 +165,33 @@
         </button>
     </div>
 
-    <!-- ── Snapdeal Black Trust Bar ── -->
-    <div class="p-4 justify-center rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-around gap-4 shadow-md border border-neutral-900 animate-fade-in" style="background-color: #000000;">
+    <!-- ── Snapdeal Trust Bar (Redesigned from Black to Soft Gradient) ── -->
+    <div class="p-4 justify-center rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-around gap-4 shadow-sm border border-slate-100 dark:border-slate-800/80 bg-gradient-to-r from-blue-50/40 via-slate-50/20 to-indigo-50/40 dark:from-slate-900/60 dark:to-slate-950/60 animate-fade-in">
         <!-- Free Delivery Card -->
-        <div class="flex flex-col items-center text-center bg-white p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner" style="background-color: #eae8ff; color: #3b30ab;">
+        <div class="flex flex-col items-center text-center bg-white dark:bg-slate-900/80 p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102 border border-slate-100/80 dark:border-slate-800/40">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner bg-blue-50 dark:bg-[#0059e3]/10 text-[#0059e3]">
                 <i class="fa-solid fa-truck-fast"></i>
             </div>
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800">FREE Delivery</h4>
-            <p class="text-[10px] text-slate-550 mt-1">On all hardware imports across India</p>
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">FREE Delivery</h4>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">On all hardware imports across India</p>
         </div>
 
         <!-- Returns Card -->
-        <div class="flex flex-col items-center text-center bg-white p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner" style="background-color: #eae8ff; color: #3b30ab;">
+        <div class="flex flex-col items-center text-center bg-white dark:bg-slate-900/80 p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102 border border-slate-100/80 dark:border-slate-800/40">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner bg-blue-50 dark:bg-[#0059e3]/10 text-[#0059e3]">
                 <i class="fa-solid fa-rotate-left"></i>
             </div>
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800">7 Days Easy Returns</h4>
-            <p class="text-[10px] text-slate-550 mt-1">Hassle-free return policy parameters</p>
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">7 Days Easy Returns</h4>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Hassle-free return policy parameters</p>
         </div>
 
         <!-- Quality Card -->
-        <div class="flex flex-col items-center text-center bg-white p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner" style="background-color: #eae8ff; color: #3b30ab;">
+        <div class="flex flex-col items-center text-center bg-white dark:bg-slate-900/80 p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102 border border-slate-100/80 dark:border-slate-800/40">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner bg-blue-50 dark:bg-[#0059e3]/10 text-[#0059e3]">
                 <i class="fa-solid fa-ribbon"></i>
             </div>
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800">Great Quality</h4>
-            <p class="text-[10px] text-slate-550 mt-1">At unmatched enterprise pricing</p>
+            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Great Quality</h4>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">At unmatched enterprise pricing</p>
         </div>
     </div>
 
@@ -150,39 +203,88 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase font-bold tracking-wider">Top discounts and flash bargains today</p>
             </div>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            @if (isset($products) && count($products) > 0)
-                @foreach ($products->take(6) as $index => $prod)
-                    @php
-                        $deals = ['UNDER Rs. 299', 'MIN. 40% OFF', 'UNDER Rs. 999', 'MIN. 50% OFF', 'UNDER Rs. 1,499', 'MIN. 30% OFF'];
-                        $deal = $deals[$index % count($deals)];
-                        $cats = ['Accessories', 'Compute', 'Storage', 'Memory', 'Cables', 'Peripherals'];
-                        $catLabel = $cats[$index % count($cats)];
-                    @endphp
-                    <a href="{{ route('storefront.product', $prod->id) }}" class="group flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden hover:border-[#0059e3]/40 transition-all duration-300 hover:shadow-xl relative aspect-[3/4]">
-                        <!-- Image container -->
-                        <div class="relative flex-1 bg-slate-50 dark:bg-slate-950 p-3 flex items-center justify-center overflow-hidden border-b border-slate-150 dark:border-slate-800">
-                            @if ($prod->pimagef)
-                                <img src="{{ $prod->primary_image_url }}" alt="{{ $prod->productname }}" class="max-h-[85%] max-w-[85%] object-contain group-hover:scale-105 transition-transform duration-300">
-                            @else
-                                <i class="fa-solid fa-cube text-slate-400 text-3xl"></i>
-                            @endif
-                            
-                            <!-- Translucent overlay tag at the bottom of the image -->
-                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[#0059e3] to-[#0040a6] text-white text-[10px] font-black text-center py-2 uppercase tracking-widest shadow-md">
-                                {{ $deal }}
+        
+        <div id="sf-deals-scroll-container" class="overflow-x-auto custom-scrollbar pb-3">
+            <div class="flex items-center gap-4 min-w-max">
+                @if (isset($products) && count($products) > 0)
+                    @foreach ($products->take(6) as $index => $prod)
+                        @php
+                            $deals = ['UNDER Rs. 299', 'MIN. 40% OFF', 'UNDER Rs. 999', 'MIN. 50% OFF', 'UNDER Rs. 1,499', 'MIN. 30% OFF'];
+                            $deal = $deals[$index % count($deals)];
+                            $cats = ['Accessories', 'Compute', 'Storage', 'Memory', 'Cables', 'Peripherals'];
+                            $catLabel = $cats[$index % count($cats)];
+                        @endphp
+                        <a href="{{ route('storefront.product', $prod->id) }}" class="group flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden hover:border-[#0059e3]/40 transition-all duration-300 hover:shadow-xl relative w-44 md:w-52 h-64 md:h-72 shrink-0">
+                            <!-- Image container -->
+                            <div class="relative flex-1 bg-slate-50 dark:bg-slate-950 p-3 flex items-center justify-center overflow-hidden border-b border-slate-150 dark:border-slate-800">
+                                @if ($prod->pimagef)
+                                    <img src="{{ $prod->primary_image_url }}" alt="{{ $prod->productname }}" class="max-h-[85%] max-w-[85%] object-contain group-hover:scale-105 transition-transform duration-300">
+                                @else
+                                    <i class="fa-solid fa-cube text-slate-400 text-3xl"></i>
+                                @endif
+                                
+                                <!-- Translucent overlay tag at the bottom of the image -->
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[#0059e3] to-[#0040a6] text-white text-[10px] font-black text-center py-2 uppercase tracking-widest shadow-md">
+                                    {{ $deal }}
+                                </div>
                             </div>
-                        </div>
-                        
-                        <!-- Caption wrapper below image -->
-                        <div class="p-3 bg-white dark:bg-slate-900 text-center">
-                            <span class="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wide group-hover:text-[#0059e3] transition-colors">{{ $catLabel }}</span>
-                        </div>
-                    </a>
-                @endforeach
-            @endif
+                            
+                            <!-- Caption wrapper below image -->
+                            <div class="p-3 bg-white dark:bg-slate-900 text-center">
+                                <span class="text-xs font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wide group-hover:text-[#0059e3] transition-colors truncate block">{{ $catLabel }}</span>
+                            </div>
+                        </a>
+                    @endforeach
+                @endif
+            </div>
         </div>
     </div>
+
+    <!-- Deals Auto-Scroll Controller -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('sf-deals-scroll-container');
+            if (!container) return;
+
+            let scrollSpeed = 0.4; // Pixels per step (slow motion)
+            let intervalTime = 25; // Step interval in milliseconds
+            let scrollInterval = null;
+            let isHovered = false;
+            let direction = 1; // 1 = right, -1 = left
+
+            function startScrolling() {
+                if (scrollInterval) return;
+                scrollInterval = setInterval(() => {
+                    if (isHovered) return;
+                    
+                    // Check if container overflows
+                    if (container.scrollWidth <= container.clientWidth) {
+                        return; // Do not scroll if there is no overflow
+                    }
+
+                    container.scrollLeft += scrollSpeed * direction;
+
+                    // Bounce back and forth when reaching either end
+                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                        direction = -1;
+                    } else if (container.scrollLeft <= 0) {
+                        direction = 1;
+                    }
+                }, intervalTime);
+            }
+
+            // Start loop
+            startScrolling();
+
+            // Hover listeners
+            container.addEventListener('mouseenter', () => { isHovered = true; });
+            container.addEventListener('mouseleave', () => { isHovered = false; });
+            
+            // Touch listeners for mobile
+            container.addEventListener('touchstart', () => { isHovered = true; });
+            container.addEventListener('touchend', () => { isHovered = false; });
+        });
+    </script>
 
     <!-- ── Main Hardware Catalog Header ── -->
     <div id="catalog" class="scroll-mt-24 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">

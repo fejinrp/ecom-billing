@@ -247,24 +247,42 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased overflow-x-hidden flex flex-col min-h-screen">
+<body class="font-sans antialiased overflow-x-hidden flex flex-col min-h-screen" 
+      :class="loginModalOpen ? 'overflow-hidden' : ''"
+      x-data="{ mobileMenuOpen: false, loginModalOpen: {{ $errors->any() ? 'true' : 'false' }} }">
 
     <!-- ── Main Navigation ── -->
-    <header class="sf-header w-full sticky top-0 z-40 border-b bg-white dark:bg-slate-950" x-data="{ mobileMenuOpen: false }">
+    <header class="sf-header w-full sticky top-0 z-40 border-b bg-white dark:bg-slate-950">
+        <!-- Mobile App Download Banner -->
+        <!-- <div x-data="{ closed: localStorage.getItem('sf-app-banner-closed') === 'true' }" 
+             x-show="!closed" 
+             class="flex md:hidden items-center justify-between px-4 py-2 bg-[#fff1f2] dark:bg-slate-900 border-b border-rose-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 relative z-50">
+            <div class="flex items-center gap-2">
+                <button @click="closed = true; localStorage.setItem('sf-app-banner-closed', 'true')" class="text-slate-450 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350 cursor-pointer p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+                <img src="{{ asset('assets/logo.png') }}" class="w-8 h-8 rounded bg-white object-contain p-0.5 shadow-sm" alt="Logo">
+                <div class="text-left">
+                    <div class="text-[10px] font-black text-slate-900 dark:text-white leading-tight">Extra <span class="text-rose-600 font-extrabold">10% Off</span> on First Order</div>
+                    <div class="text-[8px] text-slate-500 dark:text-slate-400 font-medium leading-none mt-0.5">Only on App</div>
+                </div>
+            </div>
+            <a href="#" class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-white shadow-sm transition-all cursor-pointer bg-[#e11d48] hover:bg-[#be123c]">
+                Download App
+            </a>
+        </div> -->
+
         <div class="w-full px-4 sm:px-8 lg:px-16">
-            <div class="flex items-center justify-between h-18 py-3 gap-6">
+            <!-- Top Logo & Icons Row -->
+            <div class="flex items-center justify-between h-14 md:h-18 py-2 md:py-3 gap-6">
 
                 <!-- Logo -->
                 <a href="{{ route('storefront.index') }}" class="flex items-center gap-2 flex-shrink-0 group">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shadow-md group-hover:scale-105 transition-transform" style="background-color: #0059e3;">
-                        <i class="fa-solid fa-bag-shopping text-white text-sm"></i>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-black tracking-tight leading-none" style="color: #0059e3; font-family: 'Manrope', sans-serif;">MtlMart</div>
-                    </div>
+                    <img src="{{ asset('assets/logo.png') }}" class="h-8 md:h-9 w-auto object-contain transition-all" alt="MTL Mart Logo">
                 </a>
 
-                <!-- Search Bar (Desktop) -->
+                <!-- Search Bar (Desktop Only) -->
+                @if(!request()->routeIs('login') && !request()->routeIs('register') && !request()->routeIs('password.*'))
                 <div class="hidden md:flex flex-1 max-w-2xl relative" x-data="{
                     query: '{{ request('search') }}',
                     suggestions: [],
@@ -288,7 +306,7 @@
                             });
                     }
                 }" @click.away="showSuggestions = false">
-                    <form action="{{ route('storefront.index') }}" method="GET" class="w-full flex items-center rounded-lg overflow-hidden border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-within:ring-2 focus-within:ring-[#0059e3]/20 focus-within:border-[#0059e3] transition-all">
+                    <form action="{{ route('storefront.index') }}" method="GET" class="w-full flex items-center rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus-within:ring-2 focus-within:ring-[#0059e3]/20 focus-within:border-[#0059e3] transition-all">
                         <i class="fa-solid fa-magnifying-glass text-slate-450 dark:text-slate-500 ml-4 mr-1 shrink-0 text-sm"></i>
                         <input type="text"
                                name="search"
@@ -296,7 +314,7 @@
                                @input.debounce.300ms="fetchSuggestions()"
                                @focus="showSuggestions = suggestions.length > 0"
                                placeholder="Search for Brands & Products..."
-                               class="w-full px-3 py-2.5 bg-transparent text-sm font-medium outline-none text-slate-800 dark:text-slate-200 placeholder-slate-450">
+                               class="w-full px-3 py-2.5 bg-transparent text-sm font-medium outline-none text-slate-800 dark:text-slate-200 placeholder-slate-450 border-none">
                         <button type="submit" class="text-white px-6 py-3 text-xs font-black uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 border-l border-[#0059e3]" style="background-color: #0059e3;">
                             <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                             <span>Search</span>
@@ -322,23 +340,21 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <!-- Right Actions -->
-                <div class="flex items-center gap-6 flex-shrink-0">
-
-                    <!-- Theme Toggle -->
-                    <button id="sf-theme-toggle" onclick="window.sfToggleTheme()" title="Toggle theme" class="flex items-center gap-1.5 px-2 py-1 rounded border border-slate-300 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-350">
-                        <i id="sf-icon-sun" class="fa-solid fa-sun text-[11px]" style="display:block"></i>
-                        <i id="sf-icon-moon" class="fa-solid fa-moon text-[11px]" style="display:none"></i>
-                        <span id="sf-theme-label" class="text-[10px] font-bold">Light</span>
-                    </button>
+                <div class="flex items-center gap-4 md:gap-6 flex-shrink-0 text-slate-700 dark:text-slate-350">
+                    <!-- Wishlist (Mobile Only) -->
+                    <!-- <a href="#" class="block md:hidden text-slate-700 dark:text-slate-300 hover:text-[#0059e3]" title="Wishlist">
+                        <i class="fa-regular fa-heart text-xl"></i>
+                    </a> -->
 
                     <!-- User Account / Login -->
-                    <div class="hidden sm:block relative" x-data="{ userOpen: false }" @click.away="userOpen = false">
+                    <div class="relative" x-data="{ userOpen: false }" @click.away="userOpen = false">
                         @if (Auth::check())
                             <button @click="userOpen = !userOpen" class="flex flex-col items-center justify-center text-slate-700 dark:text-slate-300 hover:text-[#0059e3] transition-colors cursor-pointer text-center">
                                 <i class="fa-regular fa-user text-xl"></i>
-                                <span class="text-[11px] font-bold mt-1 max-w-[80px] truncate">{{ Auth::user()->uname ?: Auth::user()->name }}</span>
+                                <span class="hidden sm:block text-[11px] font-bold mt-1 max-w-[80px] truncate">{{ Auth::user()->uname ?: Auth::user()->name }}</span>
                             </button>
                             <div x-show="userOpen" x-cloak
                                  x-transition:enter="transition ease-out duration-100"
@@ -365,10 +381,10 @@
                                 </form>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="flex flex-col items-center justify-center text-slate-700 dark:text-slate-300 hover:text-[#0059e3] transition-colors cursor-pointer text-center">
+                            <button @click="loginModalOpen = true" class="flex flex-col items-center justify-center text-slate-700 dark:text-slate-300 hover:text-[#0059e3] transition-colors cursor-pointer text-center border-none bg-transparent p-0 outline-none">
                                 <i class="fa-regular fa-user text-xl"></i>
-                                <span class="text-[11px] font-bold mt-1">Login</span>
-                            </a>
+                                <span class="hidden sm:block text-[11px] font-bold mt-1">Login</span>
+                            </button>
                         @endif
                     </div>
 
@@ -383,38 +399,30 @@
                         <span class="relative inline-flex items-center justify-center">
                             <i class="fa-solid fa-cart-shopping text-xl group-hover:scale-105 transition-transform"></i>
                             @if ($cartCount > 0)
-                                <span class="absolute -top-2 -right-2.5 flex h-4.5 w-4.5 items-center justify-center rounded-full text-[9px] font-black text-white shadow-md ring-2 ring-white dark:ring-slate-900" style="background:#0059e3">
+                                <span class="absolute -top-1.5 -right-2 flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[8px] font-black text-white shadow-sm ring-2 ring-white dark:ring-slate-900 whitespace-nowrap flex-shrink-0 leading-none" style="background:#0059e3">
                                     {{ $cartCount }}
                                 </span>
                             @endif
                         </span>
-                        <span class="text-[11px] font-bold mt-1">My Cart</span>
+                        <span class="hidden sm:block text-[11px] font-bold mt-1">My Cart</span>
                     </a>
 
-                    <!-- Download App styled button -->
-                    <a href="#" class="hidden lg:flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-xs font-black text-white transition-all shadow-md bg-[#0059e3] hover:bg-[#0040a6] cursor-pointer">
+                    <!-- Download App (Desktop Only) -->
+                    <!-- <a href="#" class="hidden lg:flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-xs font-black text-white transition-all shadow-md bg-[#0059e3] hover:bg-[#0040a6] cursor-pointer">
                         <span>Download App</span>
                         <i class="fa-solid fa-arrow-down-long text-[10px]"></i>
-                    </a>
+                    </a> -->
 
                     <!-- Mobile Menu Toggle -->
                     <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden sf-nav-btn p-2 border rounded-xl transition-all cursor-pointer">
                         <i class="fa-solid text-lg" :class="mobileMenuOpen ? 'fa-xmark' : 'fa-bars'"></i>
-                    </button>
+                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Mobile Drawer -->
-        <div x-show="mobileMenuOpen" x-cloak
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 -translate-y-3"
-             x-transition:enter-end="opacity-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-end="opacity-0 -translate-y-3"
-             class="sf-mobile-drawer lg:hidden border-t px-4 py-5 space-y-4 z-40 relative">
-
-            <div class="relative w-full" x-data="{
+            <!-- Mobile Search Bar (Below top row, visible only on mobile) -->
+            @if(!request()->routeIs('login') && !request()->routeIs('register') && !request()->routeIs('password.*'))
+            <div class="block md:hidden pb-3 relative" x-data="{
                 query: '{{ request('search') }}',
                 suggestions: [],
                 showSuggestions: false,
@@ -437,20 +445,18 @@
                         });
                 }
             }" @click.away="showSuggestions = false">
-                <form action="{{ route('storefront.index') }}" method="GET" class="w-full flex items-center rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus-within:ring-2 focus-within:ring-[#0059e3]/20 focus-within:border-[#0059e3] transition-all shadow-sm">
+                <form action="{{ route('storefront.index') }}" method="GET" class="w-full flex items-center rounded-full overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all focus-within:ring-2 focus-within:ring-[#0059e3]/10">
+                    <i class="fa-solid fa-magnifying-glass text-slate-450 dark:text-slate-500 ml-4 mr-1 shrink-0 text-sm"></i>
                     <input type="text"
                            name="search"
                            x-model="query"
                            @input.debounce.300ms="fetchSuggestions()"
                            @focus="showSuggestions = suggestions.length > 0"
-                           placeholder="Search products..."
-                           class="w-full pl-4 pr-2 py-2.5 bg-transparent text-sm outline-none text-slate-800 dark:text-slate-200 placeholder-slate-450">
-                    <button type="submit" class="bg-[#0059e3] hover:bg-[#0040a6] text-white px-4 py-2.5 transition-colors flex items-center justify-center cursor-pointer">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
+                           placeholder="Search for kitchen product..."
+                           class="w-full px-3 py-1.5 bg-transparent text-sm outline-none text-slate-800 dark:text-slate-200 placeholder-slate-400 border-none">
                 </form>
 
-                <!-- Suggestions Dropdown -->
+                <!-- Suggestions Dropdown (Mobile) -->
                 <div x-show="showSuggestions" x-cloak class="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-50 overflow-hidden">
                     <div class="max-h-60 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-900">
                         <template x-for="item in suggestions" :key="item.id">
@@ -465,6 +471,17 @@
                     </div>
                 </div>
             </div>
+            @endif
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div x-show="mobileMenuOpen" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-3"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-end="opacity-0 -translate-y-3"
+             class="sf-mobile-drawer lg:hidden border-t px-4 py-5 space-y-4 z-40 relative">
 
             <div class="space-y-1">
                 <span class="block px-3 text-[10px] font-extrabold uppercase tracking-widest mb-2 sf-section-sub">Categories</span>
@@ -517,8 +534,9 @@
         </div>
     </header>
 
+
     <!-- Main Content -->
-    <main class="flex-1 @yield('container_class', 'w-full') w-full px-4 sm:px-8 lg:px-16 pb-8 pt-5 md:pb-10">
+    <main class="flex-1 @yield('container_class', 'w-full') w-full px-4 sm:px-8 lg:px-16 pb-20 pt-5 md:pb-10">
         @if (session('success') && !session()->has('added_item'))
             <div class="mb-6 p-4 rounded-2xl flex items-start gap-3 shadow-lg" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2)">
                 <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
@@ -647,6 +665,12 @@
             <div class="border-t pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px]" style="border-color:rgba(255,255,255,0.08);color:#475569">
                 <p>&copy; {{ date('Y') }} MTL Computer Garden & Mart. All rights reserved.</p>
                 <div class="flex items-center gap-6">
+                    <!-- Theme Toggle -->
+                    <button id="sf-theme-toggle" onclick="window.sfToggleTheme()" title="Toggle theme" class="flex items-center gap-1.5 px-2.5 py-1 rounded border border-slate-750 cursor-pointer hover:bg-slate-800 text-slate-350 transition-colors">
+                        <i id="sf-icon-sun" class="fa-solid fa-sun text-[11px]" style="display:block"></i>
+                        <i id="sf-icon-moon" class="fa-solid fa-moon text-[11px]" style="display:none"></i>
+                        <span id="sf-theme-label" class="text-[10px] font-bold">Light</span>
+                    </button>
                     <span class="flex items-center gap-1.5">
                         <i class="fa-solid fa-shield-halved" style="color:#22c55e"></i> Secure Transactions
                     </span>
@@ -691,5 +715,185 @@
 
         document.addEventListener('DOMContentLoaded', sfSyncThemeButton);
     </script>
+
+    <!-- Mobile Sticky Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-950 border-t border-slate-150 dark:border-slate-850 flex md:hidden justify-around py-1.5 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <!-- Home -->
+        <a href="{{ route('storefront.index') }}" class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-400 hover:text-[#0059e3] {{ request()->routeIs('storefront.index') ? 'text-[#0059e3] dark:text-[#3b82f6]' : '' }} transition-colors">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider mt-1">Home</span>
+        </a>
+        <!-- Category -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-400 hover:text-[#0059e3] transition-colors cursor-pointer">
+            <i class="fa-solid fa-border-all text-lg"></i>
+            <span class="text-[9px] font-black uppercase tracking-wider mt-1">Category</span>
+        </button>
+        <!-- Cart -->
+        <a href="{{ route('storefront.cart') }}" class="relative flex flex-col items-center justify-center text-slate-600 dark:text-slate-400 hover:text-[#0059e3] {{ request()->routeIs('storefront.cart') ? 'text-[#0059e3] dark:text-[#3b82f6]' : '' }} transition-colors">
+            <span class="relative inline-flex items-center justify-center">
+                <i class="fa-solid fa-cart-shopping text-lg"></i>
+                @if ($cartCount > 0)
+                    <span class="absolute -top-1.5 -right-2 flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[8px] font-black text-white shadow whitespace-nowrap flex-shrink-0 leading-none" style="background:#0059e3">
+                        {{ $cartCount }}
+                    </span>
+                @endif
+            </span>
+            <span class="text-[9px] font-black uppercase tracking-wider mt-1">Cart</span>
+        </a>
+        <!-- Profile -->
+        @if (Auth::check())
+            <a href="{{ route('storefront.orders') }}" class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-400 hover:text-[#0059e3] transition-colors">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="text-[9px] font-black uppercase tracking-wider mt-1">Profile</span>
+            </a>
+        @else
+            <button @click="loginModalOpen = true" class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-400 hover:text-[#0059e3] transition-colors border-none bg-transparent p-0 outline-none cursor-pointer">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span class="text-[9px] font-black uppercase tracking-wider mt-1">Profile</span>
+            </button>
+        @endif
+    </div>
+
+    <!-- Login Modal -->
+    <div x-show="loginModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div x-show="loginModalOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-slate-950/75 dark:bg-black/90 backdrop-blur-md"
+             @click="loginModalOpen = false"></div>
+
+        <!-- Modal Content Container -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div x-show="loginModalOpen"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                 class="relative w-full max-w-md bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden shadow-slate-950/20 dark:shadow-black/50">
+                
+                <!-- Top Accent Line -->
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+
+                <!-- Close Button -->
+                <button @click="loginModalOpen = false" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800/60 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-450 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-450 transition-colors cursor-pointer outline-none border-none">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+
+                <!-- Header -->
+                <div class="text-center mb-6 mt-2">
+                    <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-outfit">
+                        Welcome Back
+                    </h2>
+                    <p class="mt-2 text-xs text-slate-550 dark:text-slate-400">
+                        Please enter your verified credentials to access your customer account
+                    </p>
+                </div>
+
+                <!-- Session Status / Verification Errors -->
+                @if (session('status'))
+                    <div class="p-3.5 mb-4 rounded-xl text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-medium">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="p-3.5 mb-4 rounded-xl text-xs bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 space-y-1">
+                        <div class="font-extrabold uppercase tracking-wider text-[10px]">Verification Failed:</div>
+                        <ul class="list-disc list-inside text-[11px] space-y-0.5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <!-- Form Block -->
+                <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                    @csrf
+
+                    <!-- Email Input -->
+                    <div class="space-y-1.5">
+                        <label for="modal-email" class="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Email Address
+                        </label>
+                        <div class="relative rounded-xl shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                                <i class="fa-solid fa-envelope text-xs"></i>
+                            </div>
+                            <input id="modal-email" 
+                                   type="email" 
+                                   name="email" 
+                                   value="{{ old('email') }}" 
+                                   required 
+                                   autofocus 
+                                   placeholder="customer@domain.com"
+                                   class="block w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-xs font-semibold outline-none transition-all focus:ring-2 focus:ring-blue-500/20 focus:border-[#0059e3] dark:focus:border-[#0059e3] text-slate-900 dark:text-slate-100">
+                        </div>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label for="modal-password" class="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                Security Password
+                            </label>
+                            @if (Route::has('password.request'))
+                                <a class="text-[10px] font-bold text-blue-600 dark:text-indigo-400 hover:underline" href="{{ route('password.request') }}">
+                                    Forgot Password?
+                                </a>
+                            @endif
+                        </div>
+                        <div class="relative rounded-xl shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                                <i class="fa-solid fa-lock text-xs"></i>
+                            </div>
+                            <input id="modal-password" 
+                                   type="password" 
+                                   name="password" 
+                                   required 
+                                   placeholder="••••••••••••"
+                                   class="block w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-xs font-semibold outline-none transition-all focus:ring-2 focus:ring-blue-500/20 focus:border-[#0059e3] dark:focus:border-[#0059e3] text-slate-900 dark:text-slate-100">
+                        </div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center justify-between pt-1">
+                        <label for="modal-remember_me" class="inline-flex items-center cursor-pointer">
+                            <input id="modal-remember_me" 
+                                   type="checkbox" 
+                                   name="remember"
+                                   class="w-4 h-4 rounded border-slate-350 dark:border-slate-700 text-blue-600 focus:ring-blue-500/20 focus:ring-offset-0 bg-slate-50 dark:bg-slate-950 cursor-pointer">
+                            <span class="ml-2 text-[11px] font-semibold text-slate-500 dark:text-slate-400">Keep me logged in</span>
+                        </label>
+                    </div>
+
+                    <!-- CTA Action Button -->
+                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-[0.98] transition-all cursor-pointer">
+                        Secure Sign In
+                    </button>
+                </form>
+
+                <!-- Footer -->
+                <div class="text-center pt-5 mt-5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] space-y-1.5">
+                    <div>
+                        <span class="text-slate-400 dark:text-slate-500">New hardware customer?</span>
+                        <span class="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-extrabold uppercase tracking-wider bg-slate-50 dark:bg-slate-950/60">
+                            Create an Account
+                            <i class="fa-solid fa-lock text-[9px]"></i>
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">
+                        Account creation is temporarily disabled and will be enabled in a future update.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </body>
 </html>

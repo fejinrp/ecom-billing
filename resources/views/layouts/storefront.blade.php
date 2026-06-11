@@ -578,13 +578,9 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 py-10">
                 <!-- Brand -->
                 <div class="col-span-2 md:col-span-1 space-y-4">
-                    <a href="{{ route('storefront.index') }}" class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#0059e3">
-                            <span class="font-black text-white text-lg"><i class="fa-solid fa-infinity"></i></span>
-                        </div>
-                        <div>
-                            <div class="text-base font-black text-white">snapdeal</div>
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-[#0059e3]">cloned fleet</div>
+                    <a href="{{ route('storefront.index') }}" class="inline-block">
+                        <div class="inline-flex items-center p-2 rounded-xl bg-white shadow-md">
+                            <img src="{{ asset('assets/logo.png') }}" class="h-8 w-auto object-contain" alt="MTL Logo">
                         </div>
                     </a>
                     <p class="text-xs leading-relaxed" style="color:#64748b">

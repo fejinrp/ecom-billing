@@ -3,86 +3,9 @@
 @section('container_class', 'w-full')
 
 @section('content')
-    <!-- ── Snapdeal Circular Category Row ── -->
-    <div id="sf-category-scroll-container" class="mb-4 bg-white dark:bg-slate-950 dark:border-slate-850 rounded-2xl p-4 overflow-x-auto custom-scrollbar">
-        <div class="flex items-center gap-8 min-w-max justify-start md:justify-center">
-            @if (isset($categories) && count($categories) > 0)
-                @foreach ($categories as $index => $cat)
-                    @php
-                        $icons = ['fa-server', 'fa-laptop-code', 'fa-microchip', 'fa-memory', 'fa-hard-drive', 'fa-keyboard', 'fa-headphones', 'fa-print', 'fa-network-wired'];
-                        $icon = $icons[$index % count($icons)];
-                        $isActive = Route::current()->parameter('name') === $cat->cat_name;
-                    @endphp
-                    <a href="{{ route('storefront.category', $cat->cat_name) }}" class="flex flex-col items-center group transition-all duration-300">
-                        <div class="w-14 h-14 rounded-full flex items-center justify-center border transition-all duration-350 {{ $isActive ? 'text-white shadow-md' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350' }}"
-                             style="{{ $isActive ? 'background-color: #0059e3; border-color: #0059e3;' : '' }}">
-                            <i class="fa-solid {{ $icon }} text-lg {{ $isActive ? 'text-white' : 'text-[#0059e3]' }}"
-                               style="{{ !$isActive ? 'color: #0059e3;' : '' }}"></i>
-                        </div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider mt-2 {{ $isActive ? '' : 'text-slate-650 dark:text-slate-400 group-hover:text-[#0059e3]' }}"
-                              style="{{ $isActive ? 'color: #0059e3;' : '' }}">{{ $cat->cat_name }}</span>
-                    </a>
-                @endforeach
-            @endif
-        </div>
-    </div>
-
-    <!-- Category Auto-Scroll Controller -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.getElementById('sf-category-scroll-container');
-            if (!container) return;
-
-            let scrollSpeed = 0.4; // Pixels per step (slow motion)
-            let intervalTime = 20; // Step interval in milliseconds (~50fps)
-            let scrollInterval = null;
-            let isHovered = false;
-            let direction = 1; // 1 = right, -1 = left
-
-            function startScrolling() {
-                if (scrollInterval) return;
-                scrollInterval = setInterval(() => {
-                    if (isHovered) return;
-                    
-                    // Check if container overflows
-                    if (container.scrollWidth <= container.clientWidth) {
-                        return; // Do not scroll if there is no overflow
-                    }
-
-                    container.scrollLeft += scrollSpeed * direction;
-
-                    // Bounce back and forth when reaching either end
-                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
-                        direction = -1;
-                    } else if (container.scrollLeft <= 0) {
-                        direction = 1;
-                    }
-                }, intervalTime);
-            }
-
-            function stopScrolling() {
-                if (scrollInterval) {
-                    clearInterval(scrollInterval);
-                    scrollInterval = null;
-                }
-            }
-
-            // Start loop
-            startScrolling();
-
-            // Hover listeners
-            container.addEventListener('mouseenter', () => { isHovered = true; });
-            container.addEventListener('mouseleave', () => { isHovered = false; });
-            
-            // Touch listeners for mobile
-            container.addEventListener('touchstart', () => { isHovered = true; });
-            container.addEventListener('touchend', () => { isHovered = false; });
-        });
-    </script>
-
     <style>
         .snapdeal-slider {
-            height: 280px;
+            height: 160px;
         }
         @media (min-width: 768px) {
             .snapdeal-slider {
@@ -127,43 +50,244 @@
                      x-transition:leave="transition ease-in duration-300 absolute inset-0"
                      x-transition:leave-end="opacity-0 scale-98"
                      class="w-full h-full relative">
-                    <!-- Banner Background Image -->
-                    <img :src="slide.img" class="w-full h-full object-cover" />
-                    <!-- Translucent Gradient Overlay for readability -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center p-8 md:p-16">
-                        <div class="max-w-lg space-y-4 text-white text-left">
-                            <span class="inline-block px-2.5 py-0.5 rounded bg-[#0059e3] text-white text-[9px] font-black uppercase tracking-widest">
+                     <!-- Banner Background Image -->
+                     <img :src="slide.img" class="w-full h-full object-cover" />
+                     <!-- Translucent Gradient Overlay for readability -->
+                     <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center p-4 md:p-16">
+                        <div class="max-w-lg space-y-1.5 md:space-y-4 text-white text-left font-outfit">
+                            <span class="inline-block px-2 py-0.5 rounded bg-[#0059e3] text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest">
                                 Exclusive Launch
                             </span>
-                            <h2 class="text-2xl md:text-4xl font-black uppercase tracking-tight leading-tight" x-text="slide.title"></h2>
-                            <p class="text-xs md:text-sm text-slate-300 font-medium leading-relaxed" x-text="slide.desc"></p>
-                            <a href="#catalog" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0059e3] hover:bg-[#0040a6] text-white text-xs font-black uppercase tracking-wider rounded-lg transition-all shadow-md">
+                            <h2 class="text-xs sm:text-sm md:text-4xl font-black uppercase tracking-tight leading-tight" x-text="slide.title"></h2>
+                            <p class="hidden sm:block text-xs md:text-sm text-slate-300 font-medium leading-relaxed" x-text="slide.desc"></p>
+                            <a href="#catalog" class="inline-flex items-center gap-1 px-3 py-1.5 md:px-5 md:py-2.5 bg-[#0059e3] hover:bg-[#0040a6] text-white text-[9px] md:text-xs font-black uppercase tracking-wider rounded-lg transition-all shadow-md">
                                 <span>Shop Now</span>
-                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                <i class="fa-solid fa-chevron-right text-[8px] md:text-[10px]"></i>
                             </a>
                         </div>
-                    </div>
+                     </div>
                 </div>
             </template>
         </div>
 
         <!-- Slide Navigation Dots -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+        <div class="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 md:gap-2 z-20">
             <template x-for="(slide, index) in slides" :key="index">
                 <button @click="activeSlide = index"
-                        :class="activeSlide === index ? 'w-6 bg-[#0059e3]' : 'w-2 bg-white/50'"
-                        class="h-2 rounded-full transition-all duration-300 cursor-pointer"></button>
+                        :class="activeSlide === index ? 'w-4 md:w-6 bg-[#0059e3]' : 'w-1.5 md:w-2 bg-white/50'"
+                        class="h-1.5 md:h-2 rounded-full transition-all duration-300 cursor-pointer"></button>
             </template>
         </div>
 
         <!-- Slider Arrows -->
-        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/30 dark:bg-black/30 backdrop-blur-sm hover:bg-[#0059e3] hover:text-white transition-all text-white flex items-center justify-center z-20 cursor-pointer">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
+        <button @click="prev()" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/30 dark:bg-black/30 backdrop-blur-sm hover:bg-[#0059e3] hover:text-white transition-all text-white flex items-center justify-center z-20 cursor-pointer">
+            <i class="fa-solid fa-chevron-left text-[10px] md:text-xs"></i>
         </button>
-        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/30 dark:bg-black/30 backdrop-blur-sm hover:bg-[#0059e3] hover:text-white transition-all text-white flex items-center justify-center z-20 cursor-pointer">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
+        <button @click="next()" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white/30 dark:bg-black/30 backdrop-blur-sm hover:bg-[#0059e3] hover:text-white transition-all text-white flex items-center justify-center z-20 cursor-pointer">
+            <i class="fa-solid fa-chevron-right text-[10px] md:text-xs"></i>
         </button>
     </div>
+
+    <!-- ── Snapdeal Circular Category Row ── -->
+    <div id="sf-category-scroll-container" class="mb-4 bg-white dark:bg-slate-950 dark:border-slate-850 rounded-2xl p-4 overflow-x-auto custom-scrollbar">
+        <div class="grid grid-rows-2 grid-flow-col md:flex md:items-center md:gap-8 md:min-w-max md:justify-center gap-x-6 gap-y-4 justify-start">
+            @if (isset($categories) && count($categories) > 0)
+                @foreach ($categories as $index => $cat)
+                    @php
+                        $icons = ['fa-server', 'fa-laptop-code', 'fa-microchip', 'fa-memory', 'fa-hard-drive', 'fa-keyboard', 'fa-headphones', 'fa-print', 'fa-network-wired'];
+                        $icon = $icons[$index % count($icons)];
+                        $isActive = Route::current()->parameter('name') === $cat->cat_name;
+                    @endphp
+                    <a href="{{ route('storefront.category', $cat->cat_name) }}" class="flex flex-col items-center group transition-all duration-300">
+                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center border transition-all duration-355 {{ $isActive ? 'text-white shadow-md' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-880 text-slate-750 dark:text-slate-350' }}"
+                             style="{{ $isActive ? 'background-color: #0059e3; border-color: #0059e3;' : '' }}">
+                            <i class="fa-solid {{ $icon }} text-base md:text-lg {{ $isActive ? 'text-white' : 'text-[#0059e3]' }}"
+                               style="{{ !$isActive ? 'color: #0059e3;' : '' }}"></i>
+                        </div>
+                        <span class="text-[10px] md:text-[11px] font-bold uppercase tracking-wider mt-1.5 md:mt-2 {{ $isActive ? '' : 'text-slate-650 dark:text-slate-400 group-hover:text-[#0059e3]' }}"
+                              style="{{ $isActive ? 'color: #0059e3;' : '' }}">{{ $cat->cat_name }}</span>
+                    </a>
+                @endforeach
+            @endif
+        </div>
+    </div>
+
+    <!-- Category Auto-Scroll Controller -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('sf-category-scroll-container');
+            if (!container) return;
+
+            let scrollSpeed = 0.4; // Pixels per step (slow motion)
+            let intervalTime = 20; // Step interval in milliseconds (~50fps)
+            let scrollInterval = null;
+            let isHovered = false;
+            let direction = 1; // 1 = right, -1 = left
+
+            function startScrolling() {
+                if (scrollInterval) return;
+                // Only auto-scroll on desktop or when not in grid layout
+                if (window.innerWidth < 768) return; 
+                scrollInterval = setInterval(() => {
+                    if (isHovered) return;
+                    
+                    // Check if container overflows
+                    if (container.scrollWidth <= container.clientWidth) {
+                        return; // Do not scroll if there is no overflow
+                    }
+
+                    container.scrollLeft += scrollSpeed * direction;
+
+                    // Bounce back and forth when reaching either end
+                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                        direction = -1;
+                    } else if (container.scrollLeft <= 0) {
+                        direction = 1;
+                    }
+                }, intervalTime);
+            }
+
+            function stopScrolling() {
+                if (scrollInterval) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                }
+            }
+
+            // Start loop
+            startScrolling();
+
+            // Hover listeners
+            container.addEventListener('mouseenter', () => { isHovered = true; });
+            container.addEventListener('mouseleave', () => { isHovered = false; });
+            
+            // Touch listeners for mobile
+            container.addEventListener('touchstart', () => { isHovered = true; });
+            container.addEventListener('touchend', () => { isHovered = false; });
+
+            // Disable autoscroll on resize to mobile
+            window.addEventListener('resize', () => {
+                if (window.innerWidth < 768) {
+                    stopScrolling();
+                } else {
+                    startScrolling();
+                }
+            });
+        });
+    </script>
+
+    <!-- ── Snapdeal Subcategory Row (Premium Card layout matched to categories container width) ── -->
+    @if (isset($subcategories) && count($subcategories) > 0)
+    <div class="mb-6 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-2xl p-4 overflow-hidden">
+        <div id="sf-subcategories-scroll-container" class="overflow-x-auto custom-scrollbar">
+            <div class="flex items-center gap-4 min-w-max pb-1 md:justify-center md:min-w-0 md:w-full md:flex-wrap">
+                @foreach ($subcategories as $index => $sub)
+                    @php
+                        $catNameLower = strtolower($sub->category ? $sub->category->cat_name : '');
+                        $iconMap = [
+                            'laptop' => 'fa-laptop',
+                            'computer' => 'fa-desktop',
+                            'processor' => 'fa-microchip',
+                            'cpu' => 'fa-microchip',
+                            'motherboard' => 'fa-server',
+                            'board' => 'fa-server',
+                            'memory' => 'fa-memory',
+                            'ram' => 'fa-memory',
+                            'storage' => 'fa-hard-drive',
+                            'ssd' => 'fa-hard-drive',
+                            'hdd' => 'fa-hard-drive',
+                            'keyboard' => 'fa-keyboard',
+                            'mouse' => 'fa-computer-mouse',
+                            'headphone' => 'fa-headphones',
+                            'audio' => 'fa-headphones',
+                            'printer' => 'fa-print',
+                            'network' => 'fa-network-wired',
+                            'switch' => 'fa-network-wired',
+                            'router' => 'fa-wifi',
+                            'cable' => 'fa-ethernet',
+                            'accessory' => 'fa-plug',
+                            'power' => 'fa-plug-circle-bolt',
+                        ];
+                        $icon = 'fa-cubes'; // fallback icon
+                        foreach ($iconMap as $key => $val) {
+                            if (str_contains($catNameLower, $key)) {
+                                $icon = $val;
+                                break;
+                            }
+                        }
+                    @endphp
+                    <a href="{{ route('storefront.index', ['search' => $sub->subcategoryname]) }}" class="bg-gradient-to-br from-slate-50 to-slate-100/30 dark:from-slate-900 dark:to-slate-950/40 border border-slate-150 dark:border-slate-800/80 hover:border-[#0059e3]/35 dark:hover:border-[#3b82f6]/35 p-3 rounded-2xl w-44 h-16 flex items-center gap-3 transition-all duration-250 hover:shadow-md hover:scale-[1.02] shrink-0 group">
+                        <!-- Centered Category Icon Badge -->
+                        <div class="w-8 h-8 rounded-full bg-slate-100/80 dark:bg-slate-800/60 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-[#0059e3]/10 dark:group-hover:bg-[#3b82f6]/10 group-hover:text-[#0059e3] dark:group-hover:text-[#3b82f6] transition-all duration-250 shrink-0">
+                            <i class="fa-solid {{ $icon }} text-xs"></i>
+                        </div>
+
+                        <!-- Text Details -->
+                        <div class="flex flex-col min-w-0 justify-center">
+                            <span class="text-[11px] font-extrabold text-slate-800 dark:text-slate-100 tracking-tight leading-tight line-clamp-1 capitalize">{{ strtolower($sub->subcategoryname) }}</span>
+                            @if ($sub->category)
+                                <span class="text-[8px] text-[#0059e3]/85 dark:text-blue-400/85 font-black uppercase tracking-wider mt-0.5 truncate">{{ $sub->category->cat_name }}</span>
+                            @endif
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Subcategories Auto-Scroll Controller -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('sf-subcategories-scroll-container');
+            if (!container) return;
+
+            let scrollSpeed = 0.35; // Slow motion scroll
+            let intervalTime = 25;
+            let scrollInterval = null;
+            let isHovered = false;
+            let direction = 1;
+
+            function startScrolling() {
+                if (scrollInterval) return;
+                if (window.innerWidth >= 768) return;
+                scrollInterval = setInterval(() => {
+                    if (isHovered) return;
+                    if (container.scrollWidth <= container.clientWidth) return;
+
+                    container.scrollLeft += scrollSpeed * direction;
+
+                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                        direction = -1;
+                    } else if (container.scrollLeft <= 0) {
+                        direction = 1;
+                    }
+                }, intervalTime);
+            }
+
+            function stopScrolling() {
+                if (scrollInterval) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                }
+            }
+
+            startScrolling();
+
+            container.addEventListener('mouseenter', () => { isHovered = true; });
+            container.addEventListener('mouseleave', () => { isHovered = false; });
+            container.addEventListener('touchstart', () => { isHovered = true; });
+            container.addEventListener('touchend', () => { isHovered = false; });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    stopScrolling();
+                } else {
+                    startScrolling();
+                }
+            });
+        });
+    </script>
+    @endif
 
     <!-- ── Snapdeal Trust Bar (Redesigned from Black to Soft Gradient) ── -->
     <div class="p-4 justify-center rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-around gap-4 shadow-sm border border-slate-100 dark:border-slate-800/80 bg-gradient-to-r from-blue-50/40 via-slate-50/20 to-indigo-50/40 dark:from-slate-900/60 dark:to-slate-950/60 animate-fade-in">

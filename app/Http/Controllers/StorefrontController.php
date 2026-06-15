@@ -22,6 +22,7 @@ class StorefrontController extends Controller
     public function index(Request $request)
     {
         $categories = Category::orderBy('cat_name', 'asc')->get();
+        $subcategories = Subcategory::with('category')->where('status', 1)->orderBy('subcategoryname', 'asc')->get();
         
         $query = Product::where('status', 1);
         
@@ -33,7 +34,7 @@ class StorefrontController extends Controller
         
         $products = $query->orderBy('id', 'desc')->paginate(12);
         
-        return view('storefront.index', compact('categories', 'products'));
+        return view('storefront.index', compact('categories', 'subcategories', 'products'));
     }
 
     /**

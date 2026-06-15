@@ -283,11 +283,38 @@
 
                 <!-- Search Bar (Desktop Only) -->
                 @if(!request()->routeIs('login') && !request()->routeIs('register') && !request()->routeIs('password.*'))
+                @php
+                    $placeholderCategories = (isset($categories) && count($categories) > 0) 
+                        ? $categories->pluck('cat_name')->toArray() 
+                        : ['Laptops', 'Motherboards', 'Graphics Cards', 'Processors', 'Monitors'];
+                @endphp
                 <div class="hidden md:flex flex-1 max-w-2xl relative" x-data="{
                     query: '{{ request('search') }}',
                     suggestions: [],
                     showSuggestions: false,
                     loading: false,
+                    placeholders: @js($placeholderCategories),
+                    placeholderIndex: 0,
+                    currentPlaceholder: 'Search for Brands & Products...',
+                    init() {
+                        const makeBold = (str) => {
+                            return str.split('').map(char => {
+                                const code = char.charCodeAt(0);
+                                if (code >= 65 && code <= 90) return String.fromCodePoint(code - 65 + 0x1D5D4);
+                                if (code >= 97 && code <= 122) return String.fromCodePoint(code - 97 + 0x1D5EE);
+                                if (code >= 48 && code <= 57) return String.fromCodePoint(code - 48 + 0x1D7EC);
+                                return char;
+                            }).join('');
+                        };
+                        this.placeholders = this.placeholders.map(cat => 'Search for ' + makeBold(cat) + '...');
+                        this.currentPlaceholder = this.placeholders[0] || 'Search for Brands & Products...';
+                        setInterval(() => {
+                            if (this.placeholders.length > 0) {
+                                this.placeholderIndex = (this.placeholderIndex + 1) % this.placeholders.length;
+                                this.currentPlaceholder = this.placeholders[this.placeholderIndex];
+                            }
+                        }, 2500);
+                    },
                     fetchSuggestions() {
                         if (this.query.length < 2) {
                             this.suggestions = [];
@@ -313,7 +340,7 @@
                                x-model="query"
                                @input.debounce.300ms="fetchSuggestions()"
                                @focus="showSuggestions = suggestions.length > 0"
-                               placeholder="Search for Brands & Products..."
+                               :placeholder="currentPlaceholder"
                                class="w-full px-3 py-2.5 bg-transparent text-sm font-medium outline-none text-slate-800 dark:text-slate-200 placeholder-slate-450 border-none">
                         <button type="submit" class="text-white px-6 py-3 text-xs font-black uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 border-l border-[#0059e3]" style="background-color: #0059e3;">
                             <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
@@ -420,13 +447,34 @@
                 </div>
             </div>
 
-            <!-- Mobile Search Bar (Below top row, visible only on mobile) -->
             @if(!request()->routeIs('login') && !request()->routeIs('register') && !request()->routeIs('password.*'))
             <div class="block md:hidden pb-3 relative" x-data="{
                 query: '{{ request('search') }}',
                 suggestions: [],
                 showSuggestions: false,
                 loading: false,
+                placeholders: @js($placeholderCategories),
+                placeholderIndex: 0,
+                currentPlaceholder: 'Search for Brands & Products...',
+                init() {
+                    const makeBold = (str) => {
+                        return str.split('').map(char => {
+                            const code = char.charCodeAt(0);
+                            if (code >= 65 && code <= 90) return String.fromCodePoint(code - 65 + 0x1D5D4);
+                            if (code >= 97 && code <= 122) return String.fromCodePoint(code - 97 + 0x1D5EE);
+                            if (code >= 48 && code <= 57) return String.fromCodePoint(code - 48 + 0x1D7EC);
+                            return char;
+                        }).join('');
+                    };
+                    this.placeholders = this.placeholders.map(cat => 'Search for ' + makeBold(cat) + '...');
+                    this.currentPlaceholder = this.placeholders[0] || 'Search for Brands & Products...';
+                    setInterval(() => {
+                        if (this.placeholders.length > 0) {
+                            this.placeholderIndex = (this.placeholderIndex + 1) % this.placeholders.length;
+                            this.currentPlaceholder = this.placeholders[this.placeholderIndex];
+                        }
+                    }, 2500);
+                },
                 fetchSuggestions() {
                     if (this.query.length < 2) {
                         this.suggestions = [];
@@ -452,7 +500,7 @@
                            x-model="query"
                            @input.debounce.300ms="fetchSuggestions()"
                            @focus="showSuggestions = suggestions.length > 0"
-                           placeholder="Search for kitchen product..."
+                           :placeholder="currentPlaceholder"
                            class="w-full px-3 py-1.5 bg-transparent text-sm outline-none text-slate-800 dark:text-slate-200 placeholder-slate-400 border-none">
                 </form>
 

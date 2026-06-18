@@ -193,6 +193,14 @@ Route::prefix('admin')->group(function () {
         Route::get('purchases/stock', [PurchaseStockController::class, 'index'])->name('admin.purchases.stock.index');
         Route::get('purchases/stock/{pitem_id}/detail', [PurchaseStockController::class, 'detail'])->name('admin.purchases.stock.detail');
         Route::post('purchases/stock/{pitem_id}/update', [PurchaseStockController::class, 'update'])->name('admin.purchases.stock.update');
+        Route::get('purchases/batches', [PurchaseStockController::class, 'batches'])->name('admin.purchases.batches.index');
+        
+        Route::get('purchases/pending-orders', [PurchaseStockController::class, 'pendingPurchases'])->name('admin.purchases.pending_orders');
+        Route::get('purchases/pending-orders/{porder_id}/items', [PurchaseStockController::class, 'purchaseItems'])->name('admin.purchases.pending_items');
+        Route::get('purchases/delivery-notes/create', [PurchaseStockController::class, 'createDeliveryNote'])->name('admin.purchases.delivery_notes.create');
+        Route::post('purchases/delivery-notes', [PurchaseStockController::class, 'storeDeliveryNote'])->name('admin.purchases.delivery_notes.store');
+        Route::get('purchases/delivery-notes/{id}/details', [PurchaseStockController::class, 'deliveryNoteDetails'])->name('admin.purchases.delivery_notes.details');
+        Route::get('purchases/delivery-notes', [PurchaseStockController::class, 'deliveryNotes'])->name('admin.purchases.delivery_notes.index');
 
         Route::get('purchases/{purchase}/print', [PurchaseController::class, 'print'])->name('admin.purchases.print');
         Route::post('purchases/{purchase}/payment', [PurchaseController::class, 'addPayment'])->name('admin.purchases.payment');

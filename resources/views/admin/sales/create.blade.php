@@ -266,6 +266,19 @@
                                                     <option :value="p.id" x-text="p.productname"></option>
                                                 </template>
                                             </select>
+                                            <!-- Batch Selection Dropdown -->
+                                            <div class="mt-1.5" x-show="item.batches && item.batches.length > 0">
+                                                <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Select Batch</label>
+                                                <select name="batchId[]"
+                                                        x-model="item.batchId"
+                                                        @change="onBatchSelect(index)"
+                                                        class="w-full px-2.5 py-1 bg-slate-950 border border-indigo-950 rounded text-indigo-300 text-xs focus:outline-none focus:border-indigo-500">
+                                                    <option value="">-- Auto FIFO Batch --</option>
+                                                    <template x-for="b in item.batches" :key="b.id">
+                                                        <option :value="b.id" x-text="b.batch_number + ' (Stock: ' + b.current_qty + ' | MRP: ' + b.mrp + ')'"></option>
+                                                    </template>
+                                                </select>
+                                            </div>
                                             <input type="hidden" name="hsnsac[]" x-model="item.hsnsac">
                                             <input type="hidden" name="gst[]" x-model="item.gst">
                                             <input type="hidden" name="unit[]" x-model="item.unit">
@@ -275,10 +288,11 @@
                                         <!-- Stock display -->
                                         <td class="py-2 lg:pl-2 col-span-1 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Available Stock</label>
-                                            <div class="flex items-center h-[38px] lg:h-auto">
+                                            <div class="flex flex-col justify-center h-[38px] lg:h-auto">
                                                 <span class="text-xs font-semibold px-2 py-1 rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800" 
                                                       :class="item.stock <= 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-400'"
                                                       x-text="item.stock + ' ' + item.unit"></span>
+                                                <span x-show="item.batchId" class="text-[9px] font-mono text-indigo-400 mt-1" x-text="'Batch stock: ' + item.batchStock"></span>
                                             </div>
                                         </td>
  
@@ -567,6 +581,131 @@
                 this.addLineItem();
             },
 
+
+
+            addLineItem() {
+                this.items.push({
+                    productId: '',
+                    stock: 0,
+                    qty: 1,
+                    rate: 0,
+                    gst: 0,
+                    unit: 'PCS',
+                    hsnsac: '',
+                    total: 0,
+                    batches: [],
+                    batchId: '',
+                    batchStock: 0
+                });
+            },
+
+            removeItemLine(index) {
+                if (this.items.length > 1) {
+                    this.items.splice(index, 1);
+                    this.calculateTotals();
+                } else {
+                    alert('An invoice must contain at least one line item!');
+                }
+            },
+
+            async onProductSelect(index) {
+                const item = this.items[index];
+                if (!item.productId) {
+                    item.stock = 0;
+                    item.qty = 1;
+                    item.rate = 0;
+                    item.gst = 0;
+                    item.unit = 'PCS';
+                    item.hsnsac = '';
+                    item.total = 0;
+                    item.batches = [];
+                    item.batchId = '';
+                    item.batchStock = 0;
+                    this.calculateTotals();
+                    return;
+                }
+
+                try {
+                    let res = await fetch(`/admin/products/price-search/${item.productId}`);
+                    if (res.ok) {
+                        let p = await res.json();
+                        item.stock = p.tqty || 0;
+                        item.gst = p.gst || 0;
+                        item.hsnsac = p.hsnsac || '';
+                        item.unit = p.unit == 2 ? 'BOX' : (p.unit == 3 ? 'PKT' : 'PCS');
+                        item.qty = 1;
+                        item.batches = p.batches || [];
+                        item.batchId = '';
+                        item.batchStock = 0;
+                        
+                        // Default price according to customer tier
+                        this.updateItemPricingAccordingToTier(index, p);
+                        this.calculateRowTotal(index);
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+
+                // Automatic Row Creation
+                if (index === this.items.length - 1) {
+                    this.addLineItem();
+                }
+            },
+
+            onBatchSelect(index) {
+                const item = this.items[index];
+                if (!item.batchId) {
+                    // Fall back to product default prices
+                    const p = this.products.find(x => x.id == item.productId);
+                    if (p) {
+                        this.updateItemPricingAccordingToTier(index, p);
+                    }
+                    item.batchStock = 0;
+                    this.calculateRowTotal(index);
+                    return;
+                }
+
+                const batch = item.batches.find(b => b.id == item.batchId);
+                if (batch) {
+                    item.batchStock = batch.current_qty || 0;
+                    
+                    // Determine price from batch based on customer tier
+                    const tier = this.getCustomerTier();
+                    if (tier === 'S' && batch.sdprice !== null) {
+                        item.rate = parseFloat(batch.sdprice);
+                    } else if (tier === 'D' && batch.dprice !== null) {
+                        item.rate = parseFloat(batch.dprice);
+                    } else if (tier === 'C' && batch.cprice !== null) {
+                        item.rate = parseFloat(batch.cprice);
+                    } else {
+                        item.rate = parseFloat(batch.srate || batch.mrp || 0);
+                    }
+                    this.calculateRowTotal(index);
+                }
+            },
+
+            getCustomerTier() {
+                if (this.customerSelection == '0' || this.customerSelection == 'new') {
+                    return 'C'; // default customer for walk-in
+                }
+                const c = this.customers.find(x => x.id == this.customerSelection);
+                return c ? (c.usertype || 'C') : 'C';
+            },
+
+            updateItemPricingAccordingToTier(index, productOrBatch) {
+                const item = this.items[index];
+                const tier = this.getCustomerTier();
+                if (tier === 'S' && productOrBatch.sdprice !== null) {
+                    item.rate = parseFloat(productOrBatch.sdprice);
+                } else if (tier === 'D' && productOrBatch.dprice !== null) {
+                    item.rate = parseFloat(productOrBatch.dprice);
+                } else if (tier === 'C' && productOrBatch.cprice !== null) {
+                    item.rate = parseFloat(productOrBatch.cprice);
+                } else {
+                    item.rate = parseFloat(productOrBatch.srate || productOrBatch.mrp || 0);
+                }
+            },
+
             onCustomerChange() {
                 if (this.customerSelection == '0' || this.customerSelection == 'new') {
                     this.client = { name: '', mobile: '', address: '', city: '', state: '', pincode: '', gsttin: '' };
@@ -591,59 +730,21 @@
                         this.coins.mcoinp = 0;
                     }
                 }
-            },
 
-            addLineItem() {
-                this.items.push({
-                    productId: '',
-                    stock: 0,
-                    qty: 1,
-                    rate: 0,
-                    gst: 0,
-                    unit: 'PCS',
-                    hsnsac: '',
-                    total: 0
-                });
-            },
-
-            removeItemLine(index) {
-                if (this.items.length > 1) {
-                    this.items.splice(index, 1);
-                    this.calculateTotals();
-                } else {
-                    alert('An invoice must contain at least one line item!');
-                }
-            },
-
-            onProductSelect(index) {
-                const item = this.items[index];
-                if (!item.productId) {
-                    item.stock = 0;
-                    item.qty = 1;
-                    item.rate = 0;
-                    item.gst = 0;
-                    item.unit = 'PCS';
-                    item.hsnsac = '';
-                    item.total = 0;
-                    this.calculateTotals();
-                    return;
-                }
-
-                const p = this.products.find(x => x.id == item.productId);
-                if (p) {
-                    item.stock = p.tqty || 0;
-                    item.rate = p.srate || p.mrp || 0;
-                    item.gst = p.gst || 0;
-                    item.hsnsac = p.hsnsac || '';
-                    item.unit = p.unit == 2 ? 'BOX' : (p.unit == 3 ? 'PKT' : 'PCS');
-                    item.qty = 1;
-                    this.calculateRowTotal(index);
-
-                    // Automatic Row Creation
-                    if (index === this.items.length - 1) {
-                        this.addLineItem();
+                // Recalculate rates of all items according to new customer tier
+                this.items.forEach((item, idx) => {
+                    if (item.productId) {
+                        if (item.batchId) {
+                            this.onBatchSelect(idx);
+                        } else {
+                            const p = this.products.find(x => x.id == item.productId);
+                            if (p) {
+                                this.updateItemPricingAccordingToTier(idx, p);
+                                this.calculateRowTotal(idx);
+                            }
+                        }
                     }
-                }
+                });
             },
 
             calculateRowTotal(index) {

@@ -22,6 +22,11 @@ class OnlineOrderController extends Controller
         $status = $request->input('status', 'pending');
         
         switch ($status) {
+            case 'all':
+                $title = "ALL ONLINE ORDERS";
+                $description = "View and search all online orders.";
+                $filterStatus = [];
+                break;
             case 'sending':
                 $title = "SENDING ORDERS";
                 $description = "Manage online orders currently in transit or out for delivery.";
@@ -49,13 +54,15 @@ class OnlineOrderController extends Controller
         $query = Uorder::with('user');
 
         // Apply ostatus filters
-        if (in_array(null, $filterStatus, true)) {
-            $query->where(function($q) {
-                $q->whereIn('ostatus', ['p'])
-                  ->orWhereNull('ostatus');
-            });
-        } else {
-            $query->whereIn('ostatus', $filterStatus);
+        if ($status !== 'all') {
+            if (in_array(null, $filterStatus, true)) {
+                $query->where(function($q) {
+                    $q->whereIn('ostatus', ['p'])
+                      ->orWhereNull('ostatus');
+                });
+            } else {
+                $query->whereIn('ostatus', $filterStatus);
+            }
         }
 
         // Apply Search filters
@@ -71,7 +78,7 @@ class OnlineOrderController extends Controller
             });
         }
 
-        $orders = $query->orderBy('orderid', 'desc')->paginate(15);
+        $orders = $query->orderBy('orderid', 'desc')->paginate(15)->withQueryString();
 
         return view('admin.online_orders.index', compact('orders', 'status', 'title', 'description'));
     }

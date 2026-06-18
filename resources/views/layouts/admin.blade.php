@@ -360,13 +360,6 @@
                                 <span>Manage Purchase</span>
                             </a>
                             @endif
-                            @if($hasPermission('astock'))
-                            <a href="{{ route('admin.purchases.stock.index') }}" 
-                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.stock.*') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
-                                <i class="fa-solid fa-truck-ramp-box text-[10px] opacity-60"></i>
-                                <span>Add Stock Purchase</span>
-                            </a>
-                            @endif
                             @if($hasPermission('slist'))
                             <a href="{{ route('admin.products.stock_list') }}" 
                                class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.products.stock_list') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
@@ -381,6 +374,37 @@
                                 <span>Price Search</span>
                             </a>
                             @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- New GRN / Inbound Treeview -->
+                    @if($hasPermission('astock'))
+                    <div x-data="{ open: {{ request()->routeIs('admin.purchases.stock.*', 'admin.purchases.batches.*', 'admin.purchases.delivery_notes.*') ? 'true' : 'false' }} }" class="space-y-1">
+                        <button @click="open = !open" 
+                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.purchases.stock.*', 'admin.purchases.batches.*', 'admin.purchases.delivery_notes.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-truck-ramp-box text-base"></i>
+                                <span>GRN & Inbound</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" x-transition class="pl-6 space-y-1 border-l border-slate-300/60 dark:border-slate-800/60 ml-5 mt-1">
+                            <a href="{{ route('admin.purchases.stock.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.stock.*') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-plus text-[10px] opacity-60"></i>
+                                <span>Post Inbound Stock</span>
+                            </a>
+                            <a href="{{ route('admin.purchases.batches.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.batches.*') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-boxes-stacked text-[10px] opacity-60"></i>
+                                <span>Product Batches</span>
+                            </a>
+                            <a href="{{ route('admin.purchases.delivery_notes.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.delivery_notes.*') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-file-invoice text-[10px] opacity-60"></i>
+                                <span>Delivery Notes Ledger</span>
+                            </a>
                         </div>
                     </div>
                     @endif
@@ -470,10 +494,15 @@
                         </button>
                         <div x-show="open" x-transition class="pl-6 space-y-1 border-l border-slate-300/60 dark:border-slate-800/60 ml-5 mt-1">
                             @if($hasPermission('ord'))
+                            <a href="{{ route('admin.online_orders.index', ['status' => 'all']) }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.online_orders.index') && request()->input('status') === 'all' ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-globe text-[10px] opacity-60"></i>
+                                <span>All Orders</span>
+                            </a>
                             <a href="{{ route('admin.online_orders.index', ['status' => 'pending']) }}" 
                                class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.online_orders.index') && request()->input('status', 'pending') === 'pending' ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
-                                <i class="fa-solid fa-list text-[10px] opacity-60"></i>
-                                <span>Orders</span>
+                                <i class="fa-solid fa-clock text-[10px] opacity-60"></i>
+                                <span>Pending Orders</span>
                             </a>
                             @endif
                             @if($hasPermission('sord'))

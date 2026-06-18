@@ -38,7 +38,8 @@ class Product extends Model
         'postingdate',
         'updationdate',
         'sdprice',
-        'pcode'
+        'pcode',
+        'warranty_months'
     ];
 
     public function category()
@@ -56,6 +57,22 @@ class Product extends Model
         return $this->belongsTo(Brand::class, 'brandid', 'brand_id');
     }
 
+    public function batches()
+    {
+        return $this->hasMany(ProductBatch::class, 'product_id');
+    }
+
+    public function activeBatches()
+    {
+        return $this->batches()
+            ->where('status', 1)
+            ->where('current_qty', '>', 0)
+            ->where(function($q) {
+                $q->whereNull('expiry_date')
+                  ->orWhere('expiry_date', '>=', now()->toDateString());
+            });
+    }
+
     public function getPrimaryImageUrlAttribute(): ?string
     {
         if (!$this->pimagef) {
@@ -67,15 +84,19 @@ class Product extends Model
 
     public function getDisplayPriceAttribute()
     {
+        // Fetch oldest active batch with stock
+        $oldestBatch = $this->activeBatches()->orderBy('id', 'asc')->first();
+        $source = $oldestBatch ?: $this;
+
         // Default base price (Customer)
-        $price = $this->cprice ?: ($this->srate ?: $this->mrp);
+        $price = $source->cprice ?: ($source->srate ?: $source->mrp);
 
         if (\Illuminate\Support\Facades\Auth::check()) {
             $userType = \Illuminate\Support\Facades\Auth::user()->usertype;
             if ($userType === 'D') {
-                $price = $this->dprice ?: $price;
+                $price = $source->dprice ?: $price;
             } elseif ($userType === 'S') {
-                $price = $this->sdprice ?: $price;
+                $price = $source->sdprice ?: $price;
             }
         }
         

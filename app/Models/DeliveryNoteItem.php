@@ -5,30 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EorderItem extends Model
+class DeliveryNoteItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'eorder_item';
-    public $timestamps = false;
+    protected $table = 'delivery_note_items';
 
     protected $fillable = [
-        'item_id',
-        'order_id',
+        'delivery_note_id',
         'product_id',
-        'hsnsan',
-        'gst',
-        'qty',
-        'rate',
-        'unit',
-        'total',
         'batch_id',
-        'warranty_expiry_date'
+        'qty_shipped',
+        'qty_received',
+        'qty_damaged',
     ];
 
-    public function order()
+    public function deliveryNote()
     {
-        return $this->belongsTo(Eorder::class, 'order_id', 'id');
+        return $this->belongsTo(DeliveryNote::class, 'delivery_note_id');
     }
 
     public function product()

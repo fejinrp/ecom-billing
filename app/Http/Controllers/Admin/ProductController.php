@@ -357,13 +357,20 @@ class ProductController extends Controller
      */
     public function getPriceDetails($id)
     {
-        $product = Product::with(['category', 'brand'])
+        $product = Product::with(['category', 'brand', 'batches'])
             ->where('status', 1)
             ->find($id);
 
         if (!$product) {
             return response()->json(['error' => 'Product not found.'], 404);
         }
+
+        // Filter active batches manually or reload with filter
+        $activeBatches = $product->batches()
+            ->where('status', 1)
+            ->where('current_qty', '>', 0)
+            ->orderBy('id', 'asc')
+            ->get();
 
         return response()->json([
             'id' => $product->id,
@@ -379,6 +386,7 @@ class ProductController extends Controller
             'sdprice' => $product->sdprice,
             'gst' => $product->gst,
             'tqty' => $product->tqty,
+            'batches' => $activeBatches
         ]);
     }
 }

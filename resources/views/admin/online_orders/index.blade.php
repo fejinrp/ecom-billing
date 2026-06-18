@@ -16,6 +16,30 @@
         <!-- Optional action buttons -->
     </x-admin.header>
 
+    <!-- Tabs Navigation -->
+    <div class="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800/80 pb-4">
+        <a href="{{ route('admin.online_orders.index', ['status' => 'all']) }}" 
+           class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all {{ $status === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60' }}">
+            All Orders
+        </a>
+        <a href="{{ route('admin.online_orders.index', ['status' => 'pending']) }}" 
+           class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all {{ $status === 'pending' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60' }}">
+            Pending / Processing
+        </a>
+        <a href="{{ route('admin.online_orders.index', ['status' => 'sending']) }}" 
+           class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all {{ $status === 'sending' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60' }}">
+            Sending / Transit
+        </a>
+        <a href="{{ route('admin.online_orders.index', ['status' => 'delivered']) }}" 
+           class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all {{ $status === 'delivered' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60' }}">
+            Delivered
+        </a>
+        <a href="{{ route('admin.online_orders.index', ['status' => 'cancelled']) }}" 
+           class="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all {{ $status === 'cancelled' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/60' }}">
+            Cancelled
+        </a>
+    </div>
+
     <!-- Search & Filter Bar -->
     <x-admin.search-bar :action="route('admin.online_orders.index')" placeholder="Search by Order ID, username, customer name or contact...">
         <input type="hidden" name="status" value="{{ $status }}">
@@ -27,158 +51,115 @@
     <!-- Online Orders Table -->
     @php
     $tableHeaders = [
-        ['label' => 'Order ID'],
-        ['label' => 'Date & Time'],
-        ['label' => 'Customer'],
-        ['label' => 'Contact'],
-        ['label' => 'Shipping Address'],
-        ['label' => 'Charges (S/I)', 'align' => 'right'],
-        ['label' => 'Redeem/Dis', 'align' => 'right'],
-        ['label' => 'Grand Total', 'align' => 'right'],
-        ['label' => 'Paid', 'align' => 'right'],
-        ['label' => 'Outstanding Due', 'align' => 'right'],
-        ['label' => 'Order Status', 'align' => 'center'],
-        ['label' => 'Payment Status', 'align' => 'center'],
+        ['label' => 'Order Specs'],
+        ['label' => 'Customer & Delivery'],
+        ['label' => 'Charges & Discount', 'align' => 'right'],
+        ['label' => 'Payment & Balance', 'align' => 'right'],
+        ['label' => 'Status Tags', 'align' => 'center'],
         ['label' => 'Actions', 'align' => 'center']
     ];
     @endphp
 
-    <x-admin.table :headers="$tableHeaders" :collection="$orders" type="glass" minWidth="1200px">
+    <x-admin.table :headers="$tableHeaders" :collection="$orders" type="glass" minWidth="1000px">
         @forelse ($orders as $order)
             <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/20 transition-all block lg:table-row w-full bg-white dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/60 rounded-2xl p-4 lg:p-0 mb-4 lg:mb-0 relative grid grid-cols-2 gap-x-4 gap-y-3 lg:grid-cols-none lg:bg-transparent lg:border-0 lg:hover:bg-slate-900/20 lg:transition-all">
                 
-                <!-- Order ID Badge -->
+                <!-- Order ID & Date -->
                 <td class="col-span-2 bg-indigo-500/10 text-indigo-400 px-3 py-2 rounded-lg text-xs font-mono font-bold flex items-center justify-between lg:table-cell lg:col-span-none lg:bg-transparent lg:px-6 lg:py-4">
-                    <span class="lg:hidden uppercase tracking-wider text-[10px] font-bold text-indigo-400">Order ID</span>
-                    <span>#{{ str_pad($order->orderid, 5, '0', STR_PAD_LEFT) }}</span>
+                    <span class="lg:hidden uppercase tracking-wider text-[10px] font-bold text-indigo-400">Order Specs</span>
+                    <div class="leading-relaxed">
+                        <span class="text-sm font-black text-slate-900 dark:text-white block">#{{ str_pad($order->orderid, 5, '0', STR_PAD_LEFT) }}</span>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-mono block mt-0.5">
+                            {{ $order->orderdate ? date('d-m-Y h:i A', strtotime($order->orderdate)) : 'N/A' }}
+                        </span>
+                    </div>
                 </td>
 
-                <!-- Date & Time -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Date</span>
-                    <span class="font-medium whitespace-nowrap text-xs text-slate-300">
-                        {{ $order->orderdate ? date('d-m-Y h:i A', strtotime($order->orderdate)) : 'N/A' }}
-                    </span>
-                </td>
-
-                <!-- Customer -->
+                <!-- Customer Details & Shipping Address -->
                 <td class="py-2 lg:px-6 lg:py-4 col-span-2 block lg:table-cell lg:col-span-none">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Customer</span>
-                    <div class="leading-none">
-                        <span class="font-semibold text-slate-200 block text-sm">{{ $order->user->uname ?? $order->username }}</span>
-                        @if($order->user && $order->user->email)
-                            <span class="text-[10px] text-slate-500 truncate block mt-0.5 max-w-[120px]">{{ $order->user->email }}</span>
-                        @endif
+                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Customer & Delivery</span>
+                    <div class="leading-normal">
+                        <span class="font-bold text-slate-800 dark:text-slate-250 block text-sm">{{ $order->user->uname ?? $order->username }}</span>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-450 block font-mono mt-0.5">
+                            MOB: {{ $order->user->contactno ?? 'N/A' }} @if($order->user && $order->user->email) &bull; {{ $order->user->email }}@endif
+                        </span>
+                        <div class="text-[11px] text-slate-500 dark:text-slate-500 mt-1 max-w-xs truncate" title="{{ $order->user->shippingaddress ?? 'N/A' }}">
+                            {{ $order->user ? ($order->user->shippingaddress . ', ' . $order->user->shippingcity . ', ' . $order->user->shippingstate . ' - ' . $order->user->shippingpincode) : 'N/A' }}
+                        </div>
                     </div>
                 </td>
 
-                <!-- Contact -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none text-xs font-semibold text-slate-400">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Contact</span>
-                    <span>{{ $order->user->contactno ?? 'N/A' }}</span>
-                </td>
-
-                <!-- Shipping Address -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-2 block lg:table-cell lg:col-span-none text-xs text-slate-400 max-w-[180px]">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Shipping Address</span>
-                    <div class="line-clamp-2" title="{{ $order->user->shippingaddress ?? 'N/A' }}">
-                        {{ $order->user ? ($order->user->shippingaddress . ', ' . $order->user->shippingcity . ', ' . $order->user->shippingstate . ' - ' . $order->user->shippingpincode) : 'N/A' }}
-                    </div>
-                </td>
-
-                <!-- Charges (Ship/Inst) -->
+                <!-- Charges & Discounts -->
                 <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right text-xs">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Charges (S/I)</span>
-                    <div class="leading-none font-medium text-slate-300">
-                        <span class="block">Ship: Rs. {{ number_format($order->tship, 2) }}</span>
-                        <span class="block mt-1 text-slate-500">Inst: Rs. {{ number_format($order->install, 2) }}</span>
+                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Charges & Discount</span>
+                    <div class="leading-relaxed font-medium">
+                        <div class="text-slate-600 dark:text-slate-400">Ship: Rs. {{ number_format($order->tship, 2) }} | Inst: Rs. {{ number_format($order->install, 2) }}</div>
+                        <div class="text-indigo-600 dark:text-indigo-400 mt-0.5">Coins: -Rs. {{ number_format($order->pcoin, 2) }}</div>
+                        <div class="text-amber-600 dark:text-amber-500 mt-0.5 font-semibold">Disc: -Rs. {{ number_format($order->discount, 2) }}</div>
                     </div>
                 </td>
 
-                <!-- Redeem/Discount -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right text-xs">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Redeem/Discount</span>
-                    <div class="leading-none font-medium">
-                        <span class="block text-indigo-400">Coin: -Rs. {{ number_format($order->pcoin, 2) }}</span>
-                        <span class="block mt-1 text-amber-500">Disc: -Rs. {{ number_format($order->discount, 2) }}</span>
+                <!-- Payment Breakdown (Total, Paid, Due) -->
+                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right font-semibold whitespace-nowrap">
+                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Payment & Balance</span>
+                    <div class="leading-normal">
+                        <div class="text-slate-800 dark:text-slate-200 font-bold text-sm">Total: Rs. {{ number_format($order->gamount, 2) }}</div>
+                        <div class="text-emerald-600 dark:text-emerald-400 text-xs mt-0.5">Paid: Rs. {{ number_format($order->pamount, 2) }}</div>
+                        <div class="mt-1">
+                            @if ($order->bamount > 0)
+                                <span class="text-rose-600 bg-rose-500/10 dark:text-rose-400 dark:bg-rose-500/5 px-2.5 py-0.5 rounded-lg border border-rose-500/20 dark:border-rose-500/10 text-[11px] font-bold inline-block whitespace-nowrap">
+                                    Due: Rs. {{ number_format($order->bamount, 2) }}
+                                </span>
+                            @else
+                                <span class="text-slate-500 text-xs">Due: Rs. 0.00</span>
+                            @endif
+                        </div>
                     </div>
                 </td>
 
-                <!-- Grand Total -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right font-bold text-slate-200">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Grand Total</span>
-                    <span>Rs. {{ number_format($order->gamount, 2) }}</span>
-                </td>
-
-                <!-- Paid -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right font-bold text-emerald-400">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Paid</span>
-                    <span>Rs. {{ number_format($order->pamount, 2) }}</span>
-                </td>
-
-                <!-- Outstanding Due -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right font-bold">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Outstanding Due</span>
-                    <span>
-                        @if ($order->bamount > 0)
-                            <span class="text-rose-400 bg-rose-500/5 px-2.5 py-1 rounded-lg border border-rose-500/10">
-                                Rs. {{ number_format($order->bamount, 2) }}
-                            </span>
-                        @else
-                            <span class="text-slate-500 font-normal">Rs. 0.00</span>
-                        @endif
-                    </span>
-                </td>
-
-                <!-- Order Status -->
+                <!-- Order Status & Payment Status -->
                 <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-center whitespace-nowrap text-xs font-bold">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Order Status</span>
-                    <span>
+                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Status Tags</span>
+                    <div class="flex flex-col gap-1.5 items-center justify-center">
                         @if ($order->ostatus == 'd')
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px]">
                                 <i class="fa-solid fa-truck-flat"></i>
                                 <span>Delivered</span>
                             </span>
                         @elseif ($order->ostatus == 's')
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 text-[10px]">
                                 <i class="fa-solid fa-paper-plane animate-pulse"></i>
                                 <span>Sending</span>
                             </span>
                         @elseif ($order->ostatus == 'c')
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px]">
                                 <i class="fa-solid fa-ban"></i>
                                 <span>Cancelled</span>
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse text-[10px]">
                                 <i class="fa-solid fa-spinner fa-spin"></i>
                                 <span>Processing</span>
                             </span>
                         @endif
-                    </span>
-                </td>
 
-                <!-- Payment Status -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-center whitespace-nowrap">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Payment Status</span>
-                    <span>
                         @if ($order->bamount <= 0)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                <i class="fa-solid fa-circle-check text-[10px]"></i>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <i class="fa-solid fa-circle-check"></i>
                                 <span>Full Paid</span>
                             </span>
                         @elseif ($order->pamount > 0)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse">
-                                <i class="fa-solid fa-clock text-[10px]"></i>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse">
+                                <i class="fa-solid fa-clock"></i>
                                 <span>Part Paid</span>
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                                <i class="fa-solid fa-triangle-exclamation text-[10px]"></i>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
                                 <span>No Paid</span>
                             </span>
                         @endif
-                    </span>
+                    </div>
                 </td>
 
                 <!-- Actions -->
@@ -189,7 +170,7 @@
                         <a href="{{ route('admin.online_orders.edit', $order->orderid) }}" 
                            class="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all" 
                            title="Edit Order / Items">
-                            <i class="fa-solid fa-pen-to-square text-base"></i>
+                           <i class="fa-solid fa-pen-to-square text-base"></i>
                         </a>
 
                         <!-- Record Payment -->

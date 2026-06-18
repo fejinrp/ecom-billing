@@ -116,11 +116,11 @@
                 </td>
 
                 <!-- Due Balance -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right font-semibold">
+                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none lg:text-right font-semibold whitespace-nowrap">
                     <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Due Balance</span>
-                    <span>
+                    <span class="whitespace-nowrap">
                         @if ($purchase->pbal > 0)
-                            <span class="text-rose-400 bg-rose-500/5 px-2 py-1 rounded-lg border border-rose-500/10 font-bold">
+                            <span class="text-rose-400 bg-rose-500/5 px-2 py-1 rounded-lg border border-rose-500/10 font-bold inline-block whitespace-nowrap">
                                 Rs. {{ number_format($purchase->pbal, 2) }}
                             </span>
                         @else

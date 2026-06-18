@@ -24,7 +24,9 @@ class OrderItem extends Model
         'unit',
         'total',
         'status',
-        'slno'
+        'slno',
+        'batch_id',
+        'warranty_expiry_date'
     ];
 
     public function order()
@@ -35,5 +37,10 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function batch()
+    {
+        return $this->belongsTo(ProductBatch::class, 'batch_id');
     }
 }

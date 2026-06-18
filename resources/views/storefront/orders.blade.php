@@ -5,8 +5,8 @@
         $totalSpent = 0;
         if (isset($orders)) {
             foreach ($orders as $ord) {
-                if ($ord->order_status != 3) {
-                    $totalSpent += $ord->grand_total;
+                if ($ord->ostatus !== 'c') {
+                    $totalSpent += $ord->gamount;
                 }
             }
         }
@@ -100,8 +100,8 @@
                     $totalSpent = 0;
                     if(isset($orders)) {
                         foreach ($orders as $ord) {
-                            if($ord->order_status != 3) { // Exclude cancelled orders
-                                $totalSpent += $ord->grand_total;
+                            if($ord->ostatus !== 'c') { // Exclude cancelled orders
+                                $totalSpent += $ord->gamount;
                             }
                         }
                     }
@@ -156,53 +156,57 @@
                                     <th class="py-4 px-6 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200/70 dark:divide-slate-800/70">
-                                @foreach ($orders as $ord)
+                            <tbody class="divide-y divide-slate-20                                @foreach ($orders as $ord)
                                     @php
                                         $pm = 'Cash';
-                                        if ($ord->payment_type == 1) $pm = 'Cheque';
-                                        elseif ($ord->payment_type == 3) $pm = 'Online / UPI';
-                                        elseif ($ord->payment_type == 4) $pm = 'Debit Card';
+                                        if ($ord->paymethod === 'q') $pm = 'Cheque';
+                                        elseif ($ord->paymethod === 'I') $pm = 'Online / UPI';
+                                        elseif ($ord->paymethod === 'C') $pm = 'Credit Card';
+                                        elseif ($ord->paymethod === 'D') $pm = 'Debit Card';
                                     @endphp
                                     <tr class="group text-slate-700 dark:text-slate-300 hover:bg-slate-50/70 dark:hover:bg-slate-950/30 transition-colors">
                                         <td class="py-5 px-6 font-mono font-black text-slate-900 dark:text-white text-sm whitespace-nowrap">
-                                            #{{ $ord->morder_id }}
+                                            #{{ $ord->morderid }}
                                         </td>
                                         <td class="py-5 px-6 uppercase font-bold text-slate-800 dark:text-slate-200 max-w-[220px] truncate">
-                                            {{ $ord->client_name }}
+                                            {{ $ord->username }}
                                         </td>
                                         <td class="py-5 px-6 font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                                            {{ date('d-m-Y', strtotime($ord->order_date)) }}
+                                            {{ date('d-m-Y', strtotime($ord->orderdate)) }}
                                         </td>
                                         <td class="py-5 px-6 text-right font-mono font-black text-[#0059e3] text-sm whitespace-nowrap">
-                                            Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->grand_total) }}
+                                            Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->gamount) }}
                                         </td>
                                         <td class="py-5 px-6 text-center">
                                             <span class="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-[10px] uppercase font-black tracking-widest">
                                                 {{ $pm }}
                                             </span>
                                         </td>
-                                        <td class="py-5 px-6 text-center">
-                                            @if ($ord->order_status == 1)
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-widest">
-                                                    <span class="w-1.5 h-1.5 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></span> Processing
-                                                </span>
-                                            @elseif ($ord->order_status == 2)
+                                        <td class="py-5 px-6 text-center font-bold">
+                                            @if ($ord->ostatus === 'd')
                                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
                                                     <span class="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full"></span> Delivered
                                                 </span>
-                                            @else
+                                            @elseif ($ord->ostatus === 's')
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 uppercase tracking-widest">
+                                                    <span class="w-1.5 h-1.5 bg-sky-500 dark:bg-sky-400 rounded-full"></span> Transit
+                                                </span>
+                                            @elseif ($ord->ostatus === 'c')
                                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-widest">
                                                     <span class="w-1.5 h-1.5 bg-rose-500 dark:bg-rose-400 rounded-full"></span> Cancelled
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                                                    <span class="w-1.5 h-1.5 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></span> Processing
                                                 </span>
                                             @endif
                                         </td>
                                         <td class="py-5 px-6 text-right">
                                             <div class="inline-flex items-center gap-2">
-                                                <a href="{{ route('storefront.order_details', $ord->order_id) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0059e3] dark:hover:text-blue-400 text-[10px] font-black uppercase tracking-widest transition-all">
+                                                <a href="{{ route('storefront.order_details', $ord->orderid) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#0059e3] dark:hover:text-blue-400 text-[10px] font-black uppercase tracking-widest transition-all">
                                                     Inspect
                                                 </a>
-                                                <a href="{{ route('storefront.order_print', $ord->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 hover:bg-[#0059e3] dark:bg-blue-500/10 dark:hover:bg-blue-600 text-[#0059e3] dark:text-blue-400 hover:text-white border border-blue-500/20 dark:border-blue-500/20 transition-all" title="Print Invoice Record">
+                                                <a href="{{ route('storefront.order_print', $ord->orderid) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 hover:bg-[#0059e3] dark:bg-blue-500/10 dark:hover:bg-blue-600 text-[#0059e3] dark:text-blue-400 hover:text-white border border-blue-500/20 dark:border-blue-500/20 transition-all" title="Print Invoice Record">
                                                     <i class="fa-solid fa-print text-[11px]"></i>
                                                 </a>
                                             </div>
@@ -217,26 +221,27 @@
                         @foreach ($orders as $ord)
                             @php
                                 $pm = 'Cash';
-                                if ($ord->payment_type == 1) $pm = 'Cheque';
-                                elseif ($ord->payment_type == 3) $pm = 'Online / UPI';
-                                elseif ($ord->payment_type == 4) $pm = 'Debit Card';
+                                if ($ord->paymethod === 'q') $pm = 'Cheque';
+                                elseif ($ord->paymethod === 'I') $pm = 'Online / UPI';
+                                elseif ($ord->paymethod === 'C') $pm = 'Credit Card';
+                                elseif ($ord->paymethod === 'D') $pm = 'Debit Card';
                             @endphp
                             <div class="p-5 space-y-4">
                                 <div class="flex items-start justify-between gap-4">
                                     <div>
                                         <div class="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">Invoice</div>
-                                        <div class="mt-1 font-mono text-lg font-black text-slate-900 dark:text-white">#{{ $ord->morder_id }}</div>
-                                        <div class="mt-1 text-sm font-bold uppercase text-slate-700 dark:text-slate-200 truncate">{{ $ord->client_name }}</div>
+                                        <div class="mt-1 font-mono text-lg font-black text-slate-900 dark:text-white">#{{ $ord->morderid }}</div>
+                                        <div class="mt-1 text-sm font-bold uppercase text-slate-700 dark:text-slate-200 truncate">{{ $ord->username }}</div>
                                     </div>
                                     <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 whitespace-nowrap">
-                                        {{ date('d M Y', strtotime($ord->order_date)) }}
+                                        {{ date('d M Y', strtotime($ord->orderdate)) }}
                                     </span>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 p-3">
                                         <span class="block text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Grand Total</span>
-                                        <span class="block mt-1 text-sm font-black text-[#0059e3] dark:text-blue-400 font-mono">Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->grand_total) }}</span>
+                                        <span class="block mt-1 text-sm font-black text-[#0059e3] dark:text-blue-400 font-mono">Rs. {{ \App\Helpers\NumberHelper::indianFormat($ord->gamount) }}</span>
                                     </div>
                                     <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 p-3">
                                         <span class="block text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Payment</span>
@@ -245,25 +250,29 @@
                                 </div>
 
                                 <div class="flex items-center justify-between gap-3">
-                                    @if ($ord->order_status == 1)
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-widest">
-                                            <span class="w-1.5 h-1.5 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></span> Processing
-                                        </span>
-                                    @elseif ($ord->order_status == 2)
+                                    @if ($ord->ostatus === 'd')
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">
                                             <span class="w-1.5 h-1.5 bg-emerald-500 dark:bg-emerald-400 rounded-full"></span> Delivered
                                         </span>
-                                    @else
+                                    @elseif ($ord->ostatus === 's')
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 uppercase tracking-widest">
+                                            <span class="w-1.5 h-1.5 bg-sky-500 dark:bg-sky-400 rounded-full"></span> Transit
+                                        </span>
+                                    @elseif ($ord->ostatus === 'c')
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-widest">
                                             <span class="w-1.5 h-1.5 bg-rose-500 dark:bg-rose-400 rounded-full"></span> Cancelled
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-widest">
+                                            <span class="w-1.5 h-1.5 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></span> Processing
                                         </span>
                                     @endif
 
                                     <div class="flex items-center gap-2">
-                                        <a href="{{ route('storefront.order_details', $ord->order_id) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest">
+                                        <a href="{{ route('storefront.order_details', $ord->orderid) }}" class="inline-flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest">
                                             Inspect
                                         </a>
-                                        <a href="{{ route('storefront.order_print', $ord->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/10 text-[#0059e3] dark:text-blue-400 border border-blue-500/20 dark:border-blue-500/20" title="Print Invoice Record">
+                                        <a href="{{ route('storefront.order_print', $ord->orderid) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/10 text-[#0059e3] dark:text-blue-400 border border-blue-500/20 dark:border-blue-500/20" title="Print Invoice Record">
                                             <i class="fa-solid fa-print text-[11px]"></i>
                                         </a>
                                     </div>

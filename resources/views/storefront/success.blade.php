@@ -3,11 +3,13 @@
 @section('content')
     @php
         $paymentMethod = 'Cash';
-        if ($order->payment_type == 1) {
+        if ($order->paymethod === 'q') {
             $paymentMethod = 'Cheque';
-        } elseif ($order->payment_type == 3) {
+        } elseif ($order->paymethod === 'I') {
             $paymentMethod = 'Online / UPI';
-        } elseif ($order->payment_type == 4) {
+        } elseif ($order->paymethod === 'C') {
+            $paymentMethod = 'Credit Card';
+        } elseif ($order->paymethod === 'D') {
             $paymentMethod = 'Debit Card';
         }
     @endphp
@@ -33,7 +35,7 @@
                             Order Reference
                         </p>
                         <p class="font-mono text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-                            INVOICE: #{{ $order->morder_id }}
+                            INVOICE: #{{ $order->morderid }}
                         </p>
                     </div>
                     <div class="space-y-1 sm:text-right">
@@ -41,7 +43,7 @@
                             Logged Timestamp
                         </p>
                         <p class="font-mono text-sm font-semibold text-slate-600 dark:text-slate-300">
-                            {{ date('d-m-Y', strtotime($order->order_date)) }}
+                            {{ date('d-m-Y', strtotime($order->orderdate)) }}
                         </p>
                     </div>
                 </div>
@@ -54,14 +56,14 @@
                             Dispatch / Billing Target
                         </p>
                         <p class="text-base font-black uppercase text-slate-900 dark:text-white">
-                            {{ $order->client_name }}
+                            {{ $order->username }}
                         </p>
                         <p class="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600 dark:text-slate-400 uppercase">
-                            {{ $order->client_contact }}
+                            {{ $order->user ? ($order->user->billingaddress . ', ' . $order->user->billingcity . ', ' . $order->user->billingstate . ' - ' . $order->user->billingpincode) : 'N/A' }}
                         </p>
-                        @if ($order->mobile)
+                        @if ($order->user && $order->user->contactno)
                             <p class="mt-3 text-xs font-black uppercase tracking-[0.25em] text-[#0059e3] font-mono">
-                                MOB: {{ $order->mobile }}
+                                MOB: {{ $order->user->contactno }}
                             </p>
                         @endif
                     </section>
@@ -80,13 +82,13 @@
                             <div class="flex items-center justify-between gap-4 text-slate-600 dark:text-slate-400">
                                 <span>Outstanding</span>
                                 <span class="text-right font-mono font-black text-[#0059e3]">
-                                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->grand_total) }}
+                                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->gamount) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between gap-4 text-slate-600 dark:text-slate-400">
                                 <span>Tax Allocation</span>
                                 <span class="text-right font-mono font-semibold text-slate-900 dark:text-white">
-                                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->gstn) }}
+                                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->gsta) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between gap-4 border-t border-slate-200 pt-3 font-black text-slate-900 dark:border-slate-800 dark:text-white">
@@ -94,14 +96,14 @@
                                     Total Inclusive
                                 </span>
                                 <span class="font-mono text-lg text-[#0059e3]">
-                                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->grand_total) }}
+                                    Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->gamount) }}
                                 </span>
                             </div>
                         </div>
                     </section>
                 </div>
 
-                @if ($order->payment_type == 3)
+                @if ($order->paymethod === 'I')
                     <section class="rounded-2xl border border-blue-500/15 bg-blue-500/5 p-5 dark:border-blue-500/20 dark:bg-blue-500/10">
                         <h3 class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.35em] text-[#0059e3]">
                             <i class="fa-solid fa-bank text-sm"></i>
@@ -141,7 +143,7 @@
                         <a href="{{ route('storefront.orders') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-center text-xs font-black uppercase tracking-[0.25em] text-slate-650 transition-colors hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-700 dark:hover:text-white">
                             My Purchase History
                         </a>
-                        <a href="{{ route('storefront.order_print', $order->order_id) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0059e3] px-6 py-3 text-center text-xs font-black uppercase tracking-[0.25em] text-white shadow-lg shadow-blue-600/10 transition-colors hover:bg-[#0040a6] active:scale-95 cursor-pointer">
+                        <a href="{{ route('storefront.order_print', $order->orderid) }}?autoprint=1" target="_blank" class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0059e3] px-6 py-3 text-center text-xs font-black uppercase tracking-[0.25em] text-white shadow-lg shadow-blue-600/10 transition-colors hover:bg-[#0040a6] active:scale-95 cursor-pointer">
                             <i class="fa-solid fa-print"></i>
                             Print Invoice Receipt
                         </a>

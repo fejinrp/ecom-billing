@@ -863,19 +863,19 @@
                     <!-- Email Input -->
                     <div class="space-y-1.5">
                         <label for="modal-email" class="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                            Email Address
+                            Email Address / Mobile Number
                         </label>
                         <div class="relative rounded-xl shadow-sm">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
-                                <i class="fa-solid fa-envelope text-xs"></i>
+                                <i class="fa-solid fa-user text-xs"></i>
                             </div>
                             <input id="modal-email" 
-                                   type="email" 
+                                   type="text" 
                                    name="email" 
                                    value="{{ old('email') }}" 
                                    required 
                                    autofocus 
-                                   placeholder="customer@domain.com"
+                                   placeholder="customer@domain.com or 10-digit mobile"
                                    class="block w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-xs font-semibold outline-none transition-all focus:ring-2 focus:ring-blue-500/20 focus:border-[#0059e3] dark:focus:border-[#0059e3] text-slate-900 dark:text-slate-100">
                         </div>
                     </div>

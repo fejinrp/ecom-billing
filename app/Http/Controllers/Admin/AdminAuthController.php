@@ -30,15 +30,19 @@ class AdminAuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $loginField = $request->input('login_field');
+        $loginField = trim($request->input('login_field'));
         $credentials = [
             'password' => $request->input('password'),
             'ustatus' => 1, // Only active accounts
         ];
 
-        // Determine if logging in via email or username
-        if (filter_var($loginField, FILTER_VALIDATE_EMAIL)) {
-            $credentials['email'] = $loginField;
+        // Find the admin user by email or username
+        $user = \App\Models\Auser::where('username', $loginField)
+            ->orWhere('email', $loginField)
+            ->first();
+
+        if ($user) {
+            $credentials['username'] = $user->username;
         } else {
             $credentials['username'] = $loginField;
         }

@@ -3,9 +3,10 @@
 @section('content')
     @php
         $paymentMethod = 'Cash';
-        if ($order->payment_type == 1) $paymentMethod = 'Cheque';
-        elseif ($order->payment_type == 3) $paymentMethod = 'Online / UPI';
-        elseif ($order->payment_type == 4) $paymentMethod = 'Debit Card';
+        if ($order->paymethod === 'q') $paymentMethod = 'Cheque';
+        elseif ($order->paymethod === 'I') $paymentMethod = 'Online / UPI';
+        elseif ($order->paymethod === 'C') $paymentMethod = 'Credit Card';
+        elseif ($order->paymethod === 'D') $paymentMethod = 'Debit Card';
     @endphp
 
     <div class="order-sheet">
@@ -14,7 +15,7 @@
         <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 dark:text-slate-600"></i>
         <a href="{{ route('storefront.orders') }}" class="text-[#0059e3] hover:text-[#0040a6] transition-colors">Purchase History</a>
         <i class="fa-solid fa-chevron-right text-[8px] text-slate-400 dark:text-slate-600"></i>
-        <span class="text-slate-500 dark:text-slate-400 truncate max-w-[220px]">Order #{{ $order->morder_id }} Details</span>
+        <span class="text-slate-500 dark:text-slate-400 truncate max-w-[220px]">Order #{{ $order->morderid }} Details</span>
     </nav>
 
     <div class="rounded-[2rem] border border-slate-200/70 dark:border-slate-800/70 bg-gradient-to-br from-white/90 via-white/70 to-slate-50/80 dark:from-slate-950/45 dark:via-slate-950/30 dark:to-slate-900/40 p-4 sm:p-6 lg:p-8 shadow-2xl shadow-slate-900/5 mb-12 print-card">
@@ -22,13 +23,15 @@
             <div class="space-y-2">
                 <span class="block text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Invoice Specification</span>
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">#{{ $order->morder_id }}</span>
-                    @if ($order->order_status == 1)
-                        <span class="px-3 py-1.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-widest">Placed</span>
-                    @elseif ($order->order_status == 2)
+                    <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">#{{ $order->morderid }}</span>
+                    @if ($order->ostatus === 'd')
                         <span class="px-3 py-1.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 uppercase tracking-widest">Delivered</span>
-                    @else
+                    @elseif ($order->ostatus === 's')
+                        <span class="px-3 py-1.5 rounded-full text-[10px] font-black bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 uppercase tracking-widest">Transit</span>
+                    @elseif ($order->ostatus === 'c')
                         <span class="px-3 py-1.5 rounded-full text-[10px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-widest">Cancelled</span>
+                    @else
+                        <span class="px-3 py-1.5 rounded-full text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-widest">Processing</span>
                     @endif
                 </div>
                 <p class="text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
@@ -36,7 +39,7 @@
                 </p>
             </div>
 
-            <a href="{{ route('storefront.order_print', $order->order_id) }}?autoprint=1" target="_blank" class="print-hidden inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0059e3] hover:bg-[#0040a6] text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/15 transition-all">
+            <a href="{{ route('storefront.order_print', $order->orderid) }}?autoprint=1" target="_blank" class="print-hidden inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0059e3] hover:bg-[#0040a6] text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/15 transition-all">
                 <i class="fa-solid fa-print text-[11px]"></i> Print Receipt
             </a>
         </div>
@@ -44,24 +47,24 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6">
             <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 p-4 shadow-sm print-card">
                 <span class="block text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">Dispatch & Billing</span>
-                <p class="font-black text-slate-900 dark:text-white uppercase font-bold">{{ $order->client_name }}</p>
-                <p class="text-sm text-slate-600 dark:text-slate-400 uppercase whitespace-pre-line mt-1 leading-relaxed">{{ $order->client_contact }}</p>
-                @if ($order->mobile)
-                    <p class="text-xs font-black text-[#0059e3] mt-3 font-mono">MOB: {{ $order->mobile }}</p>
+                <p class="font-black text-slate-900 dark:text-white uppercase font-bold">{{ $order->username }}</p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 uppercase whitespace-pre-line mt-1 leading-relaxed">{{ $order->user ? ($order->user->billingaddress . ', ' . $order->user->billingcity . ', ' . $order->user->billingstate . ' - ' . $order->user->billingpincode) : 'N/A' }}</p>
+                @if ($order->user && $order->user->contactno)
+                    <p class="text-xs font-black text-[#0059e3] mt-3 font-mono">MOB: {{ $order->user->contactno }}</p>
                 @endif
             </div>
 
             <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 p-4 shadow-sm print-card">
                 <span class="block text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">Remittance</span>
                 <p class="text-sm text-slate-600 dark:text-slate-400">Channel: <span class="font-black text-slate-900 dark:text-white uppercase font-bold">{{ $paymentMethod }}</span></p>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Payment Tag: <span class="font-black text-[#0059e3] uppercase font-bold">{{ $order->paymentname ?: 'ONLINE STORE' }}</span></p>
-                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Tax Mode: <span class="font-black text-[#0059e3] uppercase font-bold">{{ $order->payment_place == 1 ? 'Tamil Nadu (Intra-State)' : 'Out of State (Inter-State)' }}</span></p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Payment Tag: <span class="font-black text-[#0059e3] uppercase font-bold">ONLINE STORE</span></p>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Tax Mode: <span class="font-black text-[#0059e3] uppercase font-bold">{{ ($order->user && $order->user->billingstate == 'TAMIL NADU') ? 'Tamil Nadu (Intra-State)' : 'Out of State (Inter-State)' }}</span></p>
             </div>
 
             <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-900/70 p-4 shadow-sm print-card">
                 <span class="block text-[10px] font-black uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400 mb-2">Audit Log</span>
-                <p class="text-sm text-slate-600 dark:text-slate-400">Order Date: <span class="font-mono font-black text-slate-900 dark:text-white font-bold">{{ date('d-m-Y', strtotime($order->order_date)) }}</span></p>
-                <p class="text-[11px] text-slate-500 dark:text-slate-500 mt-1">Session: <span class="font-mono">{{ sha1($order->order_id) }}</span></p>
+                <p class="text-sm text-slate-600 dark:text-slate-400">Order Date: <span class="font-mono font-black text-slate-900 dark:text-white font-bold">{{ date('d-m-Y', strtotime($order->orderdate)) }}</span></p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-500 mt-1">Session: <span class="font-mono">{{ sha1($order->orderid) }}</span></p>
             </div>
         </div>
 
@@ -90,7 +93,7 @@
                             @foreach ($order->items as $item)
                                 <tr class="group hover:bg-slate-50/70 dark:hover:bg-slate-950/30 transition-colors">
                                     <td class="py-4 px-5 font-bold text-slate-900 dark:text-white uppercase max-w-[320px] truncate">
-                                        {{ $item->product->productname ?? $item->product_id }}
+                                        {{ $item->product->productname ?? $item->productId }}
                                     </td>
                                     <td class="py-4 px-5 text-center font-mono text-[11px] text-slate-500 dark:text-slate-400">
                                         {{ $item->hsnsan ?: '84713010' }}
@@ -102,10 +105,10 @@
                                         Rs. {{ \App\Helpers\NumberHelper::indianFormat($item->rate) }}
                                     </td>
                                     <td class="py-4 px-5 text-center font-mono font-black text-slate-900 dark:text-white">
-                                        {{ $item->qty }}
+                                        {{ $item->quantity }}
                                     </td>
                                     <td class="py-4 px-5 text-right font-mono font-black text-[#0059e3] whitespace-nowrap">
-                                        Rs. {{ \App\Helpers\NumberHelper::indianFormat($item->total) }}
+                                        Rs. {{ \App\Helpers\NumberHelper::indianFormat($item->cprice) }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -117,14 +120,14 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 mt-8 border-t border-slate-200/70 dark:border-slate-800/70">
             <div class="space-y-4">
-                @if ($order->due > 0 && $order->payment_type == 3)
+                @if ($order->bamount > 0 && $order->paymethod === 'I')
                     <div class="rounded-[1.5rem] p-5 bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/15 dark:border-blue-500/20 text-sm text-slate-650 dark:text-slate-400 leading-relaxed space-y-3 print-card">
                         <span class="block font-black text-slate-900 dark:text-white uppercase tracking-[0.25em] flex items-center gap-2 text-[10px] font-bold">
                             <i class="fa-solid fa-bank text-[#0059e3]"></i> Direct Bank Transfer Instruction
                         </span>
                         <p>
                             Transfer the pending amount of
-                            <span class="font-mono font-black text-[#0059e3]">Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->due) }}</span>
+                            <span class="font-mono font-black text-[#0059e3]">Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->bamount) }}</span>
                             to our corporate account for instant dispatch clearance.
                         </p>
                         <div class="rounded-2xl p-4 bg-white/90 dark:bg-slate-950/50 border border-slate-200/70 dark:border-slate-800 font-mono text-sm text-slate-700 dark:text-slate-300 space-y-1 print-card">
@@ -148,13 +151,13 @@
             <div class="rounded-[1.5rem] p-5 bg-white/90 dark:bg-slate-900/80 border border-slate-200/70 dark:border-slate-800 shadow-sm space-y-3 text-sm print-card">
                 <div class="flex items-center justify-between gap-3 text-slate-650 dark:text-slate-400">
                     <span>Items Subtotal</span>
-                    <span class="font-mono font-semibold text-slate-900 dark:text-white font-bold">Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->sub_total) }}</span>
+                    <span class="font-mono font-semibold text-slate-900 dark:text-white font-bold">Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->total) }}</span>
                 </div>
 
                 @php
-                    $gstTotal = floatval($order->gstn);
+                    $gstTotal = floatval($order->gsta);
                 @endphp
-                @if ($order->payment_place == 1)
+                @if ($order->user && $order->user->billingstate == 'TAMIL NADU')
                     <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
                         <span>CGST Split (50%)</span>
                         <span class="font-mono">Rs. {{ \App\Helpers\NumberHelper::indianFormat($gstTotal / 2) }}</span>
@@ -172,17 +175,17 @@
 
                 <div class="border-t border-slate-200/70 dark:border-slate-800 pt-3 flex items-center justify-between gap-3">
                     <span class="text-sm font-black uppercase tracking-[0.25em] text-slate-900 dark:text-white font-bold">Grand Total</span>
-                    <span class="font-mono text-xl font-black text-[#0059e3]">Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->grand_total) }}</span>
+                    <span class="font-mono text-xl font-black text-[#0059e3]">Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->gamount) }}</span>
                 </div>
 
                 <div class="border-t border-slate-200/70 dark:border-slate-800 pt-3 space-y-2 font-mono text-xs">
                     <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold">
                         <span class="font-black uppercase tracking-widest">Amount Paid</span>
-                        <span>Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->paid) }}</span>
+                        <span>Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->pamount) }}</span>
                     </div>
                     <div class="flex items-center justify-between text-rose-600 dark:text-rose-400 font-bold">
                         <span class="font-black uppercase tracking-widest">Balance Due</span>
-                        <span>Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->due) }}</span>
+                        <span>Rs. {{ \App\Helpers\NumberHelper::indianFormat($order->bamount) }}</span>
                     </div>
                 </div>
             </div>

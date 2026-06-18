@@ -209,6 +209,50 @@
             </div>
         </div>
 
+        <!-- Active Batches Pricing Breakdown -->
+        <div x-show="details.batches && details.batches.length > 0" class="p-6 rounded-3xl bg-white dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-450 uppercase tracking-wider border-l-4 border-indigo-500 pl-3">Active Batches Pricing & Stock</h3>
+            
+            <div class="border border-slate-850 rounded-2xl overflow-hidden overflow-x-auto scrollbar-thin">
+                <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                    <thead class="bg-slate-950/80 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-850">
+                        <tr>
+                            <th class="p-3">Batch Number</th>
+                            <th class="p-3 text-center">Mfg Date</th>
+                            <th class="p-3 text-center">Expiry Date</th>
+                            <th class="p-3 text-center">Warranty (m)</th>
+                            <th class="p-3 text-center">Current Stock</th>
+                            <th class="p-3 text-right">P. Rate</th>
+                            <th class="p-3 text-right">S. Rate</th>
+                            <th class="p-3 text-right">MRP</th>
+                            <th class="p-3 text-right">Cust Price</th>
+                            <th class="p-3 text-right">Dealer Price</th>
+                            <th class="p-3 text-right">Super Dealer</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-850">
+                        <template x-for="b in details.batches" :key="b.id">
+                            <tr class="hover:bg-slate-900/20 transition-all font-semibold">
+                                <td class="p-3 font-bold text-indigo-400 font-mono" x-text="b.batch_number"></td>
+                                <td class="p-3 text-center text-slate-400" x-text="b.mfg_date ? b.mfg_date.substring(0,10) : 'N/A'"></td>
+                                <td class="p-3 text-center text-slate-400" x-text="b.expiry_date ? b.expiry_date.substring(0,10) : 'N/A'"></td>
+                                <td class="p-3 text-center font-mono text-slate-300" x-text="b.warranty_months + ' M'"></td>
+                                <td class="p-3 text-center">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-450 font-bold" x-text="b.current_qty + ' PCS'"></span>
+                                </td>
+                                <td class="p-3 text-right text-slate-200 font-mono" x-text="formatRupee(b.prate)"></td>
+                                <td class="p-3 text-right text-slate-200 font-mono" x-text="formatRupee(b.srate)"></td>
+                                <td class="p-3 text-right text-rose-450 font-mono" x-text="formatRupee(b.mrp)"></td>
+                                <td class="p-3 text-right text-purple-400 font-mono" x-text="formatRupee(b.cprice)"></td>
+                                <td class="p-3 text-right text-emerald-400 font-mono" x-text="formatRupee(b.dprice)"></td>
+                                <td class="p-3 text-right text-indigo-400 font-mono" x-text="formatRupee(b.sdprice)"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Profit & Margin Analytics Panel -->
         <div class="p-6 rounded-3xl bg-white dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
             <h3 class="text-sm font-bold text-slate-700 dark:text-slate-450 uppercase tracking-wider border-l-4 border-indigo-500 pl-3">Margin & Saving Analytics</h3>

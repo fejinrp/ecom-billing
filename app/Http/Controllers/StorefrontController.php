@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Subcategory;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Orderbal;
+use App\Models\Uorder;
+use App\Models\UorderItem;
+use App\Models\Uorderbal;
 use App\Models\Stategst;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -343,11 +343,10 @@ class StorefrontController extends Controller
         $month = date('m');
         $year = date('Y');
         
-        // Calculate invoice number (morder_id)
-        $maxMorderId = Order::whereMonth('order_date', $month)
-            ->whereYear('order_date', $year)
-            ->where('section', 1)
-            ->max('morder_id');
+        // Calculate invoice number (morderid)
+        $maxMorderId = Uorder::whereMonth('orderdate', $month)
+            ->whereYear('orderdate', $year)
+            ->max('morderid');
             
         $morder_id = ($maxMorderId ?? 0) + 1;
         $gsttin = trim((string) $request->input('gsttin', ''));
@@ -402,46 +401,38 @@ class StorefrontController extends Controller
             
             $grandTotal = $subTotal + $taxTotal;
             
-            // Determine Intra-State vs Inter-State
-            // Tamil Nadu (33) state place of sale code
-            $paymentPlace = (strtoupper($request->input('state')) == 'TAMIL NADU') ? 1 : 2;
-            
-            // Insert Order
-            $order = Order::create([
-                'order_date' => $orderDate,
-                'client_name' => strtoupper($request->input('clientName')),
-                'client_contact' => strtoupper($request->input('clientContact')),
-                'sub_total' => $subTotal,
-                'total_amount' => $subTotal,
+            // Insert Uorder
+            $order = Uorder::create([
+                'orderdate' => date('Y-m-d H:i:s'),
+                'userid' => $uid,
+                'utype' => 'C',
+                'paymethod' => $request->input('paymentType') == 1 ? 'h' : 'I', // 'h' for Cash, 'I' for UPI/etc
+                'total' => $subTotal,
+                'gamount' => $grandTotal,
+                'tship' => 0,
+                'pamount' => 0,
+                'bamount' => $grandTotal,
                 'discount' => 0,
-                'grand_total' => $grandTotal,
-                'paid' => 0, // Customer places order, paid is updated on actual gateway integration or delivery
-                'due' => $grandTotal,
-                'payment_type' => $request->input('paymentType'),
-                'payment_status' => 3, // No paid / pending checkout
-                'payment_place' => $paymentPlace,
-                'gstn' => $taxTotal,
-                'order_status' => 1,
-                'user_id' => $uid,
-                'paymentname' => 'ONLINE STORE',
-                'morder_id' => $morder_id,
-                'mobile' => $request->input('mobileno'),
+                'gsta' => $taxTotal,
+                'ostatus' => 'p', // 'p' for pending processing
+                'morderid' => $morder_id,
+                'install' => 0,
                 'gsttin' => $gsttin,
-                'section' => 1,
-                'instamt' => 0,
-                'shipamt' => 0
+                'username' => strtoupper($request->input('clientName'))
             ]);
             
-            // Insert Orderbal
-            Orderbal::create([
-                'order_id' => $order->order_id,
+            // Insert Uorderbal
+            Uorderbal::create([
+                'orderid' => $order->orderid,
                 'gtotal' => $grandTotal,
                 'pamount' => 0,
                 'bamount' => $grandTotal,
-                'pdate' => $orderDate
+                'ptype' => $order->paymethod,
+                'pdate' => date('Y-m-d H:i:s')
             ]);
             
             // Save Items & Update Stock
+            $slno = 1;
             foreach ($cart as $id => $item) {
                 $product = Product::findOrFail($id);
                 
@@ -451,16 +442,19 @@ class StorefrontController extends Controller
                 ]);
                 
                 // Create Item record
-                OrderItem::create([
-                    'order_id' => $order->order_id,
-                    'product_id' => $id,
-                    'hsnsan' => $item['hsnsac'],
-                    'gst' => $item['gst'],
-                    'qty' => $item['quantity'],
+                UorderItem::create([
+                    'orderid' => $order->orderid,
+                    'productId' => $id,
+                    'hsnsan' => $item['hsnsac'] ?: '',
+                    'gst' => $item['gst'] ?: 0,
+                    'quantity' => $item['quantity'],
                     'rate' => $item['price'],
-                    'unit' => $item['unit'],
-                    'total' => $item['quantity'] * $item['price'],
-                    'status' => 1
+                    'unit' => $item['unit'] ?: 'PCS',
+                    'cprice' => $item['quantity'] * $item['price'],
+                    'srate' => $item['price'],
+                    'userId' => $uid,
+                    'price' => $item['price'],
+                    'slno' => $slno++
                 ]);
             }
             
@@ -469,7 +463,7 @@ class StorefrontController extends Controller
             // Clear cart
             session()->forget('cart');
             
-            return redirect()->route('storefront.order.success', $order->order_id)->with('success', 'Order placed successfully!');
+            return redirect()->route('storefront.order.success', $order->orderid)->with('success', 'Order placed successfully!');
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -483,7 +477,7 @@ class StorefrontController extends Controller
     public function orderSuccess($orderId)
     {
         $categories = Category::orderBy('cat_name', 'asc')->get();
-        $order = Order::findOrFail($orderId);
+        $order = Uorder::findOrFail($orderId);
         
         return view('storefront.success', compact('categories', 'order'));
     }
@@ -498,8 +492,8 @@ class StorefrontController extends Controller
         }
         
         $categories = Category::orderBy('cat_name', 'asc')->get();
-        $orders = Order::where('user_id', Auth::id())
-            ->orderBy('order_id', 'desc')
+        $orders = Uorder::where('userid', Auth::id())
+            ->orderBy('orderid', 'desc')
             ->paginate(10);
             
         return view('storefront.orders', compact('categories', 'orders'));
@@ -515,7 +509,7 @@ class StorefrontController extends Controller
         }
         
         $categories = Category::orderBy('cat_name', 'asc')->get();
-        $order = Order::with('items.product')->where('user_id', Auth::id())->findOrFail($id);
+        $order = Uorder::with('items.product')->where('userid', Auth::id())->findOrFail($id);
         
         return view('storefront.order_details', compact('categories', 'order'));
     }
@@ -530,7 +524,7 @@ class StorefrontController extends Controller
         }
 
         $categories = Category::orderBy('cat_name', 'asc')->get();
-        $order = Order::with('items.product')->where('user_id', Auth::id())->findOrFail($id);
+        $order = Uorder::with('items.product')->where('userid', Auth::id())->findOrFail($id);
 
         return view('storefront.order_print', compact('categories', 'order'));
     }

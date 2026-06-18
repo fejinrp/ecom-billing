@@ -30,4 +30,9 @@ class POrder extends Model
         'porder_status',
         'morder_id'
     ];
+
+    public function deliveryNotes()
+    {
+        return $this->hasMany(DeliveryNote::class, 'porder_id', 'porder_id');
+    }
 }

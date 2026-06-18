@@ -15,13 +15,26 @@
         pqty: 0,
         bqty: 0
     },
+    batch_number: '',
+    mfg_date: '',
+    expiry_date: '',
+    warranty_months: 0,
+    qty_received: 0,
+    qty_damaged: 0,
     async openAddStockModal(pitem_id) {
         this.loading = true;
         this.modalOpen = true;
+        this.batch_number = 'BATCH-' + Math.floor(1000 + Math.random() * 9000);
+        this.mfg_date = '';
+        this.expiry_date = '';
+        this.warranty_months = 0;
+        this.qty_received = 0;
+        this.qty_damaged = 0;
         try {
             let response = await fetch(`/admin/purchases/stock/${pitem_id}/detail`);
             if (response.ok) {
                 this.item = await response.json();
+                this.qty_received = this.item.bqty;
             } else {
                 alert('Error fetching item details');
                 this.modalOpen = false;
@@ -35,6 +48,10 @@
         }
     },
     async submitStockApproval() {
+        if (parseInt(this.qty_received) + parseInt(this.qty_damaged) > this.item.bqty) {
+            alert('Total received and damaged quantity cannot exceed the outstanding balance of ' + this.item.bqty);
+            return;
+        }
         this.loading = true;
         try {
             let token = document.querySelector('meta[name=&quot;csrf-token&quot;]')?.getAttribute('content') || '{{ csrf_token() }}';
@@ -45,7 +62,12 @@
                     'X-CSRF-TOKEN': token
                 },
                 body: JSON.stringify({
-                    quantity: this.item.bqty
+                    quantity: this.qty_received,
+                    damaged: this.qty_damaged,
+                    batch_number: this.batch_number,
+                    mfg_date: this.mfg_date,
+                    expiry_date: this.expiry_date,
+                    warranty_months: this.warranty_months
                 })
             });
             let result = await response.json();
@@ -355,17 +377,62 @@
                     </div>
                 </div>
 
-                <!-- Input Quantity approved -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Confirm Quantity To Add</label>
-                    <div class="relative">
+                <!-- Input Quantity Received & Damaged -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty Received (PCS)</label>
                         <input type="number"
-                               :value="item.bqty"
-                               readonly
-                               class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-xl text-slate-800 dark:text-slate-300 font-extrabold text-lg focus:outline-none cursor-not-allowed">
-                        <span class="absolute right-4 top-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase" x-text="item.punit || 'PCS'"></span>
+                               x-model="qty_received"
+                               required
+                               min="0"
+                               :max="item.bqty"
+                               class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-300 font-extrabold text-lg focus:outline-none focus:border-indigo-500">
                     </div>
-                    <span class="text-[10px] text-slate-500 font-medium">Approval processes the full remaining outstanding package quantity directly to warehouse shelves.</span>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty Damaged (PCS)</label>
+                        <input type="number"
+                               x-model="qty_damaged"
+                               required
+                               min="0"
+                               :max="item.bqty"
+                               class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-300 font-extrabold text-lg focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                <span class="text-[10px] text-slate-500 font-medium block">Confirm how many items were successfully received into stock and how many were damaged during delivery. Both counts will be deducted from outstanding PO balances.</span>
+
+                <!-- Batch Tracking Fields -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Batch Number</label>
+                        <input type="text"
+                               x-model="batch_number"
+                               required
+                               placeholder="e.g. BATCH-A01"
+                               class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-305 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Warranty (Months)</label>
+                        <input type="number"
+                               x-model="warranty_months"
+                               min="0"
+                               placeholder="e.g. 12"
+                               class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-305 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mfg Date</label>
+                        <input type="date"
+                               x-model="mfg_date"
+                               class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-305 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Expiry Date</label>
+                        <input type="date"
+                               x-model="expiry_date"
+                               class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-305 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
                 </div>
 
                 <!-- Footer Actions -->

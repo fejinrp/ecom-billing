@@ -233,33 +233,180 @@ class SalesController extends Controller
             $gsts = $request->input('gst');
             $units = $request->input('unit');
             $slnos = $request->input('slno', []);
+            $batchIds = $request->input('batchId', []);
 
             for ($x = 0; $x < count($productIds); $x++) {
                 $pid = $productIds[$x];
                 if (empty($pid)) {
                     continue;
                 }
-                $qty = $quantities[$x];
+                $qty = intval($quantities[$x]);
+                $selectedBatchId = !empty($batchIds[$x]) ? intval($batchIds[$x]) : null;
 
-                // Decrement product stock
+                // Decrement product total stock
                 $product = Product::findOrFail($pid);
                 $product->update([
                     'tqty' => $product->tqty - $qty
                 ]);
 
-                // Create item
-                OrderItem::create([
-                    'order_id' => $order->order_id,
-                    'product_id' => $pid,
-                    'hsnsan' => $hsnsacs[$x] ?? '',
-                    'gst' => $gsts[$x] ?? 0,
-                    'qty' => $qty,
-                    'rate' => $rates[$x],
-                    'unit' => $units[$x] ?? 'PCS',
-                    'total' => $totals[$x],
-                    'status' => 1,
-                    'slno' => $slnos[$x] ?? ($x + 1)
-                ]);
+                $deductedBatches = [];
+
+                if ($selectedBatchId) {
+                    // Deduct from the user-selected batch directly
+                    $batch = \App\Models\ProductBatch::where('product_id', $pid)
+                        ->where('id', $selectedBatchId)
+                        ->first();
+
+                    if ($batch) {
+                        $deductQty = min($batch->current_qty, $qty);
+                        $batch->update([
+                            'current_qty' => $batch->current_qty - $deductQty
+                        ]);
+                        
+                        $qtyRemaining = $qty - $deductQty;
+                        
+                        $warrantyExpiry = null;
+                        $wMonths = $batch->warranty_months > 0 ? $batch->warranty_months : $product->warranty_months;
+                        if ($wMonths > 0) {
+                            $warrantyExpiry = date('Y-m-d', strtotime("+$wMonths months", strtotime($orderDate)));
+                        }
+                        
+                        $deductedBatches[] = [
+                            'batch_id' => $batch->id,
+                            'qty' => $deductQty,
+                            'warranty_expiry_date' => $warrantyExpiry
+                        ];
+
+                        // If the chosen batch has insufficient stock, deduct remaining using FIFO
+                        if ($qtyRemaining > 0) {
+                            $batches = \App\Models\ProductBatch::where('product_id', $pid)
+                                ->where('status', 1)
+                                ->where('id', '!=', $selectedBatchId)
+                                ->where('current_qty', '>', 0)
+                                ->orderBy('id', 'asc') // FIFO
+                                ->get();
+
+                            foreach ($batches as $fifoBatch) {
+                                if ($qtyRemaining <= 0) {
+                                    break;
+                                }
+                                $deductFifoQty = min($fifoBatch->current_qty, $qtyRemaining);
+                                $fifoBatch->update([
+                                    'current_qty' => $fifoBatch->current_qty - $deductFifoQty
+                                ]);
+                                $qtyRemaining -= $deductFifoQty;
+
+                                $wMonthsFifo = $fifoBatch->warranty_months > 0 ? $fifoBatch->warranty_months : $product->warranty_months;
+                                $warrantyExpiryFifo = null;
+                                if ($wMonthsFifo > 0) {
+                                    $warrantyExpiryFifo = date('Y-m-d', strtotime("+$wMonthsFifo months", strtotime($orderDate)));
+                                }
+
+                                $deductedBatches[] = [
+                                    'batch_id' => $fifoBatch->id,
+                                    'qty' => $deductFifoQty,
+                                    'warranty_expiry_date' => $warrantyExpiryFifo
+                                ];
+                            }
+                        }
+
+                        // Fallback if still remaining
+                        if ($qtyRemaining > 0) {
+                            $fallbackBatch = \App\Models\ProductBatch::create([
+                                'product_id' => $pid,
+                                'batch_number' => 'LEGACY-BATCH',
+                                'initial_qty' => 0,
+                                'current_qty' => -$qtyRemaining,
+                                'warranty_months' => $product->warranty_months,
+                                'status' => 1
+                            ]);
+                            
+                            $warrantyExpiry = null;
+                            if ($product->warranty_months > 0) {
+                                $warrantyExpiry = date('Y-m-d', strtotime("+" . $product->warranty_months . " months", strtotime($orderDate)));
+                            }
+                            
+                            $deductedBatches[] = [
+                                'batch_id' => $fallbackBatch->id,
+                                'qty' => $qtyRemaining,
+                                'warranty_expiry_date' => $warrantyExpiry
+                            ];
+                        }
+                    }
+                } else {
+                    // Deduct from batches using FIFO
+                    $qtyToDeduct = $qty;
+                    $batches = \App\Models\ProductBatch::where('product_id', $pid)
+                        ->where('status', 1)
+                        ->where('current_qty', '>', 0)
+                        ->orderBy('id', 'asc') // FIFO
+                        ->get();
+
+                    foreach ($batches as $batch) {
+                        if ($qtyToDeduct <= 0) {
+                            break;
+                        }
+                        
+                        $deductQty = min($batch->current_qty, $qtyToDeduct);
+                        $batch->update([
+                            'current_qty' => $batch->current_qty - $deductQty
+                        ]);
+                        
+                        $qtyToDeduct -= $deductQty;
+                        
+                        $warrantyExpiry = null;
+                        $wMonths = $batch->warranty_months > 0 ? $batch->warranty_months : $product->warranty_months;
+                        if ($wMonths > 0) {
+                            $warrantyExpiry = date('Y-m-d', strtotime("+$wMonths months", strtotime($orderDate)));
+                        }
+                        
+                        $deductedBatches[] = [
+                            'batch_id' => $batch->id,
+                            'qty' => $deductQty,
+                            'warranty_expiry_date' => $warrantyExpiry
+                        ];
+                    }
+
+                    if ($qtyToDeduct > 0) {
+                        $fallbackBatch = \App\Models\ProductBatch::create([
+                            'product_id' => $pid,
+                            'batch_number' => 'LEGACY-BATCH',
+                            'initial_qty' => 0,
+                            'current_qty' => -$qtyToDeduct,
+                            'warranty_months' => $product->warranty_months,
+                            'status' => 1
+                        ]);
+                        
+                        $warrantyExpiry = null;
+                        if ($product->warranty_months > 0) {
+                            $warrantyExpiry = date('Y-m-d', strtotime("+" . $product->warranty_months . " months", strtotime($orderDate)));
+                        }
+                        
+                        $deductedBatches[] = [
+                            'batch_id' => $fallbackBatch->id,
+                            'qty' => $qtyToDeduct,
+                            'warranty_expiry_date' => $warrantyExpiry
+                        ];
+                    }
+                }
+
+                // Create OrderItem records for each batch deduction
+                foreach ($deductedBatches as $dbatch) {
+                    OrderItem::create([
+                        'order_id' => $order->order_id,
+                        'product_id' => $pid,
+                        'hsnsan' => $hsnsacs[$x] ?? '',
+                        'gst' => $gsts[$x] ?? 0,
+                        'qty' => $dbatch['qty'],
+                        'rate' => $rates[$x],
+                        'unit' => $units[$x] ?? 'PCS',
+                        'total' => $rates[$x] * $dbatch['qty'],
+                        'status' => 1,
+                        'slno' => $slnos[$x] ?? ($x + 1),
+                        'batch_id' => $dbatch['batch_id'],
+                        'warranty_expiry_date' => $dbatch['warranty_expiry_date']
+                    ]);
+                }
             }
 
             DB::commit();
@@ -316,7 +463,7 @@ class SalesController extends Controller
         try {
             DB::beginTransaction();
 
-            // Restore previous product stock
+            // Restore previous product stock & batch stock
             $oldItems = OrderItem::where('order_id', $order->order_id)->get();
             foreach ($oldItems as $oldItem) {
                 $product = Product::find($oldItem->product_id);
@@ -324,6 +471,14 @@ class SalesController extends Controller
                     $product->update([
                         'tqty' => $product->tqty + $oldItem->qty
                     ]);
+                }
+                if ($oldItem->batch_id) {
+                    $batch = \App\Models\ProductBatch::find($oldItem->batch_id);
+                    if ($batch) {
+                        $batch->update([
+                            'current_qty' => $batch->current_qty + $oldItem->qty
+                        ]);
+                    }
                 }
             }
 
@@ -395,25 +550,86 @@ class SalesController extends Controller
                 if (empty($pid)) {
                     continue;
                 }
-                $qty = $quantities[$x];
+                $qty = intval($quantities[$x]);
 
                 $product = Product::findOrFail($pid);
                 $product->update([
                     'tqty' => $product->tqty - $qty
                 ]);
 
-                OrderItem::create([
-                    'order_id' => $order->order_id,
-                    'product_id' => $pid,
-                    'hsnsan' => $hsnsacs[$x] ?? '',
-                    'gst' => $gsts[$x] ?? 0,
-                    'qty' => $qty,
-                    'rate' => $rates[$x],
-                    'unit' => $units[$x] ?? 'PCS',
-                    'total' => $totals[$x],
-                    'status' => 1,
-                    'slno' => $slnos[$x] ?? ($x + 1)
-                ]);
+                // Deduct from batches using FIFO
+                $qtyToDeduct = $qty;
+                $batches = \App\Models\ProductBatch::where('product_id', $pid)
+                    ->where('status', 1)
+                    ->where('current_qty', '>', 0)
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                $deductedBatches = [];
+
+                foreach ($batches as $batch) {
+                    if ($qtyToDeduct <= 0) {
+                        break;
+                    }
+                    
+                    $deductQty = min($batch->current_qty, $qtyToDeduct);
+                    $batch->update([
+                        'current_qty' => $batch->current_qty - $deductQty
+                    ]);
+                    
+                    $qtyToDeduct -= $deductQty;
+                    
+                    $warrantyExpiry = null;
+                    $wMonths = $batch->warranty_months > 0 ? $batch->warranty_months : $product->warranty_months;
+                    if ($wMonths > 0) {
+                        $warrantyExpiry = date('Y-m-d', strtotime("+$wMonths months", strtotime($orderDate)));
+                    }
+                    
+                    $deductedBatches[] = [
+                        'batch_id' => $batch->id,
+                        'qty' => $deductQty,
+                        'warranty_expiry_date' => $warrantyExpiry
+                    ];
+                }
+
+                if ($qtyToDeduct > 0) {
+                    $fallbackBatch = \App\Models\ProductBatch::create([
+                        'product_id' => $pid,
+                        'batch_number' => 'LEGACY-BATCH',
+                        'initial_qty' => 0,
+                        'current_qty' => -$qtyToDeduct,
+                        'warranty_months' => $product->warranty_months,
+                        'status' => 1
+                    ]);
+                    
+                    $warrantyExpiry = null;
+                    if ($product->warranty_months > 0) {
+                        $warrantyExpiry = date('Y-m-d', strtotime("+" . $product->warranty_months . " months", strtotime($orderDate)));
+                    }
+                    
+                    $deductedBatches[] = [
+                        'batch_id' => $fallbackBatch->id,
+                        'qty' => $qtyToDeduct,
+                        'warranty_expiry_date' => $warrantyExpiry
+                    ];
+                }
+
+                foreach ($deductedBatches as $dbatch) {
+                    OrderItem::create([
+                        'order_id' => $order->order_id,
+                        'product_id' => $pid,
+                        'hsnsan' => $hsnsacs[$x] ?? '',
+                        'gst' => $gsts[$x] ?? 0,
+                        'qty' => $dbatch['qty'],
+                        'rate' => $rates[$x],
+                        'unit' => $units[$x] ?? 'PCS',
+                        'total' => $rates[$x] * $dbatch['qty'],
+                        'status' => 1,
+                        'slno' => $slnos[$x] ?? ($x + 1),
+                        'batch_id' => $dbatch['batch_id'],
+                        'warranty_expiry_date' => $dbatch['warranty_expiry_date']
+                    ]);
+                }
             }
 
             DB::commit();
@@ -435,7 +651,7 @@ class SalesController extends Controller
 
             $order = Order::findOrFail($id);
 
-            // Restore stock
+            // Restore stock & batch stock
             $items = OrderItem::where('order_id', $order->order_id)->get();
             foreach ($items as $item) {
                 $product = Product::find($item->product_id);
@@ -443,6 +659,14 @@ class SalesController extends Controller
                     $product->update([
                         'tqty' => $product->tqty + $item->qty
                     ]);
+                }
+                if ($item->batch_id) {
+                    $batch = \App\Models\ProductBatch::find($item->batch_id);
+                    if ($batch) {
+                        $batch->update([
+                            'current_qty' => $batch->current_qty + $item->qty
+                        ]);
+                    }
                 }
             }
 

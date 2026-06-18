@@ -62,7 +62,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Product Code (PCODE) <span class="text-rose-500">*</span></label>
-                    <input type="text" name="pcode" required maxlength="6" placeholder="max 6 characters" 
+                    <input type="text" name="pcode" required maxlength="50" placeholder="max 50 characters" 
                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 uppercase font-mono font-bold tracking-wider transition-all">
                 </div>
                 <div class="md:col-span-2">

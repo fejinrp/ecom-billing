@@ -69,3 +69,6 @@ ALTER TABLE `order_item`
 ALTER TABLE `eorder_item` 
   ADD COLUMN `batch_id` bigint(20) unsigned DEFAULT NULL AFTER `prod_id`,
   ADD COLUMN `warranty_expiry_date` date DEFAULT NULL AFTER `qty`;
+
+-- 7. Alter products table pcode column length to 50
+ALTER TABLE `products` MODIFY COLUMN `pcode` VARCHAR(50) NULL;

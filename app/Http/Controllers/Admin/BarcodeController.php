@@ -28,7 +28,7 @@ class BarcodeController extends Controller
     public function print(Request $request)
     {
         $request->validate([
-            'pcode' => 'required|string|max:10',
+            'pcode' => 'required|string|max:50',
             'pname' => 'required|string|max:255',
             'mrp' => 'required|numeric',
             'cprice' => 'required|numeric',

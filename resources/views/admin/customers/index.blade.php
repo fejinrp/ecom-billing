@@ -73,7 +73,7 @@
                 <!-- No -->
                 <td class="col-span-2 bg-indigo-500/10 text-indigo-400 px-3 py-2 rounded-lg text-xs font-mono font-bold flex items-center justify-between lg:table-cell lg:col-span-none lg:bg-transparent lg:px-6 lg:py-4 lg:text-slate-400">
                     <span class="lg:hidden uppercase tracking-wider text-[10px] font-bold text-indigo-400">No</span>
-                    <span>#{{ $index + 1 }}</span>
+                    <span>#{{ ($users->currentPage() - 1) * $users->perPage() + $index + 1 }}</span>
                 </td>
 
                 <!-- Customer Name -->

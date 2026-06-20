@@ -123,11 +123,13 @@
             let scrollInterval = null;
             let isHovered = false;
             let direction = 1; // 1 = right, -1 = left
+            let scrollPos = container.scrollLeft;
 
             function startScrolling() {
                 if (scrollInterval) return;
                 // Only auto-scroll on desktop or when not in grid layout
                 if (window.innerWidth < 768) return; 
+                scrollPos = container.scrollLeft;
                 scrollInterval = setInterval(() => {
                     if (isHovered) return;
                     
@@ -136,7 +138,8 @@
                         return; // Do not scroll if there is no overflow
                     }
 
-                    container.scrollLeft += scrollSpeed * direction;
+                    scrollPos += scrollSpeed * direction;
+                    container.scrollLeft = Math.round(scrollPos);
 
                     // Bounce back and forth when reaching either end
                     if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
@@ -159,11 +162,11 @@
 
             // Hover listeners
             container.addEventListener('mouseenter', () => { isHovered = true; });
-            container.addEventListener('mouseleave', () => { isHovered = false; });
+            container.addEventListener('mouseleave', () => { isHovered = false; scrollPos = container.scrollLeft; });
             
             // Touch listeners for mobile
             container.addEventListener('touchstart', () => { isHovered = true; });
-            container.addEventListener('touchend', () => { isHovered = false; });
+            container.addEventListener('touchend', () => { isHovered = false; scrollPos = container.scrollLeft; });
 
             // Disable autoscroll on resize to mobile
             window.addEventListener('resize', () => {
@@ -246,15 +249,18 @@
             let scrollInterval = null;
             let isHovered = false;
             let direction = 1;
+            let scrollPos = container.scrollLeft;
 
             function startScrolling() {
                 if (scrollInterval) return;
                 if (window.innerWidth >= 768) return;
+                scrollPos = container.scrollLeft;
                 scrollInterval = setInterval(() => {
                     if (isHovered) return;
                     if (container.scrollWidth <= container.clientWidth) return;
 
-                    container.scrollLeft += scrollSpeed * direction;
+                    scrollPos += scrollSpeed * direction;
+                    container.scrollLeft = Math.round(scrollPos);
 
                     if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
                         direction = -1;
@@ -274,9 +280,9 @@
             startScrolling();
 
             container.addEventListener('mouseenter', () => { isHovered = true; });
-            container.addEventListener('mouseleave', () => { isHovered = false; });
+            container.addEventListener('mouseleave', () => { isHovered = false; scrollPos = container.scrollLeft; });
             container.addEventListener('touchstart', () => { isHovered = true; });
-            container.addEventListener('touchend', () => { isHovered = false; });
+            container.addEventListener('touchend', () => { isHovered = false; scrollPos = container.scrollLeft; });
 
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 768) {
@@ -289,35 +295,7 @@
     </script>
     @endif
 
-    <!-- ── Snapdeal Trust Bar (Redesigned from Black to Soft Gradient) ── -->
-    <div class="p-4 justify-center rounded-2xl mb-8 flex flex-col md:flex-row items-center justify-around gap-4 shadow-sm border border-slate-100 dark:border-slate-800/80 bg-gradient-to-r from-blue-50/40 via-slate-50/20 to-indigo-50/40 dark:from-slate-900/60 dark:to-slate-950/60 animate-fade-in">
-        <!-- Free Delivery Card -->
-        <div class="flex flex-col items-center text-center bg-white dark:bg-slate-900/80 p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102 border border-slate-100/80 dark:border-slate-800/40">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner bg-blue-50 dark:bg-[#0059e3]/10 text-[#0059e3]">
-                <i class="fa-solid fa-truck-fast"></i>
-            </div>
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">FREE Delivery</h4>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">On all hardware imports across India</p>
-        </div>
 
-        <!-- Returns Card -->
-        <div class="flex flex-col items-center text-center bg-white dark:bg-slate-900/80 p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102 border border-slate-100/80 dark:border-slate-800/40">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner bg-blue-50 dark:bg-[#0059e3]/10 text-[#0059e3]">
-                <i class="fa-solid fa-rotate-left"></i>
-            </div>
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">7 Days Easy Returns</h4>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Hassle-free return policy parameters</p>
-        </div>
-
-        <!-- Quality Card -->
-        <div class="flex flex-col items-center text-center bg-white dark:bg-slate-900/80 p-4 rounded-xl w-full max-w-sm shadow-sm transition-transform hover:scale-102 border border-slate-100/80 dark:border-slate-800/40">
-            <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 shadow-inner bg-blue-50 dark:bg-[#0059e3]/10 text-[#0059e3]">
-                <i class="fa-solid fa-ribbon"></i>
-            </div>
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Great Quality</h4>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">At unmatched enterprise pricing</p>
-        </div>
-    </div>
 
     <!-- ── Deal Of The Day Section ── -->
     <div class="mb-12">
@@ -375,9 +353,11 @@
             let scrollInterval = null;
             let isHovered = false;
             let direction = 1; // 1 = right, -1 = left
+            let scrollPos = container.scrollLeft;
 
             function startScrolling() {
                 if (scrollInterval) return;
+                scrollPos = container.scrollLeft;
                 scrollInterval = setInterval(() => {
                     if (isHovered) return;
                     
@@ -386,7 +366,8 @@
                         return; // Do not scroll if there is no overflow
                     }
 
-                    container.scrollLeft += scrollSpeed * direction;
+                    scrollPos += scrollSpeed * direction;
+                    container.scrollLeft = Math.round(scrollPos);
 
                     // Bounce back and forth when reaching either end
                     if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
@@ -402,11 +383,11 @@
 
             // Hover listeners
             container.addEventListener('mouseenter', () => { isHovered = true; });
-            container.addEventListener('mouseleave', () => { isHovered = false; });
+            container.addEventListener('mouseleave', () => { isHovered = false; scrollPos = container.scrollLeft; });
             
             // Touch listeners for mobile
             container.addEventListener('touchstart', () => { isHovered = true; });
-            container.addEventListener('touchend', () => { isHovered = false; });
+            container.addEventListener('touchend', () => { isHovered = false; scrollPos = container.scrollLeft; });
         });
     </script>
 
@@ -484,6 +465,81 @@
             <div class="flex items-center gap-4 pt-2">
                 <a href="tel:+919944228686" class="sf-home-banner-btn px-5 py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg transition-all bg-[#0059e3] hover:bg-[#0040a6]">Consult Advisor</a>
                 <span class="sf-home-banner-copy text-xs font-mono font-bold">+91 99442 28686</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Trust / Feature Highlights Section (Styled to match the attached layout) ── -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-12 mb-4">
+        <!-- FREE Delivery -->
+        <div class="flex flex-col items-center justify-between text-center p-6 rounded-[1.5rem] bg-[#e0f2fe] dark:bg-sky-950/20 border border-sky-100/50 dark:border-sky-900/30 transition-transform hover:scale-[1.03] duration-300">
+            <div class="w-16 h-16 flex items-center justify-center mb-3">
+                <svg class="w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="24" width="34" height="22" rx="3" fill="#38bdf8"/>
+                    <path d="M40 28H50L56 36V46H40V28Z" fill="#0284c7"/>
+                    <circle cx="18" cy="48" r="6" fill="#475569"/>
+                    <circle cx="18" cy="48" r="2.5" fill="#f8fafc"/>
+                    <circle cx="48" cy="48" r="6" fill="#475569"/>
+                    <circle cx="48" cy="48" r="2.5" fill="#f8fafc"/>
+                    <rect x="44" y="31" width="7" height="5" rx="1" fill="#e2e8f0"/>
+                    <path d="M12 30H24" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 36H20" stroke="#f8fafc" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">FREE Delivery</h4>
+                <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">On all hardware imports</p>
+            </div>
+        </div>
+
+        <!-- 7 Days Easy Returns -->
+        <div class="flex flex-col items-center justify-between text-center p-6 rounded-[1.5rem] bg-[#dcfce7] dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30 transition-transform hover:scale-[1.03] duration-300">
+            <div class="w-16 h-16 flex items-center justify-center mb-3">
+                <svg class="w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="18" width="40" height="30" rx="4" fill="#4ade80"/>
+                    <path d="M22 18V12C22 10.8954 22.8954 10 24 10H40C41.1046 10 42 10.8954 42 12V18" stroke="#16a34a" stroke-width="3"/>
+                    <path d="M32 26C27.5817 26 24 29.5817 24 34C24 38.4183 27.5817 42 32 42C35.5 42 38.5 39.5 39.5 36.5" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M36 33L40 37L44 33" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">7 Days Returns</h4>
+                <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Hassle-free return policy</p>
+            </div>
+        </div>
+
+        <!-- Great Quality -->
+        <div class="flex flex-col items-center justify-between text-center p-6 rounded-[1.5rem] bg-[#fef9c3] dark:bg-amber-950/20 border border-amber-100/50 dark:border-amber-900/30 transition-transform hover:scale-[1.03] duration-300">
+            <div class="w-16 h-16 flex items-center justify-center mb-3">
+                <svg class="w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 36L24 54L32 48L40 54L46 36" fill="#f59e0b"/>
+                    <circle cx="32" cy="26" r="18" fill="#facc15"/>
+                    <circle cx="32" cy="26" r="13" fill="#f59e0b"/>
+                    <path d="M28 26L31 29L37 23" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">Great Quality</h4>
+                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">Direct enterprise sourcing</p>
+            </div>
+        </div>
+
+        <!-- GST Compliant -->
+        <div class="flex flex-col items-center justify-between text-center p-6 rounded-[1.5rem] bg-[#fee2e2] dark:bg-rose-950/20 border border-rose-100/50 dark:border-rose-900/30 transition-transform hover:scale-[1.03] duration-300">
+            <div class="w-16 h-16 flex items-center justify-center mb-3">
+                <svg class="w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="14" y="8" width="36" height="48" rx="4" fill="#fb7185"/>
+                    <rect x="20" y="16" width="24" height="6" rx="1" fill="#f43f5e"/>
+                    <line x1="20" y1="28" x2="44" y2="28" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="20" y1="36" x2="44" y2="36" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="20" y1="44" x2="34" y2="44" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="46" cy="46" r="8" fill="#10b981"/>
+                    <path d="M43 46L45 48L49 44" stroke="#f8fafc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">GST Compliant</h4>
+                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">Input Credit & Tax Invoices</p>
             </div>
         </div>
     </div>

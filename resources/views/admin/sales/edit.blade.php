@@ -156,7 +156,7 @@
                                 @click="addLineItem()" 
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 text-xs font-bold rounded-lg transition-all active:scale-95">
                             <i class="fa-solid fa-plus"></i>
-                            <span>Add Item Line</span>
+                            <span class="hidden sm:inline">Add Item Line</span>
                         </button>
                     </div>
 
@@ -215,8 +215,8 @@
                                         <td class="py-2 lg:pl-2 col-span-1 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Stock + Prior</label>
                                             <div class="flex items-center h-[38px] lg:h-auto">
-                                                <span class="text-xs font-semibold px-2 py-1 rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800" 
-                                                      :class="item.stock <= 0 ? 'text-rose-450 bg-rose-500/10' : 'text-slate-700 dark:text-slate-400'"
+                                                <span class="text-xs font-semibold px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center block w-full" 
+                                                      :class="item.stock <= 0 ? 'text-rose-400 bg-rose-500/5 border-rose-500/10' : 'text-slate-700 dark:text-slate-400'"
                                                       x-text="item.stock + ' ' + item.unit"></span>
                                             </div>
                                         </td>
@@ -248,8 +248,8 @@
                                         <!-- GST rate -->
                                         <td class="py-2 lg:pl-2 col-span-1 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">GST Rate</label>
-                                            <div class="flex items-center h-[38px] lg:h-auto pl-1 lg:pl-3">
-                                                <span class="text-xs font-mono font-bold text-slate-400" x-text="item.gst + '%'"></span>
+                                            <div class="flex items-center h-[38px] lg:h-auto">
+                                                <span class="text-xs font-mono font-bold text-slate-700 dark:text-slate-400 px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center block w-full" x-text="item.gst + '%'"></span>
                                             </div>
                                         </td>
  

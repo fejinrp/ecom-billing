@@ -44,13 +44,13 @@
                                 @click="catalogDrawerOpen = true"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-bold rounded-lg transition-all active:scale-95">
                             <i class="fa-solid fa-store"></i>
-                            <span>Browse Catalog</span>
+                            <span class="hidden sm:inline">Browse Catalog</span>
                         </button>
                         <button type="button" 
                                 @click="addLineItem()" 
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/25 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-bold rounded-lg transition-all active:scale-95">
                             <i class="fa-solid fa-plus"></i>
-                            <span>Add Item Line</span>
+                            <span class="hidden sm:inline">Add Item Line</span>
                         </button>
                     </div>
                 </div>
@@ -155,7 +155,6 @@
                                             <select name="productName[]" 
                                                     x-model="item.productId" 
                                                     @change="onProductSelect(index)"
-                                                    required
                                                     class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500">
                                                 <option value="">-- Choose Product --</option>
                                                 <template x-for="p in products" :key="p.id">
@@ -185,10 +184,10 @@
                                         <td class="py-2 lg:pl-2 col-span-1 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Available Stock</label>
                                             <div class="flex flex-col justify-center h-[38px] lg:h-auto">
-                                                <span class="text-xs font-semibold px-2 py-1 rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800" 
-                                                      :class="item.stock <= 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-400'"
+                                                <span class="text-xs font-semibold px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center block w-full" 
+                                                      :class="item.stock <= 0 ? 'text-rose-600 dark:text-rose-400 bg-rose-500/5 border-rose-500/10' : 'text-slate-700 dark:text-slate-400'"
                                                       x-text="item.stock + ' ' + item.unit"></span>
-                                                <span x-show="item.batchId" class="text-[9px] font-mono text-indigo-500 dark:text-indigo-400 mt-1" x-text="'Batch stock: ' + item.batchStock"></span>
+                                                <span x-show="item.batchId" class="text-[9px] font-mono text-indigo-500 dark:text-indigo-400 mt-1 text-center" x-text="'Batch stock: ' + item.batchStock"></span>
                                             </div>
                                         </td>
  
@@ -199,7 +198,6 @@
                                                    name="quantity[]" 
                                                    x-model.number="item.qty" 
                                                    @input="calculateRowTotal(index)"
-                                                   required 
                                                    min="1" 
                                                    class="w-full px-2 py-2 bg-white dark:bg-slate-950 border border-slate-250 dark:border-slate-850 rounded-lg text-slate-800 dark:text-slate-200 text-center text-sm focus:outline-none focus:border-indigo-500">
                                         </td>
@@ -211,7 +209,6 @@
                                                    name="rateValue[]" 
                                                    x-model.number="item.rate" 
                                                    @input="calculateRowTotal(index)"
-                                                   required 
                                                    step="0.01" 
                                                    class="w-full px-2 py-2 bg-white dark:bg-slate-950 border border-slate-250 dark:border-slate-850 rounded-lg text-slate-800 dark:text-slate-200 text-right text-sm focus:outline-none focus:border-indigo-500 font-medium">
                                         </td>
@@ -219,8 +216,8 @@
                                         <!-- GST rate -->
                                         <td class="py-2 lg:pl-2 col-span-1 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">GST Rate</label>
-                                            <div class="flex items-center h-[38px] lg:h-auto pl-1 lg:pl-3">
-                                                <span class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400" x-text="item.gst + '%'"></span>
+                                            <div class="flex items-center h-[38px] lg:h-auto">
+                                                <span class="text-xs font-mono font-bold text-slate-700 dark:text-slate-400 px-2 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center block w-full" x-text="item.gst + '%'"></span>
                                             </div>
                                         </td>
  
@@ -249,16 +246,16 @@
                 </div>
  
                 <!-- Sticky Bottom Bar -->
-                <div class="fixed bottom-0 left-0 lg:left-72 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/85 px-6 py-4 flex items-center justify-between shadow-2xl">
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Grand Total:</span>
-                        <span class="font-mono text-2xl font-black text-indigo-650 dark:text-indigo-400">Rs. <span x-text="financials.grandTotal.toFixed(2)"></span></span>
+                <div class="fixed bottom-0 left-0 lg:left-72 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/85 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between gap-3 shadow-2xl">
+                    <div class="flex items-center gap-1.5 sm:gap-3">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Grand Total:</span>
+                        <span class="font-mono text-lg sm:text-2xl font-black text-indigo-650 dark:text-indigo-400 leading-none">Rs. <span x-text="financials.grandTotal.toFixed(2)"></span></span>
                     </div>
                     <button type="button" 
                             @click="pricingDrawerOpen = true"
-                            class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition-all flex items-center gap-2 shadow-lg shadow-orange-600/20 active:scale-95">
+                            class="px-4 py-2.5 sm:px-6 sm:py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs sm:text-sm transition-all flex items-center gap-1.5 sm:gap-2 shadow-lg shadow-orange-600/20 active:scale-95 whitespace-nowrap">
                         <i class="fa-solid fa-calculator"></i>
-                        <span>Summary & Complete Bill</span>
+                        <span class="hidden sm:inline">Summary & Checkout</span>
                     </button>
                 </div>
                 
@@ -282,43 +279,43 @@
 
                     <!-- Drawer Panel -->
                     <div class="absolute inset-y-0 right-0 w-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800/80 shadow-2xl flex flex-col"
-                         x-transition:enter="transition ease-out duration-300 transform"
-                         x-transition:enter-start="translate-x-full"
-                         x-transition:enter-end="translate-x-0"
-                         x-transition:leave="transition ease-in duration-200 transform"
-                         x-transition:leave-start="translate-x-0"
-                         x-transition:leave-end="translate-x-full">
-                        
-                        <!-- Header -->
-                        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
-                            <div class="flex items-center gap-2.5">
-                                <button type="button" @click="pricingDrawerOpen = false" class="p-1.5 text-slate-400 dark:text-slate-400 shadow-sm w-10 h-10 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                                    <i class="fa-solid fa-xmark text-lg"></i>
-                                </button>
-                                <i class="fa-solid fa-calculator text-indigo-600 dark:text-indigo-400 text-lg"></i>
-                                <h3 class="text-base font-bold text-slate-800 dark:text-white uppercase tracking-wider">Invoice Summary & Customer Checkout</h3>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <!-- Submit button moved to top -->
-                                <button type="submit" 
-                                        class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition-all flex items-center gap-2 shadow-lg shadow-orange-600/20 active:scale-95">
-                                    <i class="fa-solid fa-file-circle-check"></i>
-                                    <span>Complete & Issue Bill</span>
-                                </button>
-                                
-                            </div>
-                        </div>
-
-                        <!-- Split Content: Customer Profile & Return Helper (Left) and Billing Form (Right) -->
-                        <div class="flex-1 overflow-hidden flex flex-col md:flex-row">
-                            
-                            <!-- Left Panel: Customer Profile & Cash Return Calculation -->
-                            <div class="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 p-6 flex flex-col justify-between overflow-y-auto space-y-6">
-                                <div class="space-y-4">
-                                    <div class="flex items-center gap-2">
-                                        <i class="fa-solid fa-user-tag text-indigo-500"></i>
-                                        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider">Customer Profile</h4>
-                                    </div>
+                          x-transition:enter="transition ease-out duration-300 transform"
+                          x-transition:enter-start="translate-x-full"
+                          x-transition:enter-end="translate-x-0"
+                          x-transition:leave="transition ease-in duration-200 transform"
+                          x-transition:leave-start="translate-x-0"
+                          x-transition:leave-end="translate-x-full">
+                         
+                         <!-- Header -->
+                         <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                             <div class="flex items-center gap-2.5">
+                                 <button type="button" @click="pricingDrawerOpen = false" class="p-1.5 text-slate-400 dark:text-slate-400 shadow-sm w-10 h-10 border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                                     <i class="fa-solid fa-xmark text-lg"></i>
+                                 </button>
+                                 <i class="fa-solid fa-calculator text-indigo-600 dark:text-indigo-400 text-lg"></i>
+                                 <h3 class="text-base font-bold text-slate-800 dark:text-white uppercase tracking-wider">Invoice Summary</h3>
+                             </div>
+                             <div class="flex items-center gap-3">
+                                 <!-- Submit button moved to top (Desktop only) -->
+                                 <button type="submit" 
+                                         class="hidden md:flex px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition-all items-center gap-2 shadow-lg shadow-orange-600/20 active:scale-95">
+                                     <i class="fa-solid fa-file-circle-check"></i>
+                                     <span>Complete & Issue Bill</span>
+                                 </button>
+                                 
+                             </div>
+                         </div>
+ 
+                         <!-- Split Content: Customer Profile & Return Helper (Left) and Billing Form (Right) -->
+                         <div class="flex-1 overflow-y-auto md:overflow-hidden flex flex-col md:flex-row">
+                             
+                             <!-- Left Panel: Customer Profile & Cash Return Calculation -->
+                             <div class="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between md:overflow-y-auto space-y-6">
+                                 <div class="space-y-4">
+                                     <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                                         <i class="fa-solid fa-user-tag text-indigo-500 text-sm"></i>
+                                         <h4 class="text-xs font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider">Customer Profile</h4>
+                                     </div>
                                     
                                     <!-- Customer Selection & Form Fields -->
                                     <div class="space-y-4">
@@ -465,164 +462,192 @@
                                 </div>
                             </div>
 
-                            <!-- Right Panel: Billing Config Form -->
-                            <div class="w-full md:w-1/2 overflow-y-auto p-6 space-y-6 custom-scrollbar text-slate-700 dark:text-slate-300">
-                                <!-- Inputs & Settings -->
-                                <div class="space-y-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    <div class="space-y-1.5">
-                                        <label for="paymentPlace" class="block">GST Tax Mode</label>
-                                        <select id="paymentPlace" 
-                                                name="paymentPlace" 
-                                                x-model.number="financials.paymentPlace" 
-                                                @change="calculateTotals()"
-                                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-semibold normal-case">
-                                            <option value="1">Intra-State (CGST + SGST)</option>
-                                            <option value="2">Inter-State (IGST)</option>
-                                        </select>
-                                    </div>
+                             <!-- Right Panel: Billing Config Form -->
+                             <div class="w-full md:w-1/2 md:overflow-y-auto p-6 space-y-6 custom-scrollbar text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950/40">
+                                 
+                                 <!-- Card 1: Payment settings -->
+                                 <div class="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-4">
+                                     <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                                         <i class="fa-solid fa-credit-card text-indigo-500 text-sm"></i>
+                                         <span>Payment Settings</span>
+                                     </h4>
+                                     
+                                     <!-- Inputs & Settings -->
+                                     <div class="space-y-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                         <div class="space-y-1.5">
+                                             <label for="paymentPlace" class="block">GST Tax Mode</label>
+                                             <select id="paymentPlace" 
+                                                     name="paymentPlace" 
+                                                     x-model.number="financials.paymentPlace" 
+                                                     @change="calculateTotals()"
+                                                     class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-semibold normal-case">
+                                                 <option value="1">Intra-State (CGST + SGST)</option>
+                                                 <option value="2">Inter-State (IGST)</option>
+                                             </select>
+                                         </div>
 
-                                    <div class="space-y-1.5">
-                                        <label for="paymentType" class="block">Payment Mode</label>
-                                        <select id="paymentType" 
-                                                name="paymentType" 
-                                                x-model.number="financials.paymentType"
-                                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-semibold normal-case">
-                                            <option value="2">Cash Payment</option>
-                                            <option value="1">Cheque Payment</option>
-                                            <option value="3">Online / UPI Transfer</option>
-                                        </select>
-                                    </div>
+                                         <div class="space-y-1.5">
+                                             <label for="paymentType" class="block">Payment Mode</label>
+                                             <select id="paymentType" 
+                                                     name="paymentType" 
+                                                     x-model.number="financials.paymentType"
+                                                     class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-semibold normal-case">
+                                                 <option value="2">Cash Payment</option>
+                                                 <option value="1">Cheque Payment</option>
+                                                 <option value="3">Online / UPI Transfer</option>
+                                             </select>
+                                         </div>
 
-                                    <div class="space-y-1.5">
-                                        <label for="paymentName" class="block">Cashier / Account tag</label>
-                                        <input type="text" 
-                                               id="paymentName" 
-                                               name="paymentName" 
-                                               value="MTL" 
-                                               required 
-                                               class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 text-sm normal-case">
-                                    </div>
+                                         <div class="space-y-1.5">
+                                             <label for="paymentName" class="block">Cashier / Account tag</label>
+                                             <input type="text" 
+                                                    id="paymentName" 
+                                                    name="paymentName" 
+                                                    value="MTL" 
+                                                    required 
+                                                    class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 text-sm normal-case">
+                                         </div>
 
-                                    <div class="space-y-1.5">
-                                        <label for="paymentStatus" class="block">Payment Status</label>
-                                        <select id="paymentStatus" 
-                                                name="paymentStatus" 
-                                                x-model.number="financials.paymentStatus" 
-                                                @change="onPaymentStatusChange()"
-                                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-semibold normal-case">
-                                            <option value="1">Fully Paid</option>
-                                            <option value="2">Partially Paid</option>
-                                            <option value="3">No Paid / Credit</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                         <div class="space-y-1.5">
+                                             <label for="paymentStatus" class="block">Payment Status</label>
+                                             <select id="paymentStatus" 
+                                                     name="paymentStatus" 
+                                                     x-model.number="financials.paymentStatus" 
+                                                     @change="onPaymentStatusChange()"
+                                                     class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-semibold normal-case">
+                                                 <option value="1">Fully Paid</option>
+                                                 <option value="2">Partially Paid</option>
+                                                 <option value="3">No Paid / Credit</option>
+                                             </select>
+                                         </div>
+                                     </div>
+                                 </div>
 
-                                <!-- Ledgers Breakdown -->
-                                <div class="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                                    <div class="flex items-center justify-between">
-                                        <span>Subtotal Amount:</span>
-                                        <span class="font-mono font-bold text-slate-800 dark:text-slate-200">Rs. <span x-text="financials.subTotal.toFixed(2)"></span></span>
-                                        <input type="hidden" name="subTotalValue" :value="financials.subTotal">
-                                        <input type="hidden" name="totalAmountValue" :value="financials.subTotal">
-                                    </div>
+                                 <!-- Card 2: Billing Ledger calculations -->
+                                 <div class="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-4">
+                                     <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                                         <i class="fa-solid fa-receipt text-indigo-500 text-sm"></i>
+                                         <span>Ledger Calculations</span>
+                                     </h4>
+                                     
+                                     <!-- Ledgers Breakdown -->
+                                     <div class="space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+                                         <div class="flex items-center justify-between">
+                                             <span class="font-medium text-slate-500">Subtotal Amount:</span>
+                                             <span class="font-mono font-bold text-slate-800 dark:text-slate-200">Rs. <span x-text="financials.subTotal.toFixed(2)"></span></span>
+                                             <input type="hidden" name="subTotalValue" :value="financials.subTotal">
+                                             <input type="hidden" name="totalAmountValue" :value="financials.subTotal">
+                                         </div>
 
-                                    <div class="flex items-center justify-between text-xs">
-                                        <span x-text="financials.paymentPlace == 1 ? 'CGST + SGST amount:' : 'IGST Tax amount:'"></span>
-                                        <span class="font-mono font-semibold text-slate-700 dark:text-slate-300">Rs. <span x-text="financials.tax.toFixed(2)"></span></span>
-                                        <input type="hidden" name="igst" :value="financials.tax">
-                                    </div>
+                                         <div class="flex items-center justify-between text-xs">
+                                             <span class="font-medium text-slate-550" x-text="financials.paymentPlace == 1 ? 'CGST + SGST Amount:' : 'IGST Tax Amount:'"></span>
+                                             <span class="font-mono font-semibold text-slate-700 dark:text-slate-300">Rs. <span x-text="financials.tax.toFixed(2)"></span></span>
+                                             <input type="hidden" name="igst" :value="financials.tax">
+                                         </div>
 
-                                    <!-- Ext charges -->
-                                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                                        <div class="space-y-1">
-                                            <label for="shipcharge" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Shipping (Rs.)</label>
-                                            <input type="number" 
-                                                   id="shipcharge" 
-                                                   name="shipcharge" 
-                                                   x-model.number="financials.shipping" 
-                                                   @input="calculateTotals()"
-                                                   step="0.01" 
-                                                   class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm font-semibold focus:outline-none text-right">
-                                        </div>
-                                        <div class="space-y-1">
-                                            <label for="intcharge" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Interest / Ext (Rs.)</label>
-                                            <input type="number" 
-                                                   id="intcharge" 
-                                                   name="intcharge" 
-                                                   x-model.number="financials.interest" 
-                                                   @input="calculateTotals()"
-                                                   step="0.01" 
-                                                   class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm font-semibold focus:outline-none text-right">
-                                        </div>
-                                    </div>
+                                         <!-- Ext charges -->
+                                         <div class="grid grid-cols-2 gap-3 pt-2.5 border-t border-slate-100 dark:border-slate-800">
+                                             <div class="space-y-1">
+                                                 <label for="shipcharge" class="block text-[10px] font-bold uppercase tracking-wider text-slate-550 dark:text-slate-450">Shipping (Rs.)</label>
+                                                 <input type="number" 
+                                                        id="shipcharge" 
+                                                        name="shipcharge" 
+                                                        x-model.number="financials.shipping" 
+                                                        @input="calculateTotals()"
+                                                        step="0.01" 
+                                                        class="w-full px-3 py-1.5 bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm font-semibold focus:outline-none text-right">
+                                             </div>
+                                             <div class="space-y-1">
+                                                 <label for="intcharge" class="block text-[10px] font-bold uppercase tracking-wider text-slate-550 dark:text-slate-450">Interest / Ext (Rs.)</label>
+                                                 <input type="number" 
+                                                        id="intcharge" 
+                                                        name="intcharge" 
+                                                        x-model.number="financials.interest" 
+                                                        @input="calculateTotals()"
+                                                        step="0.01" 
+                                                        class="w-full px-3 py-1.5 bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm font-semibold focus:outline-none text-right">
+                                             </div>
+                                         </div>
 
-                                    <div class="space-y-1 pt-2">
-                                        <label for="discount" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Discount (Rs.)</label>
-                                        <input type="number" 
-                                               id="discount" 
-                                               name="discount" 
-                                               x-model.number="financials.discount" 
-                                               @input="calculateTotals()"
-                                               step="0.01" 
-                                               class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm font-bold focus:outline-none text-right text-amber-600 dark:text-amber-400">
-                                    </div>
+                                         <div class="space-y-1 pt-1.5">
+                                             <label for="discount" class="block text-[10px] font-bold uppercase tracking-wider text-slate-550 dark:text-slate-450">Discount (Rs.)</label>
+                                             <input type="number" 
+                                                    id="discount" 
+                                                    name="discount" 
+                                                    x-model.number="financials.discount" 
+                                                    @input="calculateTotals()"
+                                                    step="0.01" 
+                                                    class="w-full px-3 py-2 bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-800 dark:text-slate-200 text-sm font-bold focus:outline-none text-right text-amber-600 dark:text-amber-450">
+                                         </div>
+                                     </div>
+                                 </div>
 
-                                    <!-- Grand Total -->
-                                    <div class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800 text-base font-bold text-slate-800 dark:text-white">
-                                        <span>Grand Total:</span>
-                                        <span class="font-mono text-xl font-bold text-indigo-600 dark:text-indigo-400">Rs. <span x-text="financials.grandTotal.toFixed(2)"></span></span>
-                                        <input type="hidden" name="grandTotalValue" :value="financials.grandTotal">
-                                    </div>
+                                 <!-- Card 3: Financial Totals (The Main Focus Card) -->
+                                 <div class="p-5 bg-indigo-50/50 dark:bg-indigo-950/10 border border-indigo-100 dark:border-indigo-900/30 rounded-2xl shadow-sm space-y-4">
+                                     <!-- Grand Total -->
+                                     <div class="flex items-center justify-between text-base font-bold text-slate-800 dark:text-white">
+                                         <span class="text-slate-700 dark:text-slate-350">Grand Total:</span>
+                                         <span class="font-mono text-2xl font-black text-indigo-650 dark:text-indigo-400">Rs. <span x-text="financials.grandTotal.toFixed(2)"></span></span>
+                                         <input type="hidden" name="grandTotalValue" :value="financials.grandTotal">
+                                     </div>
 
-                                    <!-- Paid -->
-                                    <div class="space-y-1 pt-3">
-                                        <label for="paid" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Paid Amount (Rs.)</label>
-                                        <input type="number" 
-                                               id="paid" 
-                                               name="paid" 
-                                               x-model.number="financials.paid" 
-                                               @input="calculateDue()"
-                                               required 
-                                               step="0.01" 
-                                               class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 text-lg font-extrabold focus:outline-none text-right text-emerald-600 dark:text-emerald-400">
-                                    </div>
+                                     <!-- Paid Input -->
+                                     <div class="space-y-1.5">
+                                         <label for="paid" class="block text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">Paid Amount (Rs.)</label>
+                                         <input type="number" 
+                                                id="paid" 
+                                                name="paid" 
+                                                x-model.number="financials.paid" 
+                                                @input="calculateDue()"
+                                                required 
+                                                step="0.01" 
+                                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-950 border border-indigo-200 dark:border-indigo-900 rounded-xl text-slate-800 dark:text-slate-200 text-xl font-extrabold focus:outline-none text-right text-emerald-600 dark:text-emerald-450 focus:ring-1 focus:ring-indigo-550">
+                                     </div>
 
-                                    <!-- Due -->
-                                    <div class="flex items-cols justify-between pt-2 text-sm">
-                                        <span class="font-semibold">Remaining Due Balance:</span>
-                                        <span class="font-mono font-bold" :class="financials.due > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500'">Rs. <span x-text="financials.due.toFixed(2)"></span></span>
-                                        <input type="hidden" name="dueValue" :value="financials.due">
-                                    </div>
-                                </div>
+                                     <!-- Due Display -->
+                                     <div class="flex items-center justify-between pt-3 border-t border-indigo-100 dark:border-indigo-900/30 text-sm font-semibold">
+                                         <span class="text-slate-700 dark:text-slate-350">Remaining Due Balance:</span>
+                                         <span class="font-mono text-base font-bold" :class="financials.due > 0 ? 'text-rose-600 dark:text-rose-450' : 'text-slate-500'">Rs. <span x-text="financials.due.toFixed(2)"></span></span>
+                                         <input type="hidden" name="dueValue" :value="financials.due">
+                                     </div>
+                                 </div>
 
-                                <!-- Loyalty Coins Card (Subtle section) -->
-                                <div class="p-4 bg-amber-500/5 dark:bg-slate-900/60 border border-amber-500/10 dark:border-slate-800 rounded-xl space-y-2 text-xs text-slate-600 dark:text-slate-400">
-                                    <span class="font-bold text-amber-800 dark:text-slate-350 block uppercase tracking-wide">Loyalty Coins Ledger</span>
-                                    <div class="flex justify-between">
-                                        <span>Available Coins:</span>
-                                        <span class="font-bold text-indigo-600 dark:text-indigo-400" x-text="coins.tmcoin"></span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Redeeming Coins (Points):</span>
-                                        <input type="number" 
-                                               name="mcoinp" 
-                                               x-model.number="coins.mcoinp" 
-                                               @input="onCoinRedemptionChange()"
-                                               class="w-20 px-2 py-0.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-right text-slate-800 dark:text-slate-300 focus:outline-none font-bold">
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Coins Earned:</span>
-                                        <span class="font-bold text-emerald-600 dark:text-emerald-400" x-text="coins.mcoin"></span>
-                                    </div>
-                                    <div class="flex justify-between border-t border-slate-200 dark:border-slate-950 pt-1.5 font-semibold">
-                                        <span>Net Balance:</span>
-                                        <span class="font-bold text-slate-800 dark:text-slate-200" x-text="coins.bmcoin"></span>
-                                        <!-- Hidden fields for coins -->
-                                        <input type="hidden" name="mcoin" :value="coins.mcoin">
-                                        <input type="hidden" name="bmcoin" :value="coins.bmcoin">
-                                        <input type="hidden" name="tmcoin" :value="coins.tmcoin">
-                                    </div>
+                                 <!-- Loyalty Coins Card (Subtle section) -->
+                                 <div class="p-4 bg-amber-500/5 dark:bg-slate-900/60 border border-amber-500/10 dark:border-slate-800 rounded-xl space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                                     <span class="font-bold text-amber-800 dark:text-slate-350 block uppercase tracking-wide">Loyalty Coins Ledger</span>
+                                     <div class="flex justify-between">
+                                         <span>Available Coins:</span>
+                                         <span class="font-bold text-indigo-600 dark:text-indigo-400" x-text="coins.tmcoin"></span>
+                                     </div>
+                                     <div class="flex justify-between">
+                                         <span>Redeeming Coins (Points):</span>
+                                         <input type="number" 
+                                                name="mcoinp" 
+                                                x-model.number="coins.mcoinp" 
+                                                @input="onCoinRedemptionChange()"
+                                                class="w-20 px-2 py-0.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-right text-slate-800 dark:text-slate-300 focus:outline-none font-bold">
+                                     </div>
+                                     <div class="flex justify-between">
+                                         <span>Coins Earned:</span>
+                                         <span class="font-bold text-emerald-600 dark:text-emerald-400" x-text="coins.mcoin"></span>
+                                     </div>
+                                     <div class="flex justify-between border-t border-slate-200 dark:border-slate-950 pt-1.5 font-semibold">
+                                         <span>Net Balance:</span>
+                                         <span class="font-bold text-slate-800 dark:text-slate-200" x-text="coins.bmcoin"></span>
+                                         <!-- Hidden fields for coins -->
+                                         <input type="hidden" name="mcoin" :value="coins.mcoin">
+                                         <input type="hidden" name="bmcoin" :value="coins.bmcoin">
+                                         <input type="hidden" name="tmcoin" :value="coins.tmcoin">
+                                     </div>
+                                 </div>
 
+                                <!-- Mobile-only checkout submit button -->
+                                <div class="pt-4 md:hidden pb-6">
+                                    <button type="submit" 
+                                            class="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-base shadow-xl shadow-orange-600/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-file-circle-check"></i>
+                                        <span>Complete & Issue Bill</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1221,8 +1246,35 @@
                     event.preventDefault();
                     return;
                 }
-                if (this.items.length > 1 && !this.items[this.items.length - 1].productId) {
-                    this.items.pop();
+                
+                // First filter out completely empty rows (where productId is empty and rate is 0/empty)
+                this.items = this.items.filter(item => item.productId || parseFloat(item.rate) > 0);
+
+                // If no items remain, block the submit
+                if (this.items.length === 0) {
+                    alert("Please select at least one product before submitting.");
+                    event.preventDefault();
+                    return;
+                }
+
+                // Validate each remaining active line item
+                for (let i = 0; i < this.items.length; i++) {
+                    const item = this.items[i];
+                    if (!item.productId) {
+                        alert(`Product selection is missing for Line Item #${i + 1}. You can remove or select the product.`);
+                        event.preventDefault();
+                        return;
+                    }
+                    if (!item.qty || item.qty < 1) {
+                        alert(`Quantity must be at least 1 for Line Item #${i + 1}.`);
+                        event.preventDefault();
+                        return;
+                    }
+                    if (item.rate === '' || item.rate === null || item.rate === undefined) {
+                        alert(`Rate (Rs) is required for Line Item #${i + 1}.`);
+                        event.preventDefault();
+                        return;
+                    }
                 }
             },
 

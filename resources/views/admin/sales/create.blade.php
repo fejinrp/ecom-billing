@@ -1378,20 +1378,18 @@
                                        label.includes('camera 1') || 
                                        label.includes('facing back');
                             });
-                            // If no named back camera is found, default to the last camera in the list (on mobile, devices[0] is front and devices[length-1] is the primary rear camera)
-                            let targetCameraId = backCamera ? backCamera.id : (devices.length > 0 ? devices[devices.length - 1].id : null);
                             
-                            if (targetCameraId) {
-                                this.html5Qrcode.start(targetCameraId, config, qrCodeSuccessCallback)
+                            if (backCamera) {
+                                this.html5Qrcode.start(backCamera.id, config, qrCodeSuccessCallback)
                                     .then(() => {
                                         if (placeholder) placeholder.style.display = 'none';
                                     })
                                     .catch((err) => {
                                         console.error("Camera ID start failed, falling back", err);
-                                        // Fallback to facingMode if device ID start fails
                                         this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
                                     });
                             } else {
+                                // If camera labels are blank (common before camera access is granted), W3C facingMode environment constraint is the most reliable way to force back camera
                                 this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
                             }
                         }).catch(err => {

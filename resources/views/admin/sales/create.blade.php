@@ -676,7 +676,7 @@
                 </button>
             </div>
             <div class="p-6 space-y-4">
-                <div id="camera-reader" class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 relative" style="min-height: 250px; transform: translateZ(0); -webkit-transform: translateZ(0); isolation: isolate;">
+                <div id="camera-reader" class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 relative" style="min-height: 190px; transform: translateZ(0); -webkit-transform: translateZ(0); isolation: isolate;">
                     <!-- A loading spinner or instruction placeholder -->
                     <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 font-semibold text-sm">
                         <i class="fa-solid fa-spinner fa-spin text-2xl text-purple-400"></i>
@@ -1368,13 +1368,18 @@
                         };
                         
                         Html5Qrcode.getCameras().then(devices => {
-                            let backCamera = devices.find(device => 
-                                device.label.toLowerCase().includes('back') || 
-                                device.label.toLowerCase().includes('environment') || 
-                                device.label.toLowerCase().includes('rear') || 
-                                device.label.toLowerCase().includes('camera 1')
-                            );
-                            let targetCameraId = backCamera ? backCamera.id : (devices.length > 0 ? devices[0].id : null);
+                            let backCamera = devices.find(device => {
+                                const label = device.label.toLowerCase();
+                                return label.includes('back') || 
+                                       label.includes('rear') || 
+                                       label.includes('environment') || 
+                                       label.includes('trás') || 
+                                       label.includes('main') || 
+                                       label.includes('camera 1') || 
+                                       label.includes('facing back');
+                            });
+                            // If no named back camera is found, default to the last camera in the list (on mobile, devices[0] is front and devices[length-1] is the primary rear camera)
+                            let targetCameraId = backCamera ? backCamera.id : (devices.length > 0 ? devices[devices.length - 1].id : null);
                             
                             if (targetCameraId) {
                                 this.html5Qrcode.start(targetCameraId, config, qrCodeSuccessCallback)

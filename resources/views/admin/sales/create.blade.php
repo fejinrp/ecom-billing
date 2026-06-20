@@ -665,7 +665,7 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
          x-cloak>
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-[350px] sm:max-w-md overflow-hidden shadow-2xl relative">
             <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
                 <h3 class="text-md font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-barcode text-purple-400"></i>
@@ -676,7 +676,7 @@
                 </button>
             </div>
             <div class="p-6 space-y-4">
-                <div id="camera-reader" class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 relative" style="min-height: 250px;">
+                <div id="camera-reader" class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 relative" style="min-height: 250px; transform: translateZ(0); -webkit-transform: translateZ(0); isolation: isolate;">
                     <!-- A loading spinner or instruction placeholder -->
                     <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 font-semibold text-sm">
                         <i class="fa-solid fa-spinner fa-spin text-2xl text-purple-400"></i>
@@ -1367,17 +1367,46 @@
                             aspectRatio: 1.777778
                         };
                         
-                        this.html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
-                            .then(() => {
-                                if (placeholder) placeholder.style.display = 'none';
-                            })
-                            .catch((err) => {
-                                console.error("Unable to start scanning", err);
-                                alert("Failed to access camera: " + err);
-                                this.cameraScannerOpen = false;
-                            });
+                        Html5Qrcode.getCameras().then(devices => {
+                            let backCamera = devices.find(device => 
+                                device.label.toLowerCase().includes('back') || 
+                                device.label.toLowerCase().includes('environment') || 
+                                device.label.toLowerCase().includes('rear') || 
+                                device.label.toLowerCase().includes('camera 1')
+                            );
+                            let targetCameraId = backCamera ? backCamera.id : (devices.length > 0 ? devices[0].id : null);
+                            
+                            if (targetCameraId) {
+                                this.html5Qrcode.start(targetCameraId, config, qrCodeSuccessCallback)
+                                    .then(() => {
+                                        if (placeholder) placeholder.style.display = 'none';
+                                    })
+                                    .catch((err) => {
+                                        console.error("Camera ID start failed, falling back", err);
+                                        // Fallback to facingMode if device ID start fails
+                                        this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
+                                    });
+                            } else {
+                                this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
+                            }
+                        }).catch(err => {
+                            console.error("Failed to list cameras, falling back", err);
+                            this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
+                        });
                     }, 300);
                 });
+            },
+
+            startFallbackScanner(config, qrCodeSuccessCallback, placeholder) {
+                this.html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+                    .then(() => {
+                        if (placeholder) placeholder.style.display = 'none';
+                    })
+                    .catch((err) => {
+                        console.error("Unable to start scanning", err);
+                        alert("Failed to access camera: " + err);
+                        this.cameraScannerOpen = false;
+                    });
             },
 
             stopCameraScanner() {

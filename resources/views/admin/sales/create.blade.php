@@ -693,7 +693,7 @@
                 </div>
                 <div x-show="scanErrorNotification" 
                      x-transition:enter="transition ease-out duration-300"
-                     class="px-3.5 py-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 text-xs text-rose-405"
+                     class="px-3.5 py-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-2 text-xs text-rose-400"
                      x-cloak>
                     <i class="fa-solid fa-circle-xmark"></i>
                     <span x-text="scanErrorNotification"></span>

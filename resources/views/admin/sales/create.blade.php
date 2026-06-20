@@ -1340,7 +1340,17 @@
                     if (placeholder) placeholder.style.display = 'flex';
                     
                     setTimeout(() => {
-                        this.html5Qrcode = new Html5Qrcode("camera-reader");
+                        this.html5Qrcode = new Html5Qrcode("camera-reader", {
+                            verbose: false,
+                            formatsToSupport: [
+                                Html5QrcodeSupportedFormats.EAN_13,
+                                Html5QrcodeSupportedFormats.EAN_8,
+                                Html5QrcodeSupportedFormats.CODE_128,
+                                Html5QrcodeSupportedFormats.UPC_A,
+                                Html5QrcodeSupportedFormats.UPC_E,
+                                Html5QrcodeSupportedFormats.QR_CODE
+                            ]
+                        });
                         let lastScanTime = 0;
                         const qrCodeSuccessCallback = (decodedText, decodedResult) => {
                             const now = Date.now();
@@ -1351,7 +1361,11 @@
                             this.barcodeScanInput = decodedText;
                             this.handleBarcodeScan();
                         };
-                        const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+                        const config = { 
+                            fps: 10, 
+                            qrbox: { width: 260, height: 160 },
+                            aspectRatio: 1.777778
+                        };
                         
                         this.html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
                             .then(() => {

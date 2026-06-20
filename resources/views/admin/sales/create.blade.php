@@ -676,9 +676,39 @@
                 </button>
             </div>
             <div class="p-6 space-y-4">
+                <style>
+                    @keyframes scan-line {
+                        0% { top: 4%; }
+                        50% { top: 96%; }
+                        100% { top: 4%; }
+                    }
+                    .scanner-laser-line {
+                        position: absolute;
+                        left: 4%;
+                        right: 4%;
+                        height: 2px;
+                        background: linear-gradient(90deg, transparent, #a855f7 20%, #a855f7 80%, transparent);
+                        box-shadow: 0 0 12px 2px rgba(168, 85, 247, 0.8);
+                        z-index: 10;
+                        pointer-events: none;
+                        animation: scan-line 2s ease-in-out infinite;
+                    }
+                </style>
                 <div id="camera-reader" class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 relative" style="min-height: 190px; transform: translateZ(0); -webkit-transform: translateZ(0); isolation: isolate;">
+                    
+                    <!-- Scanning Laser Line Overlay -->
+                    <div class="scanner-laser-line"></div>
+
+                    <!-- Scanning Scope Target Corners -->
+                    <div class="absolute inset-4 border border-transparent pointer-events-none z-10">
+                        <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-purple-400 rounded-tl-md"></div>
+                        <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-purple-400 rounded-tr-md"></div>
+                        <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-purple-400 rounded-bl-md"></div>
+                        <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-purple-400 rounded-br-md"></div>
+                    </div>
+
                     <!-- A loading spinner or instruction placeholder -->
-                    <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 font-semibold text-sm">
+                    <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-2 font-semibold text-sm bg-slate-950">
                         <i class="fa-solid fa-spinner fa-spin text-2xl text-purple-400"></i>
                         <span>Initializing Camera Engine...</span>
                     </div>
@@ -1367,49 +1397,17 @@
                             aspectRatio: 1.777778
                         };
                         
-                        Html5Qrcode.getCameras().then(devices => {
-                            let backCamera = devices.find(device => {
-                                const label = device.label.toLowerCase();
-                                return label.includes('back') || 
-                                       label.includes('rear') || 
-                                       label.includes('environment') || 
-                                       label.includes('trás') || 
-                                       label.includes('main') || 
-                                       label.includes('camera 1') || 
-                                       label.includes('facing back');
+                        this.html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+                            .then(() => {
+                                if (placeholder) placeholder.style.display = 'none';
+                            })
+                            .catch((err) => {
+                                console.error("Unable to start scanning", err);
+                                alert("Failed to access camera: " + err);
+                                this.cameraScannerOpen = false;
                             });
-                            
-                            if (backCamera) {
-                                this.html5Qrcode.start(backCamera.id, config, qrCodeSuccessCallback)
-                                    .then(() => {
-                                        if (placeholder) placeholder.style.display = 'none';
-                                    })
-                                    .catch((err) => {
-                                        console.error("Camera ID start failed, falling back", err);
-                                        this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
-                                    });
-                            } else {
-                                // If camera labels are blank (common before camera access is granted), W3C facingMode environment constraint is the most reliable way to force back camera
-                                this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
-                            }
-                        }).catch(err => {
-                            console.error("Failed to list cameras, falling back", err);
-                            this.startFallbackScanner(config, qrCodeSuccessCallback, placeholder);
-                        });
                     }, 300);
                 });
-            },
-
-            startFallbackScanner(config, qrCodeSuccessCallback, placeholder) {
-                this.html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
-                    .then(() => {
-                        if (placeholder) placeholder.style.display = 'none';
-                    })
-                    .catch((err) => {
-                        console.error("Unable to start scanning", err);
-                        alert("Failed to access camera: " + err);
-                        this.cameraScannerOpen = false;
-                    });
             },
 
             stopCameraScanner() {

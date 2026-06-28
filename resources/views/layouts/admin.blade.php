@@ -312,10 +312,10 @@
                     @endif
 
                     <!-- 3. Product Treeview -->
-                    @if($hasPermission('mprod') || $hasPermission('prod') || $hasPermission('purc') || $hasPermission('mpurc') || $hasPermission('astock') || $hasPermission('slist') || $hasPermission('sprice'))
-                    <div x-data="{ open: {{ request()->routeIs('admin.products.*', 'admin.purchases.*') ? 'true' : 'false' }} }" class="space-y-1">
+                    @if($hasPermission('mprod') || $hasPermission('prod') || $hasPermission('slist') || $hasPermission('sprice'))
+                    <div x-data="{ open: {{ request()->routeIs('admin.products.*') ? 'true' : 'false' }} }" class="space-y-1">
                         <button @click="open = !open" 
-                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.products.*', 'admin.purchases.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
+                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.products.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-box text-base"></i>
                                 <span>Product</span>
@@ -344,22 +344,6 @@
                                 <span>Manage Product</span>
                             </a>
                             @endif
-                            
-                            <!-- Real Active Links for Purchases -->
-                            @if($hasPermission('purc'))
-                            <a href="{{ route('admin.purchases.create') }}" 
-                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.create') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
-                                <i class="fa-solid fa-plus text-[10px] opacity-60"></i>
-                                <span>Add Purchase</span>
-                            </a>
-                            @endif
-                            @if($hasPermission('mpurc'))
-                            <a href="{{ route('admin.purchases.index') }}" 
-                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.index') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
-                                <i class="fa-solid fa-pen-to-square text-[10px] opacity-60"></i>
-                                <span>Manage Purchase</span>
-                            </a>
-                            @endif
                             @if($hasPermission('slist'))
                             <a href="{{ route('admin.products.stock_list') }}" 
                                class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.products.stock_list') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
@@ -372,6 +356,41 @@
                                class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.products.price_search') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
                                 <i class="fa-solid fa-magnifying-glass text-[10px] opacity-60"></i>
                                 <span>Price Search</span>
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Purchases & Suppliers Treeview -->
+                    @if($hasPermission('purc') || $hasPermission('mpurc'))
+                    <div x-data="{ open: {{ request()->routeIs('admin.purchases.*', 'admin.suppliers.*') && !request()->routeIs('admin.purchases.stock.*', 'admin.purchases.batches.*', 'admin.purchases.delivery_notes.*') ? 'true' : 'false' }} }" class="space-y-1">
+                        <button @click="open = !open" 
+                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.purchases.*', 'admin.suppliers.*') && !request()->routeIs('admin.purchases.stock.*', 'admin.purchases.batches.*', 'admin.purchases.delivery_notes.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-truck text-base"></i>
+                                <span>Purchases & Suppliers</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" x-transition class="pl-6 space-y-1 border-l border-slate-300/60 dark:border-slate-800/60 ml-5 mt-1">
+                            @if($hasPermission('purc'))
+                            <a href="{{ route('admin.purchases.create') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.create') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-plus text-[10px] opacity-60"></i>
+                                <span>Add Purchase</span>
+                            </a>
+                            @endif
+                            @if($hasPermission('mpurc'))
+                            <a href="{{ route('admin.purchases.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.purchases.index') && !request()->routeIs('admin.purchases.create') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-pen-to-square text-[10px] opacity-60"></i>
+                                <span>Manage Purchase</span>
+                            </a>
+                            <a href="{{ route('admin.suppliers.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.suppliers.index') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-user-shield text-[10px] opacity-60"></i>
+                                <span>Manage Suppliers</span>
                             </a>
                             @endif
                         </div>
@@ -626,6 +645,11 @@
                                class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.reports.payhistory') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
                                 <i class="fa-solid fa-refresh text-[10px] opacity-60"></i>
                                 <span>Pay History</span>
+                            </a>
+                            <a href="{{ route('admin.reports.supplier_ledger') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.reports.supplier_ledger') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-user-tie text-[10px] opacity-60"></i>
+                                <span>Supplier Ledger</span>
                             </a>
                             @endif
                             @if($hasPermission('excel'))

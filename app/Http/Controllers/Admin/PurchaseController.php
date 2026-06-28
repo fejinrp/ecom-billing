@@ -9,6 +9,7 @@ use App\Models\PItem;
 use App\Models\Purbal;
 use App\Models\Product;
 use App\Models\Auser;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,7 +51,8 @@ class PurchaseController extends Controller
     public function create()
     {
         $products = Product::where('status', 1)->orderBy('productname', 'asc')->get();
-        return view('admin.purchases.create', compact('products'));
+        $suppliers = Supplier::where('status', 1)->orderBy('name', 'asc')->get();
+        return view('admin.purchases.create', compact('products', 'suppliers'));
     }
 
     /**
@@ -62,6 +64,7 @@ class PurchaseController extends Controller
             'pDate' => 'required|date',
             'sName' => 'required|string|max:255',
             'sContact' => 'required|string',
+            'supplier_id' => 'nullable|integer|exists:suppliers,id',
             'subTotalValue' => 'required|numeric',
             'grandTotalValue' => 'required|numeric',
             'paid' => 'required|numeric',
@@ -91,6 +94,7 @@ class PurchaseController extends Controller
 
             // 1. Insert Purchase Order Header
             $porder = POrder::create([
+                'supplier_id' => $request->input('supplier_id'),
                 'porder_date' => $pDate,
                 's_name' => strtoupper(trim($request->input('sName'))),
                 's_contact' => strtoupper(trim($request->input('sContact'))),

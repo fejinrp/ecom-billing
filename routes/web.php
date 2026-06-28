@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserSettingController;
 use App\Http\Controllers\Admin\UserCustomerController;
 use App\Http\Controllers\Admin\BackupController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Models\Category;
 use App\Models\Order;
 use App\Http\Controllers\StorefrontController;
@@ -264,6 +265,11 @@ Route::prefix('admin')->group(function () {
         Route::get('reports/payhistory', [ReportController::class, 'payHistory'])->name('admin.reports.payhistory');
         Route::post('reports/payhistory/generate', [ReportController::class, 'generatePayHistoryReport'])->name('admin.reports.payhistory.generate');
 
+        // Supplier Ledger Report Routes
+        Route::get('reports/supplier-ledger', [ReportController::class, 'supplierLedger'])->name('admin.reports.supplier_ledger');
+        Route::post('reports/supplier-ledger/generate', [ReportController::class, 'generateSupplierLedgerReport'])->name('admin.reports.supplier_ledger.generate');
+        Route::get('reports/supplier-ledger/{name}/print', [ReportController::class, 'printSupplierLedger'])->name('admin.reports.supplier_ledger.print');
+
         // Excel Export Panel Route (ref: admin/reportoexcel.php)
         Route::get('reports/excel', [ReportController::class, 'excel'])->name('admin.reports.excel_panel');
 
@@ -298,6 +304,15 @@ Route::prefix('admin')->group(function () {
         ])->except(['create', 'show', 'edit']);
         Route::post('customers/{customer}/toggle-status', [UserCustomerController::class, 'toggleStatus'])->name('admin.customers.toggle_status');
 
+        // Supplier Management Settings
+        Route::resource('suppliers', SupplierController::class)->names([
+            'index' => 'admin.suppliers.index',
+            'store' => 'admin.suppliers.store',
+            'update' => 'admin.suppliers.update',
+            'destroy' => 'admin.suppliers.destroy',
+        ])->except(['create', 'show', 'edit']);
+        Route::post('suppliers/{supplier}/toggle-status', [SupplierController::class, 'toggleStatus'])->name('admin.suppliers.toggle_status');
+
         // Database Backup Management (ref: admin/myphpbackup.php)
         Route::get('backups', [BackupController::class, 'index'])->name('admin.backups.index');
         Route::post('backups/create', [BackupController::class, 'create'])->name('admin.backups.create');
@@ -310,3 +325,6 @@ Route::prefix('admin')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+
+

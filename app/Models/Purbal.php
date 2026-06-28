@@ -20,4 +20,9 @@ class Purbal extends Model
         'bal',
         'pdate'
     ];
+
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(POrder::class, 'porder_id', 'porder_id');
+    }
 }

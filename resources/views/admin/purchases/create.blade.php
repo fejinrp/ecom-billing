@@ -42,6 +42,20 @@
                     </h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2 space-y-1.5">
+                            <label for="supplierSelect" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Select Preconfigured Supplier</label>
+                            <select id="supplierSelect" 
+                                    name="supplier_id" 
+                                    x-model="supplier_id" 
+                                    @change="onSupplierSelect()"
+                                    class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+                                <option value="">-- CUSTOM / NEW SUPPLIER --</option>
+                                <template x-for="s in suppliers" :key="s.id">
+                                    <option :value="s.id" x-text="s.name"></option>
+                                </template>
+                            </select>
+                        </div>
+
                         <div class="space-y-1.5">
                             <label for="sName" class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Supplier Name</label>
                             <input type="text" 
@@ -50,7 +64,7 @@
                                    x-model="supplier.name" 
                                    required 
                                    placeholder="ENTER SUPPLIER NAME" 
-                                   class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm uppercase">
+                                   class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-650 focus:outline-none focus:border-indigo-500 text-sm uppercase">
                         </div>
 
                         <div class="space-y-1.5">
@@ -71,7 +85,7 @@
                                       required 
                                       rows="2"
                                       placeholder="ENTER DETAILED STREET ADDRESS, PHONE NUMBER, AND EMAIL..." 
-                                      class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm uppercase"></textarea>
+                                      class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-650 focus:outline-none focus:border-indigo-500 text-sm uppercase"></textarea>
                         </div>
                     </div>
                 </div>
@@ -365,8 +379,10 @@
         return {
             // Data preloaded from PHP
             products: @json($products),
+            suppliers: @json($suppliers),
             
             // Component states
+            supplier_id: '',
             supplier: {
                 name: '',
                 contact: ''
@@ -389,6 +405,23 @@
             init() {
                 // Initialize with one blank line item
                 this.addLineItem();
+            },
+
+            onSupplierSelect() {
+                const s = this.suppliers.find(x => x.id == this.supplier_id);
+                if (s) {
+                    this.supplier.name = s.name;
+                    this.supplier.contact = s.address || '';
+                    if (s.phone) {
+                        this.supplier.contact += '\nPHONE: ' + s.phone;
+                    }
+                    if (s.email) {
+                        this.supplier.contact += '\nEMAIL: ' + s.email;
+                    }
+                } else {
+                    this.supplier.name = '';
+                    this.supplier.contact = '';
+                }
             },
 
             addLineItem() {

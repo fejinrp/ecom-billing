@@ -15,6 +15,7 @@ use App\Models\UorderItem;
 use App\Models\POrder;
 use App\Models\PItem;
 use App\Models\Auser;
+use App\Models\Purbal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -802,6 +803,87 @@ class ReportController extends Controller
             'overall_balance' => $overallBalance
         ];
     }
+
+    /**
+     * Display Supplier Ledger lookup screen.
+     */
+    public function supplierLedger(Request $request)
+    {
+        $suppliers = POrder::select('s_name', 's_contact')
+            ->distinct()
+            ->where('s_name', '<>', '')
+            ->orderBy('s_name', 'asc')
+            ->get();
+
+        $selectedSupplier = $request->input('supplier_name');
+        $ledgerData = null;
+
+        if ($selectedSupplier) {
+            $ledgerData = $this->fetchSupplierLedgerData($selectedSupplier);
+        }
+
+        return view('admin.reports.supplier_ledger', compact('suppliers', 'selectedSupplier', 'ledgerData'));
+    }
+
+    /**
+     * Generate Supplier Ledger printable redirect/report handler.
+     */
+    public function generateSupplierLedgerReport(Request $request)
+    {
+        $supplierName = $request->input('supplier_name');
+
+        if (!$supplierName) {
+            return redirect()->back()->with('error', 'Please select a supplier first.');
+        }
+
+        return redirect()->route('admin.reports.supplier_ledger.print', ['name' => $supplierName]);
+    }
+
+    /**
+     * Print Supplier Ledger statement view.
+     */
+    public function printSupplierLedger($name)
+    {
+        $ledgerData = $this->fetchSupplierLedgerData($name);
+        return view('admin.reports.supplier_ledger_print', compact('name', 'ledgerData'));
+    }
+
+    /**
+     * Helper to fetch supplier ledger details.
+     */
+    private function fetchSupplierLedgerData($supplierName)
+    {
+        $ledger = [];
+        $overallBalance = 0;
+
+        $orders = POrder::where('s_name', $supplierName)
+            ->whereIn('porder_status', [1, 2])
+            ->orderBy('porder_date', 'asc')
+            ->get();
+
+        foreach ($orders as $order) {
+            $payments = Purbal::where('porder_id', $order->porder_id)
+                ->orderBy('bal_id', 'asc')
+                ->get();
+
+            $ledger[] = [
+                'order' => $order,
+                'payments' => $payments
+            ];
+
+            if ($payments->count() > 0) {
+                $overallBalance += $payments->last()->bal;
+            } else {
+                $overallBalance += $order->pbal;
+            }
+        }
+
+        return [
+            'ledger' => $ledger,
+            'overall_balance' => $overallBalance
+        ];
+    }
+
 
     /**
      * Show the Excel export dashboard form selection (ref: admin/reportoexcel.php).

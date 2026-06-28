@@ -15,6 +15,7 @@ class POrder extends Model
 
     protected $fillable = [
         'porder_id',
+        'supplier_id',
         'porder_date',
         's_name',
         's_contact',
@@ -34,5 +35,15 @@ class POrder extends Model
     public function deliveryNotes()
     {
         return $this->hasMany(DeliveryNote::class, 'porder_id', 'porder_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Purbal::class, 'porder_id', 'porder_id');
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
 }

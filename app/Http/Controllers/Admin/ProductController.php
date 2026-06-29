@@ -389,4 +389,76 @@ class ProductController extends Controller
             'batches' => $activeBatches
         ]);
     }
+
+    public function quickStore(Request $request)
+    {
+        $request->validate([
+            'productname' => 'required|string|max:255',
+            'catid' => 'required|integer',
+            'subcatid' => 'required|integer',
+            'brandid' => 'required|integer',
+            'unit' => 'required|integer',
+            'pqty' => 'required|numeric|min:1',
+            'pcode' => 'required|string|max:50|unique:products,pcode',
+            'prate' => 'required|numeric|min:0',
+            'srate' => 'required|numeric|min:0',
+            'mrp' => 'required|numeric|min:0',
+            'gst' => 'required|numeric|min:0',
+            'cprice' => 'required|numeric|min:0',
+            'dprice' => 'required|numeric|min:0',
+            'sdprice' => 'required|numeric|min:0',
+            'hsnsac' => 'nullable|string',
+        ]);
+
+        $nextId = (Product::max('id') ?? 0) + 1;
+
+        $product = Product::create([
+            'id' => $nextId,
+            'brandid' => $request->input('brandid'),
+            'catid' => $request->input('catid'),
+            'subcatid' => $request->input('subcatid'),
+            'productname' => strtoupper($request->input('productname')),
+            'unit' => $request->input('unit'),
+            'productdes' => strtoupper($request->input('productname')),
+            'pqty' => $request->input('pqty'),
+            'tqty' => 0, // Starts with 0 stock
+            'pfrom' => 'LOCAL',
+            'prate' => $request->input('prate'),
+            'srate' => $request->input('srate'),
+            'mrp' => $request->input('mrp'),
+            'gst' => $request->input('gst'),
+            'cprice' => $request->input('cprice'),
+            'dprice' => $request->input('dprice'),
+            'sdprice' => $request->input('sdprice'),
+            'pcode' => $request->input('pcode'),
+            'status' => 1,
+            'hsnsac' => $request->input('hsnsac') ?? '',
+            'slno' => 0,
+            'pimagef' => '',
+            'pimages' => '',
+            'pimaget' => '',
+            'postingdate' => date('d-m-Y h:i:s A'),
+            'updationdate' => 'NULL',
+        ]);
+
+        // Return same payload format as getPriceDetails so front-end select fits perfectly
+        return response()->json([
+            'status' => 'success',
+            'product' => [
+                'id' => $product->id,
+                'pcode' => $product->pcode,
+                'productname' => $product->productname,
+                'punit' => $product->unit == 1 ? 'PCS' : ($product->unit == 2 ? 'MTR' : ($product->unit == 3 ? 'PKT' : 'LTR')),
+                'pqty' => $product->pqty,
+                'tqty' => 0,
+                'prate' => $product->prate,
+                'srate' => $product->srate,
+                'mrp' => $product->mrp,
+                'gst' => $product->gst,
+                'cprice' => $product->cprice,
+                'dprice' => $product->dprice,
+                'sdprice' => $product->sdprice,
+            ]
+        ]);
+    }
 }

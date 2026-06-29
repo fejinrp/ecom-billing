@@ -24,8 +24,8 @@ class AppServiceProvider extends ServiceProvider
             return new \App\Hashing\Md5BcryptHasher();
         });
 
-        if (env('APP_ENV') === 'production') {
-        URL::forceScheme('https');
-    }
+        if (str_starts_with(config('app.url', ''), 'https://') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
+            URL::forceScheme('https');
+        }
     }
 }

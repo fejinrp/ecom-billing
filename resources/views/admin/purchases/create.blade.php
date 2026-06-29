@@ -1,7 +1,7 @@
 @extends('layouts.admin', ['title' => 'Record New Purchase'])
 
 @section('content')
-<div class="space-y-6" x-data="purchaseInvoiceBuilder()">
+<div class="space-y-6" x-data="purchaseInvoiceBuilder()" @quick-product-created.window="onQuickProductCreated($event.detail)">
     <!-- Header -->
     <x-admin.header 
         description="Add a new supplier purchase order to increment product stock and track pending transaction dues."
@@ -196,16 +196,24 @@
                                         <!-- Product Selection -->
                                         <td class="py-2 lg:pl-2 col-span-2 block lg:table-cell lg:col-span-none">
                                             <label class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Product Selection</label>
-                                            <select name="productName[]" 
-                                                    x-model="item.productId" 
-                                                    @change="onProductSelect(index)"
-                                                    required
-                                                    class="w-full px-3 py-2 bg-slate-950 border border-slate-850 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-indigo-500">
-                                                <option value="">-- Choose Product --</option>
-                                                <template x-for="p in products" :key="p.id">
-                                                    <option :value="p.id" x-text="p.productname + ' [Stock: ' + (p.tqty || 0) + ']'"></option>
-                                                </template>
-                                            </select>
+                                            <div class="flex items-center gap-2">
+                                                <select name="productName[]" 
+                                                        x-model="item.productId" 
+                                                        @change="onProductSelect(index)"
+                                                        required
+                                                        class="flex-1 px-3 py-2 bg-slate-950 border border-slate-850 rounded-lg text-slate-200 text-sm focus:outline-none focus:border-indigo-500">
+                                                    <option value="">-- Choose Product --</option>
+                                                    <template x-for="p in products" :key="p.id">
+                                                        <option :value="p.id" x-text="p.productname + ' [Stock: ' + (p.tqty || 0) + ']'"></option>
+                                                    </template>
+                                                </select>
+                                                <button type="button" 
+                                                        @click="$dispatch('open-quick-product-modal', { index: index })" 
+                                                        class="px-2.5 py-2 bg-indigo-500/10 hover:bg-indigo-500/25 border border-indigo-500/20 text-indigo-400 hover:text-indigo-300 text-xs font-black rounded-lg transition-all active:scale-95" 
+                                                        title="Quick Add New Product">
+                                                    <i class="fa-solid fa-plus-circle text-sm"></i>
+                                                </button>
+                                            </div>
                                             <input type="hidden" name="punit[]" x-model="item.punit">
                                             <input type="hidden" name="slno[]" :value="index + 1">
                                         </td>
@@ -599,6 +607,14 @@
                 }, 3000);
             },
 
+            onQuickProductCreated(detail) {
+                this.products.push(detail.product);
+                if (detail.index !== null && this.items[detail.index]) {
+                    this.items[detail.index].productId = detail.product.id;
+                    this.onProductSelect(detail.index);
+                }
+            },
+
             handleSubmit(event) {
                 // Filter out all empty rows
                 this.items = this.items.filter(item => item.productId !== '');
@@ -612,4 +628,5 @@
         };
     }
 </script>
+<x-admin.quick-product-modal />
 @endsection

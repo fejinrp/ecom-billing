@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\UserSettingController;
 use App\Http\Controllers\Admin\UserCustomerController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\AttendanceController;
 use App\Models\Category;
 use App\Models\Order;
 use App\Http\Controllers\StorefrontController;
@@ -126,6 +127,7 @@ Route::prefix('admin')->group(function () {
             'destroy' => 'admin.subcategories.destroy',
         ])->except(['create', 'show', 'edit']);
 
+        Route::post('products/quick-store', [ProductController::class, 'quickStore'])->name('admin.products.quick-store');
         Route::resource('products', ProductController::class)->names([
             'index' => 'admin.products.index',
             'create' => 'admin.products.create',
@@ -320,6 +322,17 @@ Route::prefix('admin')->group(function () {
         Route::delete('backups/{fileName}', [BackupController::class, 'destroy'])->name('admin.backups.destroy');
         Route::post('backups/{fileName}/restore', [BackupController::class, 'restore'])->name('admin.backups.restore');
         Route::post('backups/upload-restore', [BackupController::class, 'uploadRestore'])->name('admin.backups.upload_restore');
+
+        // Attendance Management
+        Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance.index');
+        Route::post('attendance', [AttendanceController::class, 'store'])->name('admin.attendance.store');
+        Route::post('attendance/settings', [AttendanceController::class, 'updateSettings'])->name('admin.attendance.updateSettings');
+        Route::get('attendance/{id}/edit', [AttendanceController::class, 'edit'])->name('admin.attendance.edit');
+        Route::put('attendance/{id}', [AttendanceController::class, 'update'])->name('admin.attendance.update');
+
+        Route::get('my-attendance', [AttendanceController::class, 'staffIndex'])->name('admin.my-attendance.index');
+        Route::post('my-attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('admin.my-attendance.punch-in');
+        Route::post('my-attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('admin.my-attendance.punch-out');
 
     });
 });

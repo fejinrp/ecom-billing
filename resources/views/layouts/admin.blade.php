@@ -670,6 +670,32 @@
                     </div>
                     @endif
 
+                    <!-- Attendance Treeview -->
+                    <div x-data="{ open: {{ request()->routeIs('admin.attendance.*', 'admin.my-attendance.*') ? 'true' : 'false' }} }" class="space-y-1">
+                        <button @click="open = !open" 
+                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.attendance.*', 'admin.my-attendance.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-user-clock text-base"></i>
+                                <span>Attendance</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" x-transition class="pl-6 space-y-1 border-l border-slate-300/60 dark:border-slate-800/60 ml-5 mt-1">
+                            <a href="{{ route('admin.my-attendance.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.my-attendance.index') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-id-card-clip text-[10px] opacity-60"></i>
+                                <span>My Punch Card</span>
+                            </a>
+                            @if(Auth::guard('admin')->user()->section == 1)
+                            <a href="{{ route('admin.attendance.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.attendance.index') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-users-viewfinder text-[10px] opacity-60"></i>
+                                <span>Staff Attendance</span>
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+
                     <!-- 8. Setting Treeview -->
                     <div x-data="{ open: {{ request()->routeIs('admin.settings.*', 'admin.users.*', 'admin.usersettings.*', 'admin.customers.*', 'admin.backups.*') ? 'true' : 'false' }} }" class="space-y-1">
                         <button @click="open = !open" 

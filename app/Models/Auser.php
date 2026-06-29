@@ -21,11 +21,21 @@ class Auser extends Authenticatable
         'email',
         'mobile',
         'section',
-        'ustatus'
+        'ustatus',
+        'hourly_rate',
+        'shift_start',
+        'shift_end',
+        'mac_address',
+        'permissions'
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_id');
+    }
 }

@@ -126,6 +126,7 @@ class AdminPermission
 
                 // Products & Barcode
                 'admin.products.store' => 'prod',
+                'admin.products.quick-store' => 'prod',
                 'admin.products.update' => 'mprod',
                 'admin.products.destroy' => 'mprod',
                 'admin.products.barcode' => 'mprod',
@@ -217,6 +218,13 @@ class AdminPermission
                 'admin.users.update' => 'auser',
                 'admin.users.destroy' => 'auser',
                 'admin.users.toggle_status' => 'auser',
+
+                // Admin Attendance management
+                'admin.attendance.index' => 'auser',
+                'admin.attendance.store' => 'auser',
+                'admin.attendance.updateSettings' => 'auser',
+                'admin.attendance.edit' => 'auser',
+                'admin.attendance.update' => 'auser',
 
                 'admin.usersettings.index' => 'usett',
                 'admin.usersettings.update' => 'usett',

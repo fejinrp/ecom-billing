@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\AttendanceController;
 use App\Models\Category;
 use App\Models\Order;
 use App\Http\Controllers\Admin\LuckyDrawController;
+use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\LuckyDrawStatusController;
 use Illuminate\Support\Facades\Route;
@@ -289,6 +290,15 @@ Route::prefix('admin')->group(function () {
         Route::get('settings', [SettingController::class, 'index'])->name('admin.settings.index');
         Route::post('settings/username', [SettingController::class, 'updateUsername'])->name('admin.settings.username');
         Route::post('settings/password', [SettingController::class, 'updatePassword'])->name('admin.settings.password');
+
+        // Homepage CMS Routes
+        Route::get('cms', [CMSController::class, 'index'])->name('admin.cms.index');
+        Route::post('cms/settings', [CMSController::class, 'updateSettings'])->name('admin.cms.settings.update');
+        Route::resource('cms/banners', CMSController::class)->except(['index', 'show'])->names([
+            'store' => 'admin.cms.banners.store',
+            'update' => 'admin.cms.banners.update',
+            'destroy' => 'admin.cms.banners.destroy',
+        ]);
 
         // User Management Routes (ref: admin/user.php)
         Route::resource('users', UserController::class)->names([

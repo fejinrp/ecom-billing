@@ -723,9 +723,9 @@
                     </div>
 
                     <!-- 8. Setting Treeview -->
-                    <div x-data="{ open: {{ request()->routeIs('admin.settings.*', 'admin.users.*', 'admin.usersettings.*', 'admin.customers.*', 'admin.backups.*') ? 'true' : 'false' }} }" class="space-y-1">
+                    <div x-data="{ open: {{ request()->routeIs('admin.settings.*', 'admin.users.*', 'admin.usersettings.*', 'admin.customers.*', 'admin.backups.*', 'admin.cms.*') ? 'true' : 'false' }} }" class="space-y-1">
                         <button @click="open = !open" 
-                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.settings.*', 'admin.users.*', 'admin.usersettings.*', 'admin.customers.*', 'admin.backups.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
+                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.settings.*', 'admin.users.*', 'admin.usersettings.*', 'admin.customers.*', 'admin.backups.*', 'admin.cms.*') ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100' }} focus:outline-none">
                             <div class="flex items-center gap-3">
                                 <i class="fa-solid fa-wrench text-base"></i>
                                 <span>Setting</span>
@@ -750,6 +750,11 @@
                                class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.usersettings.*') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
                                 <i class="fa-solid fa-wrench text-[10px] opacity-60"></i>
                                 <span>User Setting</span>
+                            </a>
+                            <a href="{{ route('admin.cms.index') }}" 
+                               class="flex items-center gap-2 py-2 px-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all {{ request()->routeIs('admin.cms.*') ? 'text-indigo-400 bg-indigo-500/5' : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/30' }}">
+                                <i class="fa-solid fa-house text-[10px] opacity-60"></i>
+                                <span>Homepage CMS</span>
                             </a>
                             @endif
                             @if($hasPermission('csett'))

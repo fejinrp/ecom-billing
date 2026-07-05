@@ -33,8 +33,85 @@ class StorefrontController extends Controller
         }
         
         $products = $query->orderBy('id', 'desc')->paginate(12);
+
+        // Load Homepage CMS Content
+        $banners = \App\Models\HomepageBanner::where('is_active', true)->orderBy('sort_order', 'asc')->get();
         
-        return view('storefront.index', compact('categories', 'subcategories', 'products'));
+        $featuredCategoriesConfig = \App\Models\HomepageSetting::getByKey('homepage_categories', []);
+        $featuredCategories = [];
+        if (!empty($featuredCategoriesConfig)) {
+            foreach ($featuredCategoriesConfig as $cfg) {
+                $cat = $categories->firstWhere('cat_id', $cfg['cat_id']);
+                if ($cat) {
+                    $cat->homepage_icon = $cfg['icon'] ?? 'fa-server';
+                    $featuredCategories[] = $cat;
+                }
+            }
+        } else {
+            // Fallback: use first 8 categories with default icons
+            $icons = ['fa-server', 'fa-laptop-code', 'fa-microchip', 'fa-memory', 'fa-hard-drive', 'fa-keyboard', 'fa-headphones', 'fa-print', 'fa-network-wired'];
+            foreach ($categories->take(8) as $index => $cat) {
+                $cat->homepage_icon = $icons[$index % count($icons)];
+                $featuredCategories[] = $cat;
+            }
+        }
+
+        $dealConfig = \App\Models\HomepageSetting::getByKey('deal_of_the_day', [
+            'title' => 'Deal Of The Day',
+            'subtitle' => 'Top discounts and flash bargains today',
+            'product_ids' => []
+        ]);
+        $dealProducts = [];
+        if (!empty($dealConfig['product_ids'])) {
+            $dealProducts = Product::where('status', 1)
+                ->whereIn('id', $dealConfig['product_ids'])
+                ->get();
+        } else {
+            // Fallback to first 6 products
+            $dealProducts = Product::where('status', 1)->orderBy('id', 'desc')->limit(6)->get();
+        }
+
+        $promoBanner = \App\Models\HomepageSetting::getByKey('promo_banner', [
+            'badge' => 'Limited Campaign',
+            'title' => 'Premium Workstation Upgrade Kits',
+            'copy' => 'Maximize hardware bandwidth metrics by upgrading with premium dual-channel server memory arrays, certified SSD units, and modular power matrices. Direct consultations available with our hardware advisors.',
+            'btn_text' => 'Consult Advisor',
+            'btn_url' => 'tel:+919944228686',
+            'phone' => '+91 99442 28686'
+        ]);
+
+        $trustBadges = \App\Models\HomepageSetting::getByKey('trust_badges', [
+            'delivery_title' => 'FREE Delivery',
+            'delivery_subtitle' => 'On all hardware imports',
+            'returns_title' => '7 Days Returns',
+            'returns_subtitle' => 'Hassle-free return policy',
+            'quality_title' => 'Great Quality',
+            'quality_subtitle' => 'Direct enterprise sourcing',
+            'gst_title' => 'GST Compliant',
+            'gst_subtitle' => 'Input Credit & Tax Invoices'
+        ]);
+
+        $seoSettings = \App\Models\HomepageSetting::getByKey('seo_settings', [
+            'meta_title' => 'Enterprise Hardware Store',
+            'meta_description' => 'Imported server arrays and high-frequency compute components.'
+        ]);
+        $title = $seoSettings['meta_title'] ?? null;
+        $metaDesc = $seoSettings['meta_description'] ?? null;
+        
+        return view('storefront.index', compact(
+            'categories', 
+            'subcategories', 
+            'products', 
+            'banners', 
+            'featuredCategories', 
+            'dealConfig', 
+            'dealProducts', 
+            'promoBanner', 
+            'trustBadges',
+            'seoSettings',
+            'title',
+            'metaDesc'
+        ));
     }
 
     /**

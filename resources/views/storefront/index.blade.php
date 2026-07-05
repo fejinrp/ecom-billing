@@ -19,21 +19,39 @@
          x-data="{
             activeSlide: 0,
             slides: [
-                {
-                    img: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1600&q=80',
-                    title: 'Next-Gen Compute Solutions',
-                    desc: 'Procure imported server arrays and high-frequency components.'
-                },
-                {
-                    img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
-                    title: 'Extreme GPU Arrays & AI Compute',
-                    desc: 'Maximize computational speed with Liquid-Cooled configurations.'
-                },
-                {
-                    img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80',
-                    title: 'Enterprise Workstations',
-                    desc: 'AMD Threadripper and Intel Xeon customized platforms.'
-                }
+                @if(isset($banners) && count($banners) > 0)
+                    @foreach($banners as $b)
+                        {
+                            img: '{{ asset($b->image_path) }}',
+                            title: '{{ addslashes($b->title) }}',
+                            desc: '{{ addslashes($b->subtitle) }}',
+                            badge: '{{ addslashes($b->badge_text) }}',
+                            link: '{{ $b->link_url ?: "#catalog" }}'
+                        },
+                    @endforeach
+                @else
+                    {
+                        img: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1600&q=80',
+                        title: 'Next-Gen Compute Solutions',
+                        desc: 'Procure imported server arrays and high-frequency components.',
+                        badge: 'Exclusive Launch',
+                        link: '#catalog'
+                    },
+                    {
+                        img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
+                        title: 'Extreme GPU Arrays & AI Compute',
+                        desc: 'Maximize computational speed with Liquid-Cooled configurations.',
+                        badge: 'Exclusive Launch',
+                        link: '#catalog'
+                    },
+                    {
+                        img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600&q=80',
+                        title: 'Enterprise Workstations',
+                        desc: 'AMD Threadripper and Intel Xeon customized platforms.',
+                        badge: 'Exclusive Launch',
+                        link: '#catalog'
+                    }
+                @endif
             ],
             next() { this.activeSlide = (this.activeSlide + 1) % this.slides.length },
             prev() { this.activeSlide = (this.activeSlide - 1 + this.slides.length) % this.slides.length },
@@ -55,12 +73,12 @@
                      <!-- Translucent Gradient Overlay for readability -->
                      <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center p-4 md:p-16">
                         <div class="max-w-lg space-y-1.5 md:space-y-4 text-white text-left font-outfit">
-                            <span class="inline-block px-2 py-0.5 rounded bg-[#0059e3] text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest">
-                                Exclusive Launch
+                            <span class="inline-block px-2 py-0.5 rounded bg-[#0059e3] text-white text-[8px] md:text-[9px] font-black uppercase tracking-widest"
+                                  x-show="slide.badge" x-text="slide.badge">
                             </span>
                             <h2 class="text-xs sm:text-sm md:text-4xl font-black uppercase tracking-tight leading-tight" x-text="slide.title"></h2>
                             <p class="hidden sm:block text-xs md:text-sm text-slate-300 font-medium leading-relaxed" x-text="slide.desc"></p>
-                            <a href="#catalog" class="inline-flex items-center gap-1 px-3 py-1.5 md:px-5 md:py-2.5 bg-[#0059e3] hover:bg-[#0040a6] text-white text-[9px] md:text-xs font-black uppercase tracking-wider rounded-lg transition-all shadow-md">
+                            <a :href="slide.link" class="inline-flex items-center gap-1 px-3 py-1.5 md:px-5 md:py-2.5 bg-[#0059e3] hover:bg-[#0040a6] text-white text-[9px] md:text-xs font-black uppercase tracking-wider rounded-lg transition-all shadow-md">
                                 <span>Shop Now</span>
                                 <i class="fa-solid fa-chevron-right text-[8px] md:text-[10px]"></i>
                             </a>
@@ -91,11 +109,10 @@
     <!-- ── Snapdeal Circular Category Row ── -->
     <div id="sf-category-scroll-container" class="mb-4 bg-white dark:bg-slate-950 dark:border-slate-850 rounded-2xl p-4 overflow-x-auto custom-scrollbar">
         <div class="grid grid-rows-2 grid-flow-col md:flex md:items-center md:gap-8 md:min-w-max md:justify-center gap-x-6 gap-y-4 justify-start">
-            @if (isset($categories) && count($categories) > 0)
-                @foreach ($categories as $index => $cat)
+            @if (isset($featuredCategories) && count($featuredCategories) > 0)
+                @foreach ($featuredCategories as $index => $cat)
                     @php
-                        $icons = ['fa-server', 'fa-laptop-code', 'fa-microchip', 'fa-memory', 'fa-hard-drive', 'fa-keyboard', 'fa-headphones', 'fa-print', 'fa-network-wired'];
-                        $icon = $icons[$index % count($icons)];
+                        $icon = $cat->homepage_icon ?? 'fa-server';
                         $isActive = Route::current()->parameter('name') === $cat->cat_name;
                     @endphp
                     <a href="{{ route('storefront.category', $cat->cat_name) }}" class="flex flex-col items-center group transition-all duration-300">
@@ -105,7 +122,7 @@
                                style="{{ !$isActive ? 'color: #0059e3;' : '' }}"></i>
                         </div>
                         <span class="text-[10px] md:text-[11px] font-bold uppercase tracking-wider mt-1.5 md:mt-2 {{ $isActive ? '' : 'text-slate-650 dark:text-slate-400 group-hover:text-[#0059e3]' }}"
-                              style="{{ $isActive ? 'color: #0059e3;' : '' }}">{{ $cat->cat_name }}</span>
+                               style="{{ $isActive ? 'color: #0059e3;' : '' }}">{{ $cat->cat_name }}</span>
                     </a>
                 @endforeach
             @endif
@@ -301,20 +318,19 @@
     <div class="mb-12">
         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
             <div>
-                <h2 class="text-xl md:text-2xl font-black tracking-tight uppercase text-slate-900 dark:text-white">Deal Of The Day</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase font-bold tracking-wider">Top discounts and flash bargains today</p>
+                <h2 class="text-xl md:text-2xl font-black tracking-tight uppercase text-slate-900 dark:text-white">{{ $dealConfig['title'] ?? 'Deal Of The Day' }}</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase font-bold tracking-wider">{{ $dealConfig['subtitle'] ?? 'Top discounts and flash bargains today' }}</p>
             </div>
         </div>
         
         <div id="sf-deals-scroll-container" class="overflow-x-auto custom-scrollbar pb-3">
             <div class="flex items-center gap-4 min-w-max">
-                @if (isset($products) && count($products) > 0)
-                    @foreach ($products->take(6) as $index => $prod)
+                @if (isset($dealProducts) && count($dealProducts) > 0)
+                    @foreach ($dealProducts as $index => $prod)
                         @php
                             $deals = ['UNDER Rs. 299', 'MIN. 40% OFF', 'UNDER Rs. 999', 'MIN. 50% OFF', 'UNDER Rs. 1,499', 'MIN. 30% OFF'];
                             $deal = $deals[$index % count($deals)];
-                            $cats = ['Accessories', 'Compute', 'Storage', 'Memory', 'Cables', 'Peripherals'];
-                            $catLabel = $cats[$index % count($cats)];
+                            $catLabel = $prod->category ? $prod->category->cat_name : 'Hardware';
                         @endphp
                         <a href="{{ route('storefront.product', $prod->id) }}" class="group flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden hover:border-[#0059e3]/40 transition-all duration-300 hover:shadow-xl relative w-44 md:w-52 h-64 md:h-72 shrink-0">
                             <!-- Image container -->
@@ -453,18 +469,24 @@
     @endif
 
     <!-- ── Full-Width Premium Promo Banner ── -->
-    <div class="sf-home-banner mt-12 relative overflow-hidden rounded-[2rem] border p-8 md:p-12 shadow-2xl bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-800">
+    <div class="sf-home-banner mt-12 relative overflow-hidden rounded-[2rem] border p-8 md:p-12 shadow-2xl bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-880">
         <div class="absolute -right-24 -top-24 w-80 h-80 bg-[#0059e3]/5 rounded-full blur-3xl pointer-events-none"></div>
         
         <div class="relative z-10 max-w-lg space-y-4">
-            <span class="px-2.5 py-0.5 rounded bg-[#0059e3] text-white text-[9px] font-black tracking-widest uppercase">Limited Campaign</span>
-            <h2 class="sf-home-banner-title text-2xl md:text-3xl font-black uppercase tracking-tight font-outfit">Premium Workstation Upgrade Kits</h2>
+            @if(!empty($promoBanner['badge']))
+            <span class="px-2.5 py-0.5 rounded bg-[#0059e3] text-white text-[9px] font-black tracking-widest uppercase">{{ $promoBanner['badge'] }}</span>
+            @endif
+            <h2 class="sf-home-banner-title text-2xl md:text-3xl font-black uppercase tracking-tight font-outfit">{{ $promoBanner['title'] ?? '' }}</h2>
             <p class="sf-home-banner-copy text-xs leading-relaxed">
-                Maximize hardware bandwidth metrics by upgrading with premium dual-channel server memory arrays, certified SSD units, and modular power matrices. Direct consultations available with our hardware advisors.
+                {{ $promoBanner['copy'] ?? '' }}
             </p>
             <div class="flex items-center gap-4 pt-2">
-                <a href="tel:+919944228686" class="sf-home-banner-btn px-5 py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg transition-all bg-[#0059e3] hover:bg-[#0040a6]">Consult Advisor</a>
-                <span class="sf-home-banner-copy text-xs font-mono font-bold">+91 99442 28686</span>
+                @if(!empty($promoBanner['btn_text']))
+                <a href="{{ $promoBanner['btn_url'] ?? '#' }}" class="sf-home-banner-btn px-5 py-2.5 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg transition-all bg-[#0059e3] hover:bg-[#0040a6]">{{ $promoBanner['btn_text'] }}</a>
+                @endif
+                @if(!empty($promoBanner['phone']))
+                <span class="sf-home-banner-copy text-xs font-mono font-bold">{{ $promoBanner['phone'] }}</span>
+                @endif
             </div>
         </div>
     </div>
@@ -487,8 +509,8 @@
                 </svg>
             </div>
             <div>
-                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">FREE Delivery</h4>
-                <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">On all hardware imports</p>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">{{ $trustBadges['delivery_title'] ?? 'FREE Delivery' }}</h4>
+                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">{{ $trustBadges['delivery_subtitle'] ?? 'On all hardware imports' }}</p>
             </div>
         </div>
 
@@ -503,8 +525,8 @@
                 </svg>
             </div>
             <div>
-                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">7 Days Returns</h4>
-                <p class="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Hassle-free return policy</p>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">{{ $trustBadges['returns_title'] ?? '7 Days Returns' }}</h4>
+                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">{{ $trustBadges['returns_subtitle'] ?? 'Hassle-free return policy' }}</p>
             </div>
         </div>
 
@@ -519,8 +541,8 @@
                 </svg>
             </div>
             <div>
-                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">Great Quality</h4>
-                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">Direct enterprise sourcing</p>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">{{ $trustBadges['quality_title'] ?? 'Great Quality' }}</h4>
+                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">{{ $trustBadges['quality_subtitle'] ?? 'Direct enterprise sourcing' }}</p>
             </div>
         </div>
 
@@ -538,8 +560,8 @@
                 </svg>
             </div>
             <div>
-                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">GST Compliant</h4>
-                <p class="text-[10px] md:text-xs text-slate-550 dark:text-slate-400 mt-1 font-medium">Input Credit & Tax Invoices</p>
+                <h4 class="text-sm md:text-base font-bold text-slate-800 dark:text-slate-100 tracking-tight leading-tight">{{ $trustBadges['gst_title'] ?? 'GST Compliant' }}</h4>
+                <p class="text-[10px] md:text-xs text-slate-555 dark:text-slate-400 mt-1 font-medium">{{ $trustBadges['gst_subtitle'] ?? 'Input Credit & Tax Invoices' }}</p>
             </div>
         </div>
     </div>

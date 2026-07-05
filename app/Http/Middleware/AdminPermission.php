@@ -229,6 +229,12 @@ class AdminPermission
                 'admin.usersettings.index' => 'usett',
                 'admin.usersettings.update' => 'usett',
 
+                'admin.cms.index' => 'usett',
+                'admin.cms.settings.update' => 'usett',
+                'admin.cms.banners.store' => 'usett',
+                'admin.cms.banners.update' => 'usett',
+                'admin.cms.banners.destroy' => 'usett',
+
                 'admin.customers.index' => 'csett',
                 'admin.customers.store' => 'csett',
                 'admin.customers.update' => 'csett',

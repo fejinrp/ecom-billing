@@ -21,9 +21,9 @@ class LuckyDrawStatusController extends Controller
     {
         $settings = LuckyDrawSetting::active()->orderBy('min_amount')->get();
         $winners  = LuckyDrawWinner::orderBy('id', 'desc')->with('categorySetting')->take(50)->get();
+        $categories = \App\Models\Category::orderBy('cat_name', 'asc')->get();
 
-        // Build pool progress data (no personal data exposed)
-        $categories = $settings->map(function ($setting) {
+        $categoryPools = $settings->map(function (LuckyDrawSetting $setting) {
             $batchCount = LuckyDrawWinner::where('category', $setting->category_key)->count();
             $count      = $this->countEligiblePool($setting);
             $needed     = $setting->batch_size;
@@ -47,7 +47,7 @@ class LuckyDrawStatusController extends Controller
             $myStatus = $this->getCustomerStatus($user);
         }
 
-        return view('storefront.lucky_draw', compact('categories', 'winners', 'myStatus'));
+        return view('storefront.lucky_draw', compact('categoryPools', 'winners', 'myStatus', 'categories'));
     }
 
     // ─────────────────────────────────────────────────────────────────────────

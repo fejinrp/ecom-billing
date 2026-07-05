@@ -77,7 +77,7 @@
                 Live Pool Status
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                @forelse($categories as $cat)
+                @forelse($categoryPools as $cat)
                     @php
                         $setting    = $cat['setting'];
                         $count      = $cat['count'];
@@ -260,7 +260,7 @@
     <div class="lg:col-span-4 space-y-6">
 
         {{-- Prize summary cards --}}
-        @foreach($categories as $cat)
+        @foreach($categoryPools as $cat)
             @php $s = $cat['setting']; @endphp
             <div class="bg-white/92 dark:bg-slate-900/82 border border-slate-200/70 dark:border-slate-800/70 rounded-2xl p-4 shadow-sm flex items-center gap-4">
                 <div class="text-3xl">

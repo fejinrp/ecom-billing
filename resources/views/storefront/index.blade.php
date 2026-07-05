@@ -420,6 +420,8 @@
         });
     </script>
 
+    {{-- Disabled for now: Premium Hardware Fleet catalog section --}}
+    {{--
     <!-- ── Main Hardware Catalog Header ── -->
     <div id="catalog" class="scroll-mt-24 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
@@ -479,6 +481,31 @@
                 Reset Storefront Filters
             </a>
         </div>
+    @endif
+    --}}
+
+    <!-- ── Category Showcase Section ── -->
+    @if(isset($categoryShowcases) && count($categoryShowcases) > 0)
+        @foreach($categoryShowcases as $showcase)
+            <div class="mb-12 mt-12">
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-black tracking-tight uppercase text-slate-900 dark:text-white">{{ $showcase['category']->cat_name }}</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 uppercase font-bold tracking-wider">Top curated products from {{ $showcase['category']->cat_name }}</p>
+                    </div>
+                    <a href="{{ route('storefront.category', $showcase['category']->cat_name) }}" class="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#0059e3] hover:text-[#0040a6] dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                        <span>View All</span>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    @foreach ($showcase['products'] as $prod)
+                        <x-product-card :product="$prod" />
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
     @endif
 
     <!-- ── Full-Width Premium Promo Banner ── -->

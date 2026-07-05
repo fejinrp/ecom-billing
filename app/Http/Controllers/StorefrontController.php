@@ -97,6 +97,31 @@ class StorefrontController extends Controller
         ]);
         $title = $seoSettings['meta_title'] ?? null;
         $metaDesc = $seoSettings['meta_description'] ?? null;
+
+        // Dynamic Category Showcase Loop
+        $showcaseConfig = \App\Models\HomepageSetting::getByKey('homepage_category_products', [
+            'category_ids' => [],
+            'product_limit' => 4
+        ]);
+        $categoryShowcases = [];
+        if (!empty($showcaseConfig['category_ids'])) {
+            foreach ($showcaseConfig['category_ids'] as $catId) {
+                $cat = Category::find($catId);
+                if ($cat) {
+                    $catProducts = Product::where('status', 1)
+                        ->where('catid', $catId)
+                        ->inRandomOrder()
+                        ->limit($showcaseConfig['product_limit'] ?? 4)
+                        ->get();
+                    if ($catProducts->count() > 0) {
+                        $categoryShowcases[] = [
+                            'category' => $cat,
+                            'products' => $catProducts
+                        ];
+                    }
+                }
+            }
+        }
         
         return view('storefront.index', compact(
             'categories', 
@@ -110,7 +135,8 @@ class StorefrontController extends Controller
             'trustBadges',
             'seoSettings',
             'title',
-            'metaDesc'
+            'metaDesc',
+            'categoryShowcases'
         ));
     }
 

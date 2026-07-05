@@ -54,6 +54,11 @@ class CMSController extends Controller
             'meta_description' => 'Imported server arrays and high-frequency compute components.'
         ]);
 
+        $categoryShowcase = HomepageSetting::getByKey('homepage_category_products', [
+            'category_ids' => [],
+            'product_limit' => 4
+        ]);
+
         return view('admin.cms.index', compact(
             'banners',
             'categories',
@@ -62,7 +67,8 @@ class CMSController extends Controller
             'promoBanner',
             'dealOfTheDay',
             'trustBadges',
-            'seoSettings'
+            'seoSettings',
+            'categoryShowcase'
         ));
     }
 
@@ -234,6 +240,14 @@ class CMSController extends Controller
                 'meta_description' => $request->input('meta_description')
             ];
             HomepageSetting::setByKey('seo_settings', $seo);
+        }
+
+        elseif ($type === 'category_showcase') {
+            $showcase = [
+                'category_ids' => array_map('intval', $request->input('showcase_category_ids', [])),
+                'product_limit' => intval($request->input('showcase_product_limit', 4))
+            ];
+            HomepageSetting::setByKey('homepage_category_products', $showcase);
         }
 
         return redirect()->route('admin.cms.index')->with('success', 'Homepage settings updated successfully!');

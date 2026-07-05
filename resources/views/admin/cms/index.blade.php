@@ -71,6 +71,11 @@
                 class="px-4 py-3 border-b-2 font-semibold text-sm transition-all whitespace-nowrap">
             <i class="fa-solid fa-globe mr-2"></i>SEO Settings
         </button>
+        <button @click="activeTab = 'category_showcase'" 
+                :class="activeTab === 'category_showcase' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                class="px-4 py-3 border-b-2 font-semibold text-sm transition-all whitespace-nowrap">
+            <i class="fa-solid fa-folder-open mr-2"></i>Category Showcase
+        </button>
     </div>
 
     <!-- ── TAB 1: BANNER SLIDER ── -->
@@ -465,6 +470,40 @@
 
             <div class="flex justify-end">
                 <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-widest transition-all">Save SEO Config</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── TAB 7: CATEGORY SHOWCASE ── -->
+    <div x-show="activeTab === 'category_showcase'" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm" x-transition style="display: none;">
+        <div class="mb-6">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white uppercase font-outfit">Category Showcase Config</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Configure which categories display their own dynamic product showcase sections on the homepage and set product limit.</p>
+        </div>
+
+        <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="space-y-6">
+            @csrf
+            <input type="hidden" name="settings_type" value="category_showcase" />
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Max Products to Show Per Category</label>
+                <input type="number" name="showcase_product_limit" value="{{ old('showcase_product_limit', $categoryShowcase['product_limit'] ?? 4) }}" class="w-32 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 dark:bg-slate-950 text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:border-indigo-500" min="1" max="12" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-3">Select Categories to Showcase on Homepage</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    @foreach($categories as $cat)
+                    <label class="flex items-center gap-2.5 p-3 border border-slate-100 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer">
+                        <input type="checkbox" name="showcase_category_ids[]" value="{{ $cat->cat_id }}" {{ in_array($cat->cat_id, old('showcase_category_ids', $categoryShowcase['category_ids'] ?? [])) ? 'checked' : '' }} class="rounded text-indigo-600 focus:ring-indigo-500" />
+                        <span class="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase">{{ $cat->cat_name }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-widest transition-all">Save Showcase Config</button>
             </div>
         </form>
     </div>

@@ -84,7 +84,7 @@
     >
         <x-slot:action>
             <x-admin.button href="{{ route('admin.products.index') }}" variant="secondary" icon="fa-solid fa-arrow-left">
-                Back to Products
+                Back
             </x-admin.button>
         </x-slot:action>
     </x-admin.header>

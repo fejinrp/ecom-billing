@@ -116,7 +116,7 @@
     >
         <x-slot:action>
             <x-admin.button href="{{ route('admin.products.index') }}" variant="secondary" icon="fa-solid fa-arrow-left">
-                Back to Products
+                Back
             </x-admin.button>
         </x-slot:action>
     </x-admin.header>
@@ -143,56 +143,56 @@
     @endif
 
     <!-- STEPPER PROCESS BAR -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-lg">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
-            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(1)">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 md:p-6 shadow-lg">
+        <div class="flex flex-row justify-between items-center w-full gap-2 md:gap-0">
+            <div class="flex items-center gap-2 md:gap-3 cursor-pointer" @click="goToStep(1)">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all"
                      :class="currentStep === 1 ? 'bg-indigo-600 text-white shadow-lg' : (currentStep > 1 ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')">
                     <span x-show="currentStep <= 1">1</span>
-                    <i x-show="currentStep > 1" class="fa-solid fa-check text-sm"></i>
+                    <i x-show="currentStep > 1" class="fa-solid fa-check text-xs"></i>
                 </div>
-                <div>
+                <div class="hidden md:block">
                     <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 1</div>
                     <div class="text-sm font-semibold" :class="currentStep === 1 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Basic Info</div>
                 </div>
             </div>
 
-            <div class="hidden md:block flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-4"></div>
+            <div class="flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-2 md:mx-4"></div>
 
-            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(2)">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+            <div class="flex items-center gap-2 md:gap-3 cursor-pointer" @click="goToStep(2)">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all"
                      :class="currentStep === 2 ? 'bg-indigo-600 text-white shadow-lg' : (currentStep > 2 ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')">
                     <span x-show="currentStep <= 2">2</span>
-                    <i x-show="currentStep > 2" class="fa-solid fa-check text-sm"></i>
+                    <i x-show="currentStep > 2" class="fa-solid fa-check text-xs"></i>
                 </div>
-                <div>
+                <div class="hidden md:block">
                     <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 2</div>
                     <div class="text-sm font-semibold" :class="currentStep === 2 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Branding</div>
                 </div>
             </div>
 
-            <div class="hidden md:block flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-4"></div>
+            <div class="flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-2 md:mx-4"></div>
 
-            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(3)">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+            <div class="flex items-center gap-2 md:gap-3 cursor-pointer" @click="goToStep(3)">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all"
                      :class="currentStep === 3 ? 'bg-indigo-600 text-white shadow-lg' : (currentStep > 3 ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')">
                     <span x-show="currentStep <= 3">3</span>
-                    <i x-show="currentStep > 3" class="fa-solid fa-check text-sm"></i>
+                    <i x-show="currentStep > 3" class="fa-solid fa-check text-xs"></i>
                 </div>
-                <div>
+                <div class="hidden md:block">
                     <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 3</div>
                     <div class="text-sm font-semibold" :class="currentStep === 3 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Pricing & Stock</div>
                 </div>
             </div>
 
-            <div class="hidden md:block flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-4"></div>
+            <div class="flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-2 md:mx-4"></div>
 
-            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(4)">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+            <div class="flex items-center gap-2 md:gap-3 cursor-pointer" @click="goToStep(4)">
+                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all"
                      :class="currentStep === 4 ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
                     <span>4</span>
                 </div>
-                <div>
+                <div class="hidden md:block">
                     <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 4</div>
                     <div class="text-sm font-semibold" :class="currentStep === 4 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Media & Advanced</div>
                 </div>
@@ -329,74 +329,86 @@
             </div>
 
             <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Opening Quantity <span class="text-rose-500">*</span></label>
-                        <input type="number" name="tqty" required placeholder="0" value="0"
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Packaging Capacity (Per Pack) <span class="text-rose-500">*</span></label>
-                        <input type="number" name="pqty" required placeholder="1" value="1"
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vendor / Procurement Source <span class="text-rose-500">*</span></label>
-                            <button type="button" @click="showAddSupplier = true" class="text-indigo-500 text-xs font-bold">+ Add Supplier</button>
+                <!-- Section 1: Inventory & Sourcing -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Inventory & Sourcing</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Opening Quantity <span class="text-rose-500">*</span></label>
+                            <input type="number" name="tqty" required placeholder="0" value="0"
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
                         </div>
-                        <select name="pfrom" id="supplier_select" required class="select2-select w-full">
-                            <option value="">~ Select Supplier ~</option>
-                            @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->name }}">{{ $supplier->name }}</option>
-                            @endforeach
-                        </select>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Packaging Capacity (Per Pack) <span class="text-rose-500">*</span></label>
+                            <input type="number" name="pqty" required placeholder="1" value="1"
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vendor / Procurement Source <span class="text-rose-500">*</span></label>
+                                <button type="button" @click="showAddSupplier = true" class="text-indigo-500 text-xs font-bold">+ Add Supplier</button>
+                            </div>
+                            <select name="pfrom" id="supplier_select" required class="select2-select w-full">
+                                <option value="">~ Select Supplier ~</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->name }}">{{ $supplier->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Procurement Cost <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="prate" required placeholder="0.00" 
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-indigo-600 dark:text-indigo-400 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Shipping Charge <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="srate" required placeholder="0.00" 
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">MRP <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="mrp" required placeholder="0.00" 
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">GST%</label>
-                        <select name="gst" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer transition-all">
-                            <option value="0">GST 0%</option>
-                            <option value="5">GST 5%</option>
-                            <option value="12">GST 12%</option>
-                            <option value="18" selected>GST 18%</option>
-                            <option value="28">GST 28%</option>
-                        </select>
+                <!-- Section 2: Purchase Cost & Taxation -->
+                <div class="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                    <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Purchase Cost & Taxation</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Procurement Cost <span class="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" name="prate" required placeholder="0.00" 
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-indigo-600 dark:text-indigo-400 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Shipping Charge <span class="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" name="srate" required placeholder="0.00" 
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">GST%</label>
+                            <select name="gst" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer transition-all">
+                                <option value="0">GST 0%</option>
+                                <option value="5">GST 5%</option>
+                                <option value="12">GST 12%</option>
+                                <option value="18" selected>GST 18%</option>
+                                <option value="28">GST 28%</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Customer Rate <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="cprice" required placeholder="0.00" 
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-emerald-600 dark:text-emerald-400 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Dealer Rate <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="dprice" required placeholder="0.00" 
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-indigo-650 dark:text-indigo-400 transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Super Dealer Rate <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="sdprice" required placeholder="0.00" 
-                               class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-purple-650 dark:text-purple-450 transition-all">
+                <!-- Section 3: Selling Price Tiers -->
+                <div class="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                    <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Selling Price Tiers</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">MRP <span class="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" name="mrp" required placeholder="0.00" 
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Super Dealer Rate <span class="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" name="sdprice" required placeholder="0.00" 
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-purple-650 dark:text-purple-450 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Dealer Rate <span class="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" name="dprice" required placeholder="0.00" 
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-indigo-650 dark:text-indigo-400 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Customer Rate <span class="text-rose-500">*</span></label>
+                            <input type="number" step="0.01" name="cprice" required placeholder="0.00" 
+                                   class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-emerald-600 dark:text-emerald-400 transition-all">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -424,21 +436,24 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center space-y-3">
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Product Showcase Image 1</label>
-                    <input type="file" name="productimagef" 
+                    <input type="file" name="productimagef" id="productimagef" onchange="validateImageSize(this)"
                            class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-indigo-500/10 file:text-indigo-600 dark:file:text-indigo-400 hover:file:bg-indigo-500/20 cursor-pointer">
                     <p class="text-[9px] text-slate-400 dark:text-slate-500 font-medium">GIF, JPG, JPEG, PNG (Max Size: 250KB)</p>
+                    <p id="error-productimagef" class="text-rose-500 text-[10px] mt-1 hidden font-semibold"></p>
                 </div>
                 <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center space-y-3">
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Product Showcase Image 2</label>
-                    <input type="file" name="productimages" 
+                    <input type="file" name="productimages" id="productimages" onchange="validateImageSize(this)"
                            class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-indigo-500/10 file:text-indigo-600 dark:file:text-indigo-400 hover:file:bg-indigo-500/20 cursor-pointer">
                     <p class="text-[9px] text-slate-400 dark:text-slate-500 font-medium">GIF, JPG, JPEG, PNG (Max Size: 250KB)</p>
+                    <p id="error-productimages" class="text-rose-500 text-[10px] mt-1 hidden font-semibold"></p>
                 </div>
                 <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center space-y-3">
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Product Showcase Image 3</label>
-                    <input type="file" name="productimaget" 
+                    <input type="file" name="productimaget" id="productimaget" onchange="validateImageSize(this)"
                            class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-indigo-500/10 file:text-indigo-600 dark:file:text-indigo-400 hover:file:bg-indigo-500/20 cursor-pointer">
                     <p class="text-[9px] text-slate-400 dark:text-slate-500 font-medium">GIF, JPG, JPEG, PNG (Max Size: 250KB)</p>
+                    <p id="error-productimaget" class="text-rose-500 text-[10px] mt-1 hidden font-semibold"></p>
                 </div>
             </div>
 
@@ -824,6 +839,30 @@
     function generateBarcode() {
         const rand = '890' + Math.floor(100000000 + Math.random() * 900000000);
         $('#pcode').val(rand).trigger('input');
+    }
+
+    // Image size validator (max 250KB)
+    function validateImageSize(input) {
+        const file = input.files[0];
+        const errorEl = document.getElementById(`error-${input.id}`);
+        
+        // Reset state
+        if (errorEl) {
+            errorEl.classList.add('hidden');
+            errorEl.innerText = '';
+        }
+
+        if (file) {
+            const maxSize = 250 * 1024; // 250KB in bytes
+            if (file.size > maxSize) {
+                const sizeInKB = (file.size / 1024).toFixed(1);
+                if (errorEl) {
+                    errorEl.innerText = `File is too large! Maximum allowed is 250KB. (Your file is ${sizeInKB}KB)`;
+                    errorEl.classList.remove('hidden');
+                }
+                input.value = ''; // Reset the input element
+            }
+        }
     }
 </script>
 @endsection

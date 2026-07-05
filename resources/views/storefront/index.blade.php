@@ -110,19 +110,29 @@
     <div id="sf-category-scroll-container" class="mb-4 bg-white dark:bg-slate-950 dark:border-slate-850 rounded-2xl p-4 overflow-x-auto custom-scrollbar">
         <div class="grid grid-rows-2 grid-flow-col md:flex md:items-center md:gap-8 md:min-w-max md:justify-center gap-x-6 gap-y-4 justify-start">
             @if (isset($featuredCategories) && count($featuredCategories) > 0)
+                @php
+                    $colors = [
+                        ['bg' => 'from-orange-500 to-rose-500 shadow-orange-500/20', 'text' => 'text-orange-500 dark:text-orange-400', 'lightBg' => 'bg-orange-50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/30'],
+                        ['bg' => 'from-indigo-500 to-purple-500 shadow-indigo-500/20', 'text' => 'text-indigo-500 dark:text-indigo-400', 'lightBg' => 'bg-indigo-50 dark:bg-indigo-950/20 border-indigo-100 dark:border-indigo-900/30'],
+                        ['bg' => 'from-emerald-500 to-teal-500 shadow-emerald-500/20', 'text' => 'text-emerald-500 dark:text-emerald-400', 'lightBg' => 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30'],
+                        ['bg' => 'from-pink-500 to-rose-500 shadow-pink-500/20', 'text' => 'text-pink-500 dark:text-pink-400', 'lightBg' => 'bg-pink-50 dark:bg-pink-950/20 border-pink-100 dark:border-pink-900/30'],
+                        ['bg' => 'from-blue-500 to-cyan-500 shadow-blue-500/20', 'text' => 'text-blue-500 dark:text-blue-400', 'lightBg' => 'bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30'],
+                        ['bg' => 'from-amber-500 to-orange-500 shadow-amber-500/20', 'text' => 'text-amber-500 dark:text-amber-400', 'lightBg' => 'bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30'],
+                        ['bg' => 'from-rose-500 to-pink-500 shadow-rose-500/20', 'text' => 'text-rose-500 dark:text-rose-400', 'lightBg' => 'bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/30'],
+                        ['bg' => 'from-violet-500 to-fuchsia-500 shadow-violet-500/20', 'text' => 'text-violet-500 dark:text-violet-400', 'lightBg' => 'bg-violet-50 dark:bg-violet-950/20 border-violet-100 dark:border-violet-900/30'],
+                    ];
+                @endphp
                 @foreach ($featuredCategories as $index => $cat)
                     @php
+                        $color = $colors[$index % count($colors)];
                         $icon = $cat->homepage_icon ?? 'fa-server';
                         $isActive = Route::current()->parameter('name') === $cat->cat_name;
                     @endphp
                     <a href="{{ route('storefront.category', $cat->cat_name) }}" class="flex flex-col items-center group transition-all duration-300">
-                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center border transition-all duration-355 {{ $isActive ? 'text-white shadow-md' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-880 text-slate-750 dark:text-slate-350' }}"
-                             style="{{ $isActive ? 'background-color: #0059e3; border-color: #0059e3;' : '' }}">
-                            <i class="fa-solid {{ $icon }} text-base md:text-lg {{ $isActive ? 'text-white' : 'text-[#0059e3]' }}"
-                               style="{{ !$isActive ? 'color: #0059e3;' : '' }}"></i>
+                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center border transition-all duration-300 group-hover:scale-105 group-hover:shadow-md {{ $isActive ? 'text-white bg-gradient-to-br ' . $color['bg'] . ' shadow-lg border-transparent' : $color['lightBg'] . ' text-slate-700' }}">
+                            <i class="fa-solid {{ $icon }} text-base md:text-lg transition-transform group-hover:scale-110 {{ $isActive ? 'text-white' : $color['text'] }}"></i>
                         </div>
-                        <span class="text-[10px] md:text-[11px] font-bold uppercase tracking-wider mt-1.5 md:mt-2 {{ $isActive ? '' : 'text-slate-650 dark:text-slate-400 group-hover:text-[#0059e3]' }}"
-                               style="{{ $isActive ? 'color: #0059e3;' : '' }}">{{ $cat->cat_name }}</span>
+                        <span class="text-[10px] md:text-[11px] font-bold uppercase tracking-wider mt-1.5 md:mt-2 transition-colors {{ $isActive ? $color['text'] : 'text-slate-650 dark:text-slate-400 group-hover:' . $color['text'] }}">{{ $cat->cat_name }}</span>
                     </a>
                 @endforeach
             @endif
@@ -236,17 +246,20 @@
                             }
                         }
                     @endphp
-                    <a href="{{ route('storefront.index', ['search' => $sub->subcategoryname]) }}" class="bg-gradient-to-br from-slate-50 to-slate-100/30 dark:from-slate-900 dark:to-slate-950/40 border border-slate-150 dark:border-slate-800/80 hover:border-[#0059e3]/35 dark:hover:border-[#3b82f6]/35 p-3 rounded-2xl w-44 h-16 flex items-center gap-3 transition-all duration-250 hover:shadow-md hover:scale-[1.02] shrink-0 group">
+                    @php
+                        $color = $colors[$index % count($colors)];
+                    @endphp
+                    <a href="{{ route('storefront.index', ['search' => $sub->subcategoryname]) }}" class="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-950/40 border border-slate-150 dark:border-slate-800/80 hover:border-indigo-500/20 dark:hover:border-indigo-500/30 p-3 rounded-2xl w-44 h-16 flex items-center gap-3 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 shrink-0 group">
                         <!-- Centered Category Icon Badge -->
-                        <div class="w-8 h-8 rounded-full bg-slate-100/80 dark:bg-slate-800/60 flex items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-[#0059e3]/10 dark:group-hover:bg-[#3b82f6]/10 group-hover:text-[#0059e3] dark:group-hover:text-[#3b82f6] transition-all duration-250 shrink-0">
-                            <i class="fa-solid {{ $icon }} text-xs"></i>
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 {{ $color['lightBg'] }}">
+                            <i class="fa-solid {{ $icon }} text-xs {{ $color['text'] }}"></i>
                         </div>
 
                         <!-- Text Details -->
                         <div class="flex flex-col min-w-0 justify-center">
                             <span class="text-[11px] font-extrabold text-slate-800 dark:text-slate-100 tracking-tight leading-tight line-clamp-1 capitalize">{{ strtolower($sub->subcategoryname) }}</span>
                             @if ($sub->category)
-                                <span class="text-[8px] text-[#0059e3]/85 dark:text-blue-400/85 font-black uppercase tracking-wider mt-0.5 truncate">{{ $sub->category->cat_name }}</span>
+                                <span class="text-[8px] font-black uppercase tracking-wider mt-0.5 truncate {{ $color['text'] }}">{{ $sub->category->cat_name }}</span>
                             @endif
                         </div>
                     </a>

@@ -206,13 +206,27 @@
                                 <button type="button" @click="editMode = true" class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 hover:underline">
                                     <i class="fa-solid fa-pen-to-square"></i>Edit
                                 </button>
-                                <form action="{{ route('admin.cms.banners.destroy', $banner->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this slide?')" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:underline">
+                                <div x-data="{ confirmDelete: false }" class="inline-flex items-center">
+                                    <!-- Delete button (Initial State) -->
+                                    <button type="button" x-show="!confirmDelete" @click="confirmDelete = true" class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:underline">
                                         <i class="fa-solid fa-trash-can"></i>Delete
                                     </button>
-                                </form>
+                                    
+                                    <!-- Confirmation State -->
+                                    <div x-show="confirmDelete" x-transition class="flex items-center gap-2" style="display: none;">
+                                        <span class="text-[9px] font-bold text-rose-500 uppercase tracking-wider">Confirm Delete?</span>
+                                        <form action="{{ route('admin.cms.banners.destroy', $banner->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white font-bold text-[9px] uppercase tracking-widest transition-all">
+                                                Yes
+                                            </button>
+                                        </form>
+                                        <button type="button" @click="confirmDelete = false" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-350 dark:hover:bg-slate-700 text-slate-650 dark:text-slate-400 font-bold text-[9px] uppercase tracking-widest transition-all">
+                                            No
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

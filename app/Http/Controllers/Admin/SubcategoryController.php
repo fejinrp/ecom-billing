@@ -36,12 +36,19 @@ class SubcategoryController extends Controller
             'catid' => 'required|integer',
         ]);
 
-        Subcategory::create([
+        $subcategory = Subcategory::create([
             'subcategoryname' => $request->input('subcategoryname'),
             'catid' => $request->input('catid'),
             'creationdate' => date('Y-m-d H:i:s'),
             'status' => 1,
         ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'subcategory' => $subcategory
+            ]);
+        }
 
         return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory successfully created!');
     }

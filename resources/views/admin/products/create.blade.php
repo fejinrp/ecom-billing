@@ -5,7 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
     /* Premium Select2 Styling to match Tailwind Inputs */
-    .select2-container--default .select2-selection--single {
+    .select2-container .select2-selection--single {
         background-color: #f8fafc !important; /* bg-slate-50 equivalent */
         border: 1px solid #e2e8f0 !important; /* border-slate-200 equivalent */
         border-radius: 0.75rem !important; /* rounded-xl */
@@ -17,21 +17,21 @@
         align-items: center;
         transition: all 0.2s ease-in-out;
     }
-    .dark .select2-container--default .select2-selection--single {
+    .dark .select2-container .select2-selection--single {
         background-color: #020617 !important; /* bg-slate-950 equivalent */
         border: 1px solid #1e293b !important; /* border-slate-800 equivalent */
         color: #cbd5e1 !important; /* text-slate-300 */
     }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
+    .select2-container .select2-selection--single .select2-selection__rendered {
         color: #334155 !important;
         font-size: 0.875rem !important; /* text-sm */
         font-weight: 500;
         padding-left: 0 !important;
     }
-    .dark .select2-container--default .select2-selection--single .select2-selection__rendered {
+    .dark .select2-container .select2-selection--single .select2-selection__rendered {
         color: #cbd5e1 !important;
     }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
+    .select2-container .select2-selection--single .select2-selection__arrow {
         height: 3rem !important;
         right: 10px !important;
     }
@@ -54,15 +54,15 @@
     .dark .select2-results__option {
         color: #cbd5e1 !important;
     }
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    .select2-container .select2-results__option--highlighted[aria-selected] {
         background-color: #4f46e5 !important; /* indigo-600 */
         color: #ffffff !important;
     }
-    .select2-container--default .select2-results__option[aria-selected=true] {
+    .select2-container .select2-results__option[aria-selected=true] {
         background-color: rgba(79, 70, 229, 0.1) !important;
         color: #4f46e5 !important;
     }
-    .dark .select2-container--default .select2-results__option[aria-selected=true] {
+    .dark .select2-container .select2-results__option[aria-selected=true] {
         color: #818cf8 !important;
     }
 </style>
@@ -73,62 +73,38 @@
      @close-brand-modal.window="showAddBrand = false"
      @close-supplier-modal.window="showAddSupplier = false"
      x-data="{
+    currentStep: 1,
     showAddCategory: false,
     showAddSubcategory: false,
     showAddBrand: false,
     showAddSupplier: false,
-    hasDraft: false,
-    categories: @js($categories),
-    subcategories: @js($subcategories),
-    brands: @js($brands),
+    categories: globalCategories,
+    subcategories: globalSubcategories,
+    brands: globalBrands,
     selectedCat: '',
     selectedSubcat: '',
 
-    init() {
-        if (localStorage.getItem('product_create_draft')) {
-            this.hasDraft = true;
-        }
-        // Auto-save setup every 8 seconds
-        setInterval(() => {
-            this.saveDraft();
-        }, 8000);
-    },
-
-    saveDraft() {
-        const form = document.getElementById('productForm');
-        if (form) {
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                if (key !== '_token' && !(value instanceof File)) {
-                    data[key] = value;
-                }
-            });
-            if (Object.keys(data).length > 0) {
-                localStorage.setItem('product_create_draft', JSON.stringify(data));
+    goToStep(step) {
+        if (step > this.currentStep) {
+            // Validate intermediate steps before proceeding
+            for (let s = this.currentStep; s < step; s++) {
+                if (!this.validateStep(s)) return;
             }
         }
+        this.currentStep = step;
     },
 
-    loadDraft() {
-        const draft = JSON.parse(localStorage.getItem('product_create_draft'));
-        if (draft) {
-            Object.keys(draft).forEach(key => {
-                const el = document.getElementsByName(key)[0];
-                if (el) {
-                    el.value = draft[key];
-                    if (el.tagName === 'SELECT') {
-                        $(el).val(draft[key]).trigger('change');
-                    }
-                }
-            });
-            this.hasDraft = false;
+    validateStep(stepNum) {
+        const container = document.querySelector(`[data-step-container='${stepNum}']`);
+        if (!container) return true;
+        const inputs = container.querySelectorAll('input[required], select[required]');
+        for (let input of inputs) {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                return false;
+            }
         }
-    },
-
-    discardDraft() {
-        localStorage.removeItem('product_create_draft');
-        this.hasDraft = false;
+        return true;
     }
 }">
     <!-- Header Section -->
@@ -145,50 +121,109 @@
         </x-slot:action>
     </x-admin.header>
 
-    <!-- Draft Alert -->
-    <div x-show="hasDraft" x-transition class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-sm font-semibold flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-file-invoice text-base"></i>
-            <span>We recovered an unsaved product draft. Do you want to load it?</span>
-        </div>
-        <div class="flex gap-2">
-            <button type="button" @click="loadDraft()" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">Load Draft</button>
-            <button type="button" @click="discardDraft()" class="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">Discard</button>
-        </div>
-    </div>
-
     <!-- Error Alerts -->
     @if(session('error'))
-        <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-sm font-semibold flex items-center gap-2">
+        <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-sm font-semibold flex items-center gap-2 animate-fadeIn">
             <i class="fa-solid fa-circle-exclamation text-base"></i>
             <span>{{ session('error') }}</span>
         </div>
     @endif
+    @if($errors->any())
+        <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-sm font-semibold space-y-2 animate-fadeIn">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-base"></i>
+                <span class="font-bold">Please correct the following errors:</span>
+            </div>
+            <ul class="list-disc pl-5 text-xs space-y-1 font-medium">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- STEPPER PROCESS BAR -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-lg">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(1)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+                     :class="currentStep === 1 ? 'bg-indigo-600 text-white shadow-lg' : (currentStep > 1 ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')">
+                    <span x-show="currentStep <= 1">1</span>
+                    <i x-show="currentStep > 1" class="fa-solid fa-check text-sm"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 1</div>
+                    <div class="text-sm font-semibold" :class="currentStep === 1 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Basic Info</div>
+                </div>
+            </div>
+
+            <div class="hidden md:block flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-4"></div>
+
+            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(2)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+                     :class="currentStep === 2 ? 'bg-indigo-600 text-white shadow-lg' : (currentStep > 2 ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')">
+                    <span x-show="currentStep <= 2">2</span>
+                    <i x-show="currentStep > 2" class="fa-solid fa-check text-sm"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 2</div>
+                    <div class="text-sm font-semibold" :class="currentStep === 2 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Branding</div>
+                </div>
+            </div>
+
+            <div class="hidden md:block flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-4"></div>
+
+            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(3)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+                     :class="currentStep === 3 ? 'bg-indigo-600 text-white shadow-lg' : (currentStep > 3 ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500')">
+                    <span x-show="currentStep <= 3">3</span>
+                    <i x-show="currentStep > 3" class="fa-solid fa-check text-sm"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 3</div>
+                    <div class="text-sm font-semibold" :class="currentStep === 3 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Pricing & Stock</div>
+                </div>
+            </div>
+
+            <div class="hidden md:block flex-1 h-[2px] bg-slate-200 dark:bg-slate-800 mx-4"></div>
+
+            <div class="flex items-center gap-3 cursor-pointer" @click="goToStep(4)">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all"
+                     :class="currentStep === 4 ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'">
+                    <span>4</span>
+                </div>
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Step 4</div>
+                    <div class="text-sm font-semibold" :class="currentStep === 4 ? 'text-indigo-500' : 'text-slate-700 dark:text-slate-300'">Media & Advanced</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <form method="POST" id="productForm" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
-        <!-- SECTION 1: General Details -->
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6" x-data="{ open: true }">
-            <div class="flex justify-between items-center cursor-pointer border-b border-slate-200 dark:border-slate-800 pb-3" @click="open = !open">
+        <!-- STEP 1: Basic Information -->
+        <div x-show="currentStep === 1" x-transition data-step-container="1" class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-circle-info text-indigo-500"></i>
                     <span>1. General Information</span>
                 </h3>
-                <i class="fa-solid" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Specify core descriptive details, barcode labels, and catalog measurements.</p>
             </div>
             
-            <div x-show="open" x-transition class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Product Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="productname" id="productname" required placeholder="Enter product commercial name" 
+                    <input type="text" name="productname" id="productname" required placeholder="Enter product commercial name" value="{{ old('productname') }}"
                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
                     <div id="name-warning" class="text-xs text-rose-500 mt-1 hidden"></div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Product Code (PCODE) <span class="text-rose-500">*</span></label>
                     <div class="flex">
-                        <input type="text" name="pcode" id="pcode" required maxlength="50" placeholder="Product Code" value="{{ $nextCode }}"
+                        <input type="text" name="pcode" id="pcode" required maxlength="50" placeholder="Product Code" value="{{ old('pcode', $nextCode) }}"
                                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-l-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 uppercase font-mono font-bold tracking-wider transition-all">
                         <button type="button" onclick="generateBarcode()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-xl text-xs font-bold transition-all">Generate</button>
                     </div>
@@ -196,7 +231,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Product Description <span class="text-rose-500">*</span></label>
-                    <input type="text" name="productdes" required placeholder="Enter broad specifications and packaging layout details..." 
+                    <input type="text" name="productdes" required placeholder="Enter broad specifications and packaging layout details..." value="{{ old('productdes') }}"
                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
                 </div>
                 <div>
@@ -204,31 +239,37 @@
                     <select name="unit" required 
                             class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer transition-all">
                         <option value="">~ Choose Base Unit ~</option>
-                        <option value="1">Number (PCS)</option>
-                        <option value="2">Meter (MTR)</option>
-                        <option value="3">Packet (PKT)</option>
-                        <option value="4">Liter (LTR)</option>
+                        <option value="1" {{ old('unit') == '1' ? 'selected' : '' }}>Number (PCS)</option>
+                        <option value="2" {{ old('unit') == '2' ? 'selected' : '' }}>Meter (MTR)</option>
+                        <option value="3" {{ old('unit') == '3' ? 'selected' : '' }}>Packet (PKT)</option>
+                        <option value="4" {{ old('unit') == '4' ? 'selected' : '' }}>Liter (LTR)</option>
                     </select>
                 </div>
                 <div class="md:col-span-3">
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">HSN/SAC Code <span class="text-rose-500">*</span></label>
-                    <input type="text" name="hsnsac" required placeholder="GST classification code (HSN/SAC)" 
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">HSN/SAC Code</label>
+                    <input type="text" name="hsnsac" placeholder="GST classification code (HSN/SAC)" value="{{ old('hsnsac') }}"
                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
                 </div>
             </div>
+
+            <div class="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" @click="goToStep(2)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <span>Continue to Branding</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- SECTION 2: Category & Branding -->
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6" x-data="{ open: true }">
-            <div class="flex justify-between items-center cursor-pointer border-b border-slate-200 dark:border-slate-800 pb-3" @click="open = !open">
+        <!-- STEP 2: Category & Branding -->
+        <div x-show="currentStep === 2" x-transition data-step-container="2" class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-folder-open text-indigo-500"></i>
                     <span>2. Branding & Category Linkages</span>
                 </h3>
-                <i class="fa-solid" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Select the hierarchical category node and assign appropriate structural brands.</p>
             </div>
 
-            <div x-show="open" x-transition class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Category <span class="text-rose-500">*</span></label>
@@ -244,7 +285,7 @@
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sub Category <span class="text-rose-500">*</span></label>
-                        <button type="button" @click="showAddSubcategory = true" class="text-indigo-500 text-xs font-bold" :disabled="!selectedCat" :class="!selectedCat ? 'opacity-50 cursor-not-allowed' : ''">+ Add Subcategory</button>
+                        <button type="button" @click="showAddSubcategory = true; setTimeout(() => { $('#modal_subcat_cat_select').val(selectedCat).trigger('change'); }, 50)" class="text-indigo-500 text-xs font-bold" :disabled="!selectedCat" :class="!selectedCat ? 'opacity-50 cursor-not-allowed' : ''">+ Add Subcategory</button>
                     </div>
                     <select name="subcatid" id="subcatid_select" x-model="selectedSubcat" :disabled="!selectedCat" required class="select2-select w-full">
                         <option value="">~ Select Subcategory ~</option>
@@ -256,7 +297,7 @@
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Brand <span class="text-rose-500">*</span></label>
-                        <button type="button" @click="showAddBrand = true" class="text-indigo-500 text-xs font-bold" :disabled="!selectedSubcat" :class="!selectedSubcat ? 'opacity-50 cursor-not-allowed' : ''">+ Add Brand</button>
+                        <button type="button" @click="showAddBrand = true; setTimeout(() => { $('#modal_brand_cat_select').val(selectedCat).trigger('change'); setTimeout(() => { $('#modal_brand_subcat_select').val(selectedSubcat).trigger('change'); }, 100); }, 50)" class="text-indigo-500 text-xs font-bold" :disabled="!selectedSubcat" :class="!selectedSubcat ? 'opacity-50 cursor-not-allowed' : ''">+ Add Brand</button>
                     </div>
                     <select name="brandid" id="brandid_select" :disabled="!selectedSubcat" required class="select2-select w-full">
                         <option value="">~ Select Brand ~</option>
@@ -266,19 +307,28 @@
                     </select>
                 </div>
             </div>
+
+            <div class="flex justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" @click="goToStep(1)" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Previous Step</span>
+                </button>
+                <button type="button" @click="goToStep(3)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <span>Continue to Pricing</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- SECTION 3: Stock & Tiers -->
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6" x-data="{ open: false }">
-            <div class="flex justify-between items-center cursor-pointer border-b border-slate-200 dark:border-slate-800 pb-3" @click="open = !open">
+        <!-- STEP 3: Stock Valuation & Pricing Tiers -->
+        <div x-show="currentStep === 3" x-transition data-step-container="3" class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-coins text-indigo-500"></i>
                     <span>3. Stock Valuation & Pricing Tiers</span>
                 </h3>
-                <i class="fa-solid" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Specify procurement cost, MRP, dynamic margins, and vendor parameters.</p>
             </div>
 
-            <div x-show="open" x-transition class="space-y-6">
+            <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Opening Quantity <span class="text-rose-500">*</span></label>
@@ -321,8 +371,8 @@
                                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-bold transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">GST% <span class="text-rose-500">*</span></label>
-                        <select name="gst" required class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer transition-all">
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">GST%</label>
+                        <select name="gst" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer transition-all">
                             <option value="0">GST 0%</option>
                             <option value="5">GST 5%</option>
                             <option value="12">GST 12%</option>
@@ -350,19 +400,28 @@
                     </div>
                 </div>
             </div>
+
+            <div class="flex justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" @click="goToStep(2)" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Previous Step</span>
+                </button>
+                <button type="button" @click="goToStep(4)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <span>Continue to Media</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- SECTION 4: Product Media -->
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6" x-data="{ open: false }">
-            <div class="flex justify-between items-center cursor-pointer border-b border-slate-200 dark:border-slate-800 pb-3" @click="open = !open">
+        <!-- STEP 4: Media & Advanced Settings -->
+        <div x-show="currentStep === 4" x-transition data-step-container="4" class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
+            <div class="border-b border-slate-200 dark:border-slate-800 pb-3">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-images text-indigo-500"></i>
-                    <span>4. Product Showcase Media</span>
+                    <span>4. Showcase Media & Advanced Settings</span>
                 </h3>
-                <i class="fa-solid" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Upload showcases and specify warranty details.</p>
             </div>
 
-            <div x-show="open" x-transition class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center space-y-3">
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Product Showcase Image 1</label>
                     <input type="file" name="productimagef" 
@@ -382,36 +441,26 @@
                     <p class="text-[9px] text-slate-400 dark:text-slate-500 font-medium">GIF, JPG, JPEG, PNG (Max Size: 250KB)</p>
                 </div>
             </div>
-        </div>
 
-        <!-- SECTION 5: Warranty Settings -->
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6" x-data="{ open: false }">
-            <div class="flex justify-between items-center cursor-pointer border-b border-slate-200 dark:border-slate-800 pb-3" @click="open = !open">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-gears text-indigo-500"></i>
-                    <span>5. Advanced & Warranty Settings</span>
-                </h3>
-                <i class="fa-solid" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Warranty Period (Months)</label>
+                <input type="number" name="warranty_months" placeholder="0 for no warranty" value="0"
+                       class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
             </div>
 
-            <div x-show="open" x-transition class="grid grid-cols-1 gap-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Warranty Period (Months)</label>
-                    <input type="number" name="warranty_months" placeholder="0 for no warranty" value="0"
-                           class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+            <div class="flex justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" @click="goToStep(3)" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> <span>Previous Step</span>
+                </button>
+                
+                <div class="flex gap-2">
+                    <x-admin.button type="submit" variant="primary" icon="fa-solid fa-circle-check text-sm" class="px-8 py-3 shadow-lg shadow-indigo-500/10 uppercase text-xs font-bold tracking-wider">
+                        Save Product Details
+                    </x-admin.button>
                 </div>
             </div>
         </div>
 
-        <!-- Form Submit Footer -->
-        <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex justify-end gap-3">
-            <button type="button" @click="saveDraft()" class="px-6 py-4 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 uppercase text-xs font-bold tracking-wider hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                Save Draft
-            </button>
-            <x-admin.button type="submit" variant="primary" icon="fa-solid fa-circle-check text-lg" class="px-8 py-4 shadow-lg shadow-indigo-500/10 uppercase text-xs font-bold tracking-wider">
-                Save Product Details
-            </x-admin.button>
-        </div>
     </form>
 
     <!-- ==========================================
@@ -438,7 +487,7 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
-                    <select name="catid" id="modal_subcat_cat_select" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"></select>
+                    <select name="catid" id="modal_subcat_cat_select" required class="select2-select w-full"></select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Subcategory Name</label>
@@ -458,11 +507,11 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Category</label>
-                    <select id="modal_brand_cat_select" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500" onchange="modalLoadSubcategories()"></select>
+                    <select name="catid" id="modal_brand_cat_select" required class="select2-select w-full"></select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Subcategory</label>
-                    <select name="scatid" id="modal_brand_subcat_select" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500" disabled>
+                    <select name="scatid" id="modal_brand_subcat_select" required class="select2-select w-full" disabled>
                         <option value="">~ Select Subcategory ~</option>
                     </select>
                 </div>
@@ -518,6 +567,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    // Global datasets that can be dynamically updated by AJAX
+    let globalCategories = @js($categories);
+    let globalSubcategories = @js($subcategories);
+    let globalBrands = @js($brands);
+
     $(document).ready(function() {
         // Initialize Select2 dropdowns
         $('.select2-select').select2({
@@ -526,11 +580,9 @@
 
         // Sync dropdown selectors with Alpine state when select2 changes value
         $('#catid_select').on('change', function(e) {
-            // Trigger native change so Alpine x-model updates
             if (e.originalEvent) return;
             this.dispatchEvent(new Event('change'));
 
-            // Reset dependent subcategory and brand select2s
             setTimeout(() => {
                 $('#subcatid_select').val('').trigger('change');
             }, 50);
@@ -548,6 +600,11 @@
         $('#brandid_select').on('change', function(e) {
             if (e.originalEvent) return;
             this.dispatchEvent(new Event('change'));
+        });
+
+        // Trigger subcategory load when category is updated inside Brand modal
+        $('#modal_brand_cat_select').on('change', function() {
+            modalLoadSubcategories();
         });
 
         // Real-time duplicate validation calls
@@ -587,8 +644,7 @@
         modalSubcatSelect.html('<option value="">~ Select Category ~</option>');
         modalBrandSelect.html('<option value="">~ Select Category ~</option>');
 
-        const categories = @js($categories);
-        categories.forEach(cat => {
+        globalCategories.forEach(cat => {
             modalSubcatSelect.append(`<option value="${cat.cat_id}">${cat.cat_name}</option>`);
             modalBrandSelect.append(`<option value="${cat.cat_id}">${cat.cat_name}</option>`);
         });
@@ -600,17 +656,16 @@
         subSelect.html('<option value="">~ Select Subcategory ~</option>');
 
         if (!catId) {
-            subSelect.prop('disabled', true);
+            subSelect.prop('disabled', true).trigger('change');
             return;
         }
 
-        const subcategories = @js($subcategories);
-        const filtered = subcategories.filter(sub => sub.catid == catId);
+        const filtered = globalSubcategories.filter(sub => sub.catid == catId);
         filtered.forEach(sub => {
             subSelect.append(`<option value="${sub.id}">${sub.subcategoryname}</option>`);
         });
 
-        subSelect.prop('disabled', false);
+        subSelect.prop('disabled', false).trigger('change');
     }
 
     // Duplicate Check AJAX
@@ -626,7 +681,6 @@
             success: function(response) {
                 let html = '';
                 
-                // If there are similar matches, list up to 3
                 if (response.matches && response.matches.length > 0) {
                     html += `<div class="mt-2 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">`;
                     html += `<div class="font-bold text-xs uppercase tracking-wider mb-1"><i class="fa-solid fa-list-check mr-1 text-indigo-500"></i> Matching Products (Max 3):</div><ul class="list-disc pl-4 space-y-1">`;
@@ -636,13 +690,10 @@
                     html += `</ul></div>`;
                 }
 
-                // If exact match exists, block saving
                 if (response.exists) {
                     html += `<div class="mt-2 p-3 bg-rose-500/10 border border-rose-500/25 text-rose-600 dark:text-rose-400 rounded-xl font-bold text-xs flex items-center gap-2"><i class="fa-solid fa-ban"></i> Exact Match Blocked: This product is already registered!</div>`;
-                    // Block form save buttons
                     $('button[type="submit"]').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
                 } else {
-                    // Unblock form save buttons if no other field is blocked
                     if ($('.bg-rose-500\\/10').length === 0) {
                         $('button[type="submit"]').prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
                     }
@@ -683,13 +734,9 @@
                     select.append(`<option value="${id}">${text}</option>`);
                     select.val(id).trigger('change');
 
-                    // Close Modal using window custom event triggers (bound to parent Alpine scope)
                     if (modalVarName === 'showAddCategory') {
                         window.dispatchEvent(new CustomEvent('close-category-modal'));
-                        
-                        // Push new category into modal lists dynamically
-                        const categories = @js($categories);
-                        categories.push({ cat_id: id, cat_name: text });
+                        globalCategories.push({ cat_id: id, cat_name: text });
                         setupModalOptions();
                     } else if (modalVarName === 'showAddSupplier') {
                         window.dispatchEvent(new CustomEvent('close-supplier-modal'));
@@ -712,10 +759,28 @@
             type: 'POST',
             data: form.serialize() + `&_token={{ csrf_token() }}`,
             success: function(response) {
-                alert('Subcategory added successfully! Page will refresh to update datasets.');
-                window.dispatchEvent(new CustomEvent('close-subcategory-modal'));
-                form[0].reset();
-                window.location.reload();
+                if (response.status === 'success') {
+                    const sub = response.subcategory;
+                    
+                    // Push to local reactive dataset
+                    globalSubcategories.push({
+                        id: sub.id,
+                        subcategoryname: sub.subcategoryname,
+                        catid: sub.catid
+                    });
+
+                    // Update dropdown select and trigger Select2 change
+                    const select = $('#subcatid_select');
+                    select.append(`<option value="${sub.id}">${sub.subcategoryname}</option>`);
+                    select.val(sub.id).trigger('change');
+
+                    // Close modal and reset form
+                    window.dispatchEvent(new CustomEvent('close-subcategory-modal'));
+                    form[0].reset();
+                }
+            },
+            error: function() {
+                alert('Validation failed: Subcategory name might already be registered!');
             }
         });
     }
@@ -728,10 +793,29 @@
             type: 'POST',
             data: form.serialize() + `&_token={{ csrf_token() }}`,
             success: function(response) {
-                alert('Brand added successfully! Page will refresh to update datasets.');
-                window.dispatchEvent(new CustomEvent('close-brand-modal'));
-                form[0].reset();
-                window.location.reload();
+                if (response.status === 'success') {
+                    const brand = response.brand;
+                    
+                    // Push to local reactive dataset
+                    globalBrands.push({
+                        brand_id: brand.brand_id,
+                        brand_name: brand.brand_name,
+                        catid: brand.catid,
+                        scatid: brand.scatid
+                    });
+
+                    // Update dropdown select and trigger Select2 change
+                    const select = $('#brandid_select');
+                    select.append(`<option value="${brand.brand_id}">${brand.brand_name}</option>`);
+                    select.val(brand.brand_id).trigger('change');
+
+                    // Close modal and reset form
+                    window.dispatchEvent(new CustomEvent('close-brand-modal'));
+                    form[0].reset();
+                }
+            },
+            error: function() {
+                alert('Validation failed: Brand name might already be registered!');
             }
         });
     }

@@ -28,7 +28,9 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Models\Category;
 use App\Models\Order;
+use App\Http\Controllers\Admin\LuckyDrawController;
 use App\Http\Controllers\StorefrontController;
+use App\Http\Controllers\LuckyDrawStatusController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,6 +51,9 @@ Route::get('/order/success/{id}', [StorefrontController::class, 'orderSuccess'])
 Route::get('/orders', [StorefrontController::class, 'orderHistory'])->name('storefront.orders');
 Route::get('/orders/{id}', [StorefrontController::class, 'orderDetails'])->name('storefront.order_details');
 Route::get('/orders/{id}/print', [StorefrontController::class, 'orderPrint'])->name('storefront.order_print');
+
+// Lucky Draw Status Board (public — anyone can view winners)
+Route::get('/lucky-draw', [LuckyDrawStatusController::class, 'index'])->name('storefront.lucky_draw');
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
@@ -333,6 +338,13 @@ Route::prefix('admin')->group(function () {
         Route::get('my-attendance', [AttendanceController::class, 'staffIndex'])->name('admin.my-attendance.index');
         Route::post('my-attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('admin.my-attendance.punch-in');
         Route::post('my-attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('admin.my-attendance.punch-out');
+
+        // Lucky Draw
+        Route::get('lucky-draw', [LuckyDrawController::class, 'index'])->name('admin.lucky_draw.index');
+        Route::post('lucky-draw/draw', [LuckyDrawController::class, 'draw'])->name('admin.lucky_draw.draw');
+        Route::get('lucky-draw/settings', [LuckyDrawController::class, 'settings'])->name('admin.lucky_draw.settings');
+        Route::post('lucky-draw/settings', [LuckyDrawController::class, 'updateSettings'])->name('admin.lucky_draw.settings.update');
+        Route::delete('lucky-draw/settings/{id}', [LuckyDrawController::class, 'destroySetting'])->name('admin.lucky_draw.settings.destroy');
 
     });
 });

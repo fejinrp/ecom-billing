@@ -2,8 +2,8 @@
 
 @section('content')
 <div x-data="{ 
-    showAddModal: false, 
-    showEditModal: false, 
+    showAddModal: {{ session('reopen_modal') === 'add' ? 'true' : 'false' }}, 
+    showEditModal: {{ session('reopen_modal') === 'edit' ? 'true' : 'false' }}, 
     showStatusModal: false,
     
     // Add form states
@@ -52,6 +52,13 @@
             </x-admin.button>
         </x-slot:action>
     </x-admin.header>
+
+    <!-- Search & Filter Bar -->
+    <x-admin.search-bar :action="route('admin.customers.index')" placeholder="Search by name, email or mobile number...">
+        <x-slot:info>
+            <span>Showing {{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }} of {{ $users->total() }} customer records</span>
+        </x-slot:info>
+    </x-admin.search-bar>
 
     <!-- Table Config -->
     @php
@@ -128,7 +135,13 @@
             </tr>
         @empty
             <tr class="block lg:table-row w-full bg-slate-900/30 border border-slate-800/60 rounded-2xl p-6 lg:p-0">
-                <td colspan="7" class="px-6 py-8 text-center text-slate-500 font-medium block lg:table-cell w-full">No customer or dealer accounts found. Click 'Add Customer' to create one.</td>
+                <td colspan="7" class="px-6 py-8 text-center text-slate-500 font-medium block lg:table-cell w-full">
+                    @if(request('search'))
+                        No customer or dealer accounts found matching <span class="text-indigo-400 font-semibold">"{{ request('search') }}"</span>.
+                    @else
+                        No customer or dealer accounts found. Click 'Add Customer' to create one.
+                    @endif
+                </td>
             </tr>
         @endforelse
     </x-admin.table>
@@ -144,8 +157,14 @@
                 <input type="text" 
                        name="uname" 
                        required 
+                       value="{{ old('uname') }}"
                        placeholder="Enter customer name"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('uname') ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @error('uname')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                    </p>
+                @enderror
             </div>
 
             <!-- Email -->
@@ -154,8 +173,14 @@
                 <input type="email" 
                        name="email" 
                        required 
+                       value="{{ old('email') }}"
                        placeholder="Enter email ID"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('email') ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @error('email')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                    </p>
+                @enderror
             </div>
 
             <!-- Contact No -->
@@ -164,20 +189,31 @@
                 <input type="text" 
                        name="contactno" 
                        required 
+                       value="{{ old('contactno') }}"
                        placeholder="Enter mobile number"
                        maxlength="10"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('contactno') ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @error('contactno')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                    </p>
+                @enderror
             </div>
 
             <!-- User Type -->
             <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">User Type</label>
-                <select name="usertype" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <select name="usertype" required class="w-full bg-slate-950 border {{ $errors->has('usertype') ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                     <option value="">~~Select Type~~</option>
-                    <option value="C">Customer</option>
-                    <option value="D">Dealer</option>
-                    <option value="S">Super Dealer</option>
+                    <option value="C" {{ old('usertype') == 'C' ? 'selected' : '' }}>Customer</option>
+                    <option value="D" {{ old('usertype') == 'D' ? 'selected' : '' }}>Dealer</option>
+                    <option value="S" {{ old('usertype') == 'S' ? 'selected' : '' }}>Super Dealer</option>
                 </select>
+                @error('usertype')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                    </p>
+                @enderror
             </div>
 
             <!-- Password -->
@@ -187,7 +223,12 @@
                        name="password" 
                        required 
                        placeholder="Enter password"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('password') ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @error('password')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                    </p>
+                @enderror
             </div>
 
             <div class="flex gap-4 pt-4 border-t border-slate-850">
@@ -211,7 +252,12 @@
                        required 
                        x-model="editUname"
                        placeholder="Enter customer name"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('uname') && session('reopen_modal') === 'edit' ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @if($errors->has('uname') && session('reopen_modal') === 'edit')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $errors->first('uname') }}
+                    </p>
+                @endif
             </div>
 
             <!-- Email -->
@@ -222,7 +268,12 @@
                        required 
                        x-model="editEmail"
                        placeholder="Enter email ID"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('email') && session('reopen_modal') === 'edit' ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @if($errors->has('email') && session('reopen_modal') === 'edit')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $errors->first('email') }}
+                    </p>
+                @endif
             </div>
 
             <!-- Contact No -->
@@ -234,18 +285,28 @@
                        x-model="editContactno"
                        placeholder="Enter mobile no"
                        maxlength="10"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('contactno') && session('reopen_modal') === 'edit' ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @if($errors->has('contactno') && session('reopen_modal') === 'edit')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $errors->first('contactno') }}
+                    </p>
+                @endif
             </div>
 
             <!-- User Type -->
             <div>
                 <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">User Type</label>
-                <select name="usertype" required x-model="editUsertype" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <select name="usertype" required x-model="editUsertype" class="w-full bg-slate-950 border {{ $errors->has('usertype') && session('reopen_modal') === 'edit' ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                     <option value="">~~Select Type~~</option>
                     <option value="C">Customer</option>
                     <option value="D">Dealer</option>
                     <option value="S">Super Dealer</option>
                 </select>
+                @if($errors->has('usertype') && session('reopen_modal') === 'edit')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $errors->first('usertype') }}
+                    </p>
+                @endif
             </div>
 
             <!-- Password (Optional) -->
@@ -254,7 +315,12 @@
                 <input type="password" 
                        name="password" 
                        placeholder="Enter new password"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                       class="w-full bg-slate-950 border {{ $errors->has('password') && session('reopen_modal') === 'edit' ? 'border-rose-500' : 'border-slate-800' }} rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                @if($errors->has('password') && session('reopen_modal') === 'edit')
+                    <p class="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> {{ $errors->first('password') }}
+                    </p>
+                @endif
             </div>
 
             <div class="flex gap-4 pt-4 border-t border-slate-850">

@@ -415,6 +415,12 @@
                         @endif
                     </div>
 
+                    <!-- Lucky Draw -->
+                    <a href="{{ route('storefront.lucky_draw') }}" class="flex flex-col items-center justify-center text-slate-700 dark:text-slate-300 hover:text-[#0059e3] transition-colors" title="Lucky Draw">
+                        <i class="fa-solid fa-gift text-xl"></i>
+                        <span class="hidden sm:block text-[11px] font-bold mt-1">Lucky Draw</span>
+                    </a>
+
                     <!-- Cart -->
                     @php
                         $cartCount = 0;
@@ -560,6 +566,9 @@
                     </div>
                     <a href="{{ route('storefront.orders') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all sf-section-title">
                         <i class="fa-solid fa-receipt text-xs" style="color:#0059e3"></i> My Orders
+                    </a>
+                    <a href="{{ route('storefront.lucky_draw') }}" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all sf-section-title">
+                        <i class="fa-solid fa-gift text-xs" style="color:#0059e3"></i> Lucky Draw Status
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

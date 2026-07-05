@@ -6,7 +6,15 @@
     $usercheck = $adminUser ? \App\Models\Usercheck::where('uid', $adminUser->user_id)->first() : null;
     $canRestore = $adminUser && ($adminUser->section == 1 || ($usercheck && $usercheck->restore == 1));
 @endphp
-<div class="space-y-8 animate-fadeIn">
+<div class="space-y-8 animate-fadeIn" x-data="{ 
+    showConfirmModal: false, 
+    confirmAction: '', 
+    confirmMethod: 'POST', 
+    confirmTitle: '', 
+    confirmText: '', 
+    confirmBtnText: 'Confirm', 
+    isDelete: false 
+}">
     <!-- Header Section -->
     <x-admin.header 
         title="Database Backup Center" 
@@ -65,7 +73,7 @@
             <i class="fa-solid fa-upload text-orange-400"></i>
             Upload & Restore Database (.sql or .sql.gz)
         </h3>
-        <form method="POST" action="{{ route('admin.backups.upload_restore') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+        <form id="upload-restore-form" method="POST" action="{{ route('admin.backups.upload_restore') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             @csrf
             <div class="flex-1">
                 <input type="file" name="backup_file" accept=".sql,.gz" required
@@ -79,7 +87,7 @@
                               border border-slate-800 bg-slate-950 rounded-xl p-1.5">
             </div>
             <button type="submit" class="px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-semibold text-sm transition-all shadow-md shadow-orange-600/10 hover:shadow-orange-500/20 flex items-center justify-center gap-2"
-                    onclick="return confirm('WARNING: Restoring the database will overwrite all existing tables, structures, and data. Are you sure you want to proceed?');">
+                    @click.prevent="if(document.querySelector('input[name=backup_file]').files.length) { confirmAction = 'upload-restore-form'; confirmTitle = 'Restore Database?'; confirmText = 'WARNING: Restoring the database will overwrite all existing tables, structures, and data. Are you sure you want to proceed?'; confirmBtnText = 'Restore'; isDelete = false; showConfirmModal = true; } else { document.getElementById('upload-restore-form').reportValidity(); }">
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 Upload & Restore
             </button>
@@ -135,18 +143,20 @@
                             </a>
                             <!-- Restore -->
                             @if($canRestore)
-                            <form method="POST" action="{{ route('admin.backups.restore', $backup['name']) }}" onsubmit="return confirm('WARNING: Restoring the database will overwrite all existing tables, structures, and data. Are you sure you want to restore the database to this backup?');" class="inline">
+                            <form id="restore-form-{{ $index }}" method="POST" action="{{ route('admin.backups.restore', $backup['name']) }}" class="inline">
                                 @csrf
-                                <button type="submit" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-400 hover:text-orange-400 hover:border-orange-500/50 transition-all flex items-center justify-center" title="Restore Database to this Backup">
+                                <button type="button" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-400 hover:text-orange-400 hover:border-orange-500/50 transition-all flex items-center justify-center cursor-pointer" title="Restore Database to this Backup"
+                                        @click="confirmAction = 'restore-form-{{ $index }}'; confirmTitle = 'Restore Database?'; confirmText = 'WARNING: Restoring the database will overwrite all existing tables, structures, and data. Are you sure you want to restore the database to this backup?'; confirmBtnText = 'Restore'; isDelete = false; showConfirmModal = true;">
                                     <i class="fa-solid fa-clock-rotate-left text-sm"></i>
                                 </button>
                             </form>
                             @endif
                             <!-- Delete -->
-                            <form method="POST" action="{{ route('admin.backups.destroy', $backup['name']) }}" onsubmit="return confirm('Do you really want to permanently delete this backup file?');" class="inline">
+                            <form id="delete-form-{{ $index }}" method="POST" action="{{ route('admin.backups.destroy', $backup['name']) }}" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 transition-all" title="Delete Backup">
+                                <button type="button" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 transition-all cursor-pointer" title="Delete Backup"
+                                        @click="confirmAction = 'delete-form-{{ $index }}'; confirmTitle = 'Delete Backup File?'; confirmText = 'Do you really want to permanently delete this backup file?'; confirmBtnText = 'Delete'; isDelete = true; showConfirmModal = true;">
                                     <i class="fa-solid fa-trash-can text-sm"></i>
                                 </button>
                             </form>
@@ -160,5 +170,47 @@
             @endforelse
         </x-admin.table>
     </div>
+    <!-- Confirm Modal -->
+    <template x-teleport="body">
+    <div x-show="showConfirmModal" 
+         x-cloak 
+         class="admin-modal fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+         
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm" @click="showConfirmModal = false"></div>
+
+        <div x-show="showConfirmModal"
+             x-transition:enter="transition ease-out duration-300 delay-75"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="relative w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-3">
+                <div class="inline-flex p-3 rounded-2xl mb-2" :class="isDelete ? 'bg-rose-500/10 text-rose-500' : 'bg-orange-500/10 text-orange-500'">
+                    <i class="fa-solid text-2xl animate-bounce" :class="isDelete ? 'fa-trash-can' : 'fa-triangle-exclamation'"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200" x-text="confirmTitle">Confirm Action</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400" x-text="confirmText"></p>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+                <button type="button" @click="showConfirmModal = false" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-650 dark:text-slate-300 font-semibold text-sm transition-all cursor-pointer">Cancel</button>
+                <button type="button" @click="document.getElementById(confirmAction).submit(); showConfirmModal = false;" 
+                        class="flex-1 py-3 px-4 rounded-xl font-bold text-sm shadow-xl transition-all cursor-pointer text-white"
+                        :class="isDelete ? 'bg-gradient-to-r from-rose-500 to-red-600 shadow-rose-500/10 hover:shadow-rose-500/25' : 'bg-gradient-to-r from-orange-500 to-amber-600 shadow-orange-500/10 hover:shadow-orange-500/25'">
+                    <span x-text="confirmBtnText">Confirm</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    </template>
 </div>
 @endsection

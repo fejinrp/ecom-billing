@@ -6,7 +6,9 @@
     activePurchaseId: null, 
     activePurchaseBill: '', 
     activePurchaseDue: 0, 
-    paymentAmount: '' 
+    paymentAmount: '',
+    showDeleteModal: false,
+    deleteUrl: ''
 }">
     <!-- Header -->
     <x-admin.header title="Purchase Transactions" description="View and track supplier stock acquisitions, payments, and outstanding balances.">
@@ -172,17 +174,12 @@
 
                         <!-- Cancel -->
                         @if ($purchase->porder_status != 3)
-                            <form method="POST" action="{{ route('admin.purchases.destroy', $purchase->porder_id) }}" 
-                                  onsubmit="return confirm('Are you sure you want to cancel this purchase order? This will revert added product stock levels.')" 
-                                  class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" 
-                                        class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all" 
-                                        title="Cancel Purchase Order">
-                                    <i class="fa-solid fa-trash-can text-base"></i>
-                                </button>
-                            </form>
+                            <button type="button" 
+                                    @click="deleteUrl = '{{ route('admin.purchases.destroy', $purchase->porder_id) }}'; showDeleteModal = true"
+                                    class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer" 
+                                    title="Cancel Purchase Order">
+                                <i class="fa-solid fa-trash-can text-base"></i>
+                            </button>
                         @endif
                     </div>
                 </td>
@@ -231,5 +228,48 @@
             </div>
         </form>
     </x-admin.modal>
+    <!-- Delete Confirmation Modal -->
+    <template x-teleport="body">
+    <div x-show="showDeleteModal" 
+         x-cloak 
+         class="admin-modal fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+         
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm" @click="showDeleteModal = false"></div>
+
+        <div x-show="showDeleteModal"
+             x-transition:enter="transition ease-out duration-300 delay-75"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="relative w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-3">
+                <div class="inline-flex p-3 rounded-2xl bg-rose-500/10 text-rose-500 mb-2">
+                    <i class="fa-solid fa-trash-can text-2xl animate-bounce"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Cancel Purchase Order?</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Are you sure you want to cancel this purchase order? This will revert added product stock levels.</p>
+            </div>
+
+            <form method="POST" :action="deleteUrl">
+                @csrf
+                @method('DELETE')
+                
+                <div class="flex gap-4 pt-2">
+                    <button type="button" @click="showDeleteModal = false" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-650 dark:text-slate-300 font-semibold text-sm transition-all cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white font-bold text-sm shadow-xl shadow-rose-500/10 hover:shadow-rose-500/25 transition-all cursor-pointer">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </template>
 </div>
 @endsection

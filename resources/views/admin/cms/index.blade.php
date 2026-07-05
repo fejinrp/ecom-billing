@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 
-<div class="container mx-auto px-4 py-8" x-data="{ activeTab: 'banners' }">
+<div class="container mx-auto px-4 py-8" x-data="{ activeTab: 'banners', showDeleteModal: false, deleteUrl: '' }">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
@@ -206,27 +206,9 @@
                                 <button type="button" @click="editMode = true" class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 hover:underline">
                                     <i class="fa-solid fa-pen-to-square"></i>Edit
                                 </button>
-                                <div x-data="{ confirmDelete: false }" class="inline-flex items-center">
-                                    <!-- Delete button (Initial State) -->
-                                    <button type="button" x-show="!confirmDelete" @click="confirmDelete = true" class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:underline">
-                                        <i class="fa-solid fa-trash-can"></i>Delete
-                                    </button>
-                                    
-                                    <!-- Confirmation State -->
-                                    <div x-show="confirmDelete" x-transition class="flex items-center gap-2" style="display: none;">
-                                        <span class="text-[9px] font-bold text-rose-500 uppercase tracking-wider">Confirm Delete?</span>
-                                        <form action="{{ route('admin.cms.banners.destroy', $banner->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white font-bold text-[9px] uppercase tracking-widest transition-all">
-                                                Yes
-                                            </button>
-                                        </form>
-                                        <button type="button" @click="confirmDelete = false" class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-350 dark:hover:bg-slate-700 text-slate-650 dark:text-slate-400 font-bold text-[9px] uppercase tracking-widest transition-all">
-                                            No
-                                        </button>
-                                    </div>
-                                </div>
+                                <button type="button" @click="deleteUrl = '{{ route('admin.cms.banners.destroy', $banner->id) }}'; showDeleteModal = true" class="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 hover:underline">
+                                    <i class="fa-solid fa-trash-can"></i>Delete
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -522,6 +504,49 @@
         </form>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <template x-teleport="body">
+    <div x-show="showDeleteModal" 
+         x-cloak 
+         class="admin-modal fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+         
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm" @click="showDeleteModal = false"></div>
+
+        <div x-show="showDeleteModal"
+             x-transition:enter="transition ease-out duration-300 delay-75"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="relative w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-3">
+                <div class="inline-flex p-3 rounded-2xl bg-rose-500/10 text-rose-500 mb-2">
+                    <i class="fa-solid fa-trash-can text-2xl animate-bounce"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Remove Banner Slide?</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Do you really want to remove this banner slide? This cannot be undone.</p>
+            </div>
+
+            <form method="POST" :action="deleteUrl">
+                @csrf
+                @method('DELETE')
+                
+                <div class="flex gap-4 pt-2">
+                    <button type="button" @click="showDeleteModal = false" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-650 dark:text-slate-300 font-semibold text-sm transition-all cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white font-bold text-sm shadow-xl shadow-rose-500/10 hover:shadow-rose-500/25 transition-all cursor-pointer">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </template>
 </div>
 
 <!-- Image Cropper Modal (Alpine/JS Overlay) -->
@@ -545,6 +570,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     let cropperInstance = null;

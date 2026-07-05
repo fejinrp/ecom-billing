@@ -3,7 +3,14 @@
 @section('title', 'Lucky Draw — Draw Board')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ 
+    showConfirmModal: false, 
+    confirmAction: '', 
+    confirmTitle: '', 
+    confirmText: '', 
+    confirmBtnText: 'Confirm', 
+    isDelete: false 
+}">
 
     {{-- ── Header ─────────────────────────────────────────────────────────── --}}
     <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 p-6 text-white shadow-xl">
@@ -107,12 +114,12 @@
 
                         {{-- Draw Button --}}
                         @if($isFull)
-                            <form action="{{ route('admin.lucky_draw.draw') }}" method="POST"
-                                  onsubmit="return confirm('Start draw for {{ $setting->category_label }}? This cannot be undone.')">
+                            <form id="draw-form-{{ $setting->category_key }}" action="{{ route('admin.lucky_draw.draw') }}" method="POST" class="inline">
                                 @csrf
                                 <input type="hidden" name="category_key" value="{{ $setting->category_key }}">
-                                <button type="submit"
-                                        class="w-full rounded-xl bg-gradient-to-r {{ $g[0] }} px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:shadow-lg hover:brightness-110 active:scale-95">
+                                <button type="button"
+                                        @click="confirmAction = 'draw-form-{{ $setting->category_key }}'; confirmTitle = 'Start Draw?'; confirmText = 'Start draw for {{ $setting->category_label }}? This cannot be undone.'; confirmBtnText = 'Draw'; isDelete = false; showConfirmModal = true;"
+                                        class="w-full rounded-xl bg-gradient-to-r {{ $g[0] }} px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:shadow-lg hover:brightness-110 active:scale-95 cursor-pointer">
                                     <i class="fa-solid fa-shuffle mr-2"></i> Draw Winner Now!
                                 </button>
                             </form>
@@ -261,5 +268,47 @@
         </div>
     </div>
 
+    <!-- Confirm Modal -->
+    <template x-teleport="body">
+    <div x-show="showConfirmModal" 
+         x-cloak 
+         class="admin-modal fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+         
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm" @click="showConfirmModal = false"></div>
+
+        <div x-show="showConfirmModal"
+             x-transition:enter="transition ease-out duration-300 delay-75"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+             class="relative w-full max-w-sm rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-3">
+                <div class="inline-flex p-3 rounded-2xl mb-2" :class="isDelete ? 'bg-rose-500/10 text-rose-500' : 'bg-indigo-500/10 text-indigo-500'">
+                    <i class="fa-solid text-2xl animate-bounce" :class="isDelete ? 'fa-trash-can' : 'fa-shuffle'"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200" x-text="confirmTitle">Confirm Action</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400" x-text="confirmText"></p>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+                <button type="button" @click="showConfirmModal = false" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-650 dark:text-slate-300 font-semibold text-sm transition-all cursor-pointer">Cancel</button>
+                <button type="button" @click="document.getElementById(confirmAction).submit(); showConfirmModal = false;" 
+                        class="flex-1 py-3 px-4 rounded-xl font-bold text-sm shadow-xl transition-all cursor-pointer text-white"
+                        :class="isDelete ? 'bg-gradient-to-r from-rose-500 to-red-600 shadow-rose-500/10 hover:shadow-rose-500/25' : 'bg-gradient-to-r from-violet-500 to-indigo-600 shadow-indigo-500/10 hover:shadow-indigo-500/25'">
+                    <span x-text="confirmBtnText">Confirm</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    </template>
 </div>
 @endsection

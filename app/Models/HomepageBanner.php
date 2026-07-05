@@ -20,4 +20,15 @@ class HomepageBanner extends Model
         'sort_order',
         'is_active',
     ];
+
+    public function getImagePathAttribute($value)
+    {
+        if (!$value) {
+            return '';
+        }
+        if (str_starts_with($value, 'storage/') || str_starts_with($value, 'http')) {
+            return $value;
+        }
+        return 'storage/' . $value;
+    }
 }

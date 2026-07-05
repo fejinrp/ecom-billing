@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\Brand;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -91,11 +92,6 @@ class ProductController extends Controller
 
         // Get max ID to determine product directory
         $nextId = (Product::max('id') ?? 0) + 1;
-        $legacyImageDir = public_path('productimage/' . $nextId . '/');
-
-        if (!File::exists($legacyImageDir)) {
-            File::makeDirectory($legacyImageDir, 0755, true);
-        }
 
         $urlff = '';
         $urlss = '';
@@ -105,21 +101,21 @@ class ProductController extends Controller
             $file = $request->file('productimagef');
             $ext = $file->getClientOriginalExtension();
             $urlff = 'first.' . $ext;
-            $file->move($legacyImageDir, $urlff);
+            Storage::disk('public')->putFileAs('productimage/' . $nextId, $file, $urlff);
         }
 
         if ($request->hasFile('productimages')) {
             $file = $request->file('productimages');
             $ext = $file->getClientOriginalExtension();
             $urlss = 'second.' . $ext;
-            $file->move($legacyImageDir, $urlss);
+            Storage::disk('public')->putFileAs('productimage/' . $nextId, $file, $urlss);
         }
 
         if ($request->hasFile('productimaget')) {
             $file = $request->file('productimaget');
             $ext = $file->getClientOriginalExtension();
             $urltt = 'third.' . $ext;
-            $file->move($legacyImageDir, $urltt);
+            Storage::disk('public')->putFileAs('productimage/' . $nextId, $file, $urltt);
         }
 
         Product::create([
@@ -190,12 +186,6 @@ class ProductController extends Controller
             return redirect()->back()->withInput()->with('error', 'Already Existing Product Code!');
         }
 
-        $legacyImageDir = public_path('productimage/' . $id . '/');
-
-        if (!File::exists($legacyImageDir)) {
-            File::makeDirectory($legacyImageDir, 0755, true);
-        }
-
         $updates = [
             'brandid' => $request->input('brandid'),
             'catid' => $request->input('catid'),
@@ -220,37 +210,46 @@ class ProductController extends Controller
 
         if ($request->hasFile('productimagef')) {
             // Delete old first.* files
-            foreach (glob($legacyImageDir . 'first.*') as $oldFile) {
-                @unlink($oldFile);
+            $existingFiles = Storage::disk('public')->files('productimage/' . $id);
+            foreach ($existingFiles as $oldFile) {
+                if (str_starts_with(basename($oldFile), 'first.')) {
+                    Storage::disk('public')->delete($oldFile);
+                }
             }
             $file = $request->file('productimagef');
             $ext = $file->getClientOriginalExtension();
             $urlff = 'first.' . $ext;
-            $file->move($legacyImageDir, $urlff);
+            Storage::disk('public')->putFileAs('productimage/' . $id, $file, $urlff);
             $updates['pimagef'] = $urlff;
         }
 
         if ($request->hasFile('productimages')) {
             // Delete old second.* files
-            foreach (glob($legacyImageDir . 'second.*') as $oldFile) {
-                @unlink($oldFile);
+            $existingFiles = Storage::disk('public')->files('productimage/' . $id);
+            foreach ($existingFiles as $oldFile) {
+                if (str_starts_with(basename($oldFile), 'second.')) {
+                    Storage::disk('public')->delete($oldFile);
+                }
             }
             $file = $request->file('productimages');
             $ext = $file->getClientOriginalExtension();
             $urlss = 'second.' . $ext;
-            $file->move($legacyImageDir, $urlss);
+            Storage::disk('public')->putFileAs('productimage/' . $id, $file, $urlss);
             $updates['pimages'] = $urlss;
         }
 
         if ($request->hasFile('productimaget')) {
             // Delete old third.* files
-            foreach (glob($legacyImageDir . 'third.*') as $oldFile) {
-                @unlink($oldFile);
+            $existingFiles = Storage::disk('public')->files('productimage/' . $id);
+            foreach ($existingFiles as $oldFile) {
+                if (str_starts_with(basename($oldFile), 'third.')) {
+                    Storage::disk('public')->delete($oldFile);
+                }
             }
             $file = $request->file('productimaget');
             $ext = $file->getClientOriginalExtension();
             $urltt = 'third.' . $ext;
-            $file->move($legacyImageDir, $urltt);
+            Storage::disk('public')->putFileAs('productimage/' . $id, $file, $urltt);
             $updates['pimaget'] = $urltt;
         }
 

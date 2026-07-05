@@ -154,7 +154,7 @@
                         <div class="flex items-center gap-3 pt-3.5 first:pt-0">
                             <div class="w-10 h-10 rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-955 flex items-center justify-center p-1 flex-shrink-0">
                                 @if ($item['image'])
-                                    <img src="/productimage/{{ $id }}/{{ $item['image'] }}" alt="{{ $item['name'] }}" class="max-h-full max-w-full object-contain">
+                                    <img src="/storage/productimage/{{ $id }}/{{ $item['image'] }}" alt="{{ $item['name'] }}" class="max-h-full max-w-full object-contain">
                                 @else
                                     <i class="fa-solid fa-cube text-slate-400 text-xs"></i>
                                 @endif

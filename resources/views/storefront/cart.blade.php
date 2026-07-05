@@ -20,7 +20,7 @@
                     <div class="flex items-center gap-3 mt-1.5 flex-wrap">
                         <div class="w-8 h-8 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded p-0.5 flex-shrink-0 flex items-center justify-center">
                             @if ($added['image'])
-                                <img src="/productimage/{{ $added['id'] }}/{{ $added['image'] }}" alt="{{ $added['name'] }}" class="max-h-full max-w-full object-contain">
+                                <img src="/storage/productimage/{{ $added['id'] }}/{{ $added['image'] }}" alt="{{ $added['name'] }}" class="max-h-full max-w-full object-contain">
                             @else
                                 <i class="fa-solid fa-cube text-slate-400 text-[10px]"></i>
                             @endif
@@ -64,7 +64,7 @@
                                     <div class="col-span-1 sm:col-span-6 flex items-center gap-3.5">
                                         <div class="w-14 h-14 bg-slate-50 dark:bg-slate-950 rounded-lg flex items-center justify-center p-1.5 border border-slate-200 dark:border-slate-800 flex-shrink-0">
                                             @if ($item['image'])
-                                                <img src="/productimage/{{ $id }}/{{ $item['image'] }}" alt="{{ $item['name'] }}" class="max-h-full max-w-full object-contain">
+                                                <img src="/storage/productimage/{{ $id }}/{{ $item['image'] }}" alt="{{ $item['name'] }}" class="max-h-full max-w-full object-contain">
                                             @else
                                                 <i class="fa-solid fa-cube text-slate-400 text-xl"></i>
                                             @endif

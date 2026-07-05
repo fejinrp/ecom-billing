@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class CMSController extends Controller
 {
@@ -89,13 +90,7 @@ class CMSController extends Controller
         $imagePath = '';
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $dir = public_path('bannerimage/');
-            if (!File::exists($dir)) {
-                File::makeDirectory($dir, 0755, true);
-            }
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move($dir, $filename);
-            $imagePath = 'bannerimage/' . $filename;
+            $imagePath = Storage::disk('public')->putFile('bannerimage', $file);
         }
 
         HomepageBanner::create([
@@ -138,18 +133,13 @@ class CMSController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($banner->image_path && File::exists(public_path($banner->image_path))) {
-                File::delete(public_path($banner->image_path));
+            $oldPath = str_replace('storage/', '', $banner->image_path);
+            if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
             }
 
             $file = $request->file('image');
-            $dir = public_path('bannerimage/');
-            if (!File::exists($dir)) {
-                File::makeDirectory($dir, 0755, true);
-            }
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move($dir, $filename);
-            $data['image_path'] = 'bannerimage/' . $filename;
+            $data['image_path'] = Storage::disk('public')->putFile('bannerimage', $file);
         }
 
         $banner->update($data);
@@ -164,8 +154,9 @@ class CMSController extends Controller
     {
         $banner = HomepageBanner::findOrFail($id);
         
-        if ($banner->image_path && File::exists(public_path($banner->image_path))) {
-            File::delete(public_path($banner->image_path));
+        $oldPath = str_replace('storage/', '', $banner->image_path);
+        if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+            Storage::disk('public')->delete($oldPath);
         }
 
         $banner->delete();

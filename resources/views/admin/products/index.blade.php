@@ -115,7 +115,7 @@
                                 <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Image</span>
                                 <div class="flex items-center">
                                     @if($prod->pimagef)
-                                        <img src="/productimage/{{ $prod->id }}/{{ $prod->pimagef }}" alt="Prod Image" class="w-10 h-10 object-cover rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <img src="/storage/productimage/{{ $prod->id }}/{{ $prod->pimagef }}" alt="Prod Image" class="w-10 h-10 object-cover rounded-xl border border-slate-200 dark:border-slate-700">
                                     @else
                                         <span class="text-xs text-slate-400 dark:text-slate-600 font-bold">No Image</span>
                                     @endif

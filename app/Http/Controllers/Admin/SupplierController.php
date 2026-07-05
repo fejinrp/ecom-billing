@@ -43,7 +43,7 @@ class SupplierController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        Supplier::create([
+        $supplier = Supplier::create([
             'name' => strtoupper(trim($request->input('name'))),
             'contact_person' => strtoupper(trim($request->input('contact_person'))),
             'phone' => $request->input('phone'),
@@ -51,6 +51,13 @@ class SupplierController extends Controller
             'address' => strtoupper(trim($request->input('address'))),
             'status' => 1,
         ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'supplier' => $supplier
+            ]);
+        }
 
         return redirect()->route('admin.suppliers.index')->with('success', 'Supplier created successfully!');
     }

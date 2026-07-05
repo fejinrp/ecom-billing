@@ -29,11 +29,18 @@ class CategoryController extends Controller
             'cat_name' => 'required|string|max:255',
         ]);
 
-        Category::create([
+        $category = Category::create([
             'cat_name' => $request->input('cat_name'),
             'creation_date' => date('Y-m-d H:i:s'),
             'status' => 1,
         ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'category' => $category
+            ]);
+        }
 
         return redirect()->route('admin.categories.index')->with('success', 'Category successfully created!');
     }

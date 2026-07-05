@@ -133,6 +133,7 @@ Route::prefix('admin')->group(function () {
         ])->except(['create', 'show', 'edit']);
 
         Route::post('products/quick-store', [ProductController::class, 'quickStore'])->name('admin.products.quick-store');
+        Route::post('products/check-duplicate', [ProductController::class, 'checkDuplicate'])->name('admin.products.check_duplicate');
         Route::resource('products', ProductController::class)->names([
             'index' => 'admin.products.index',
             'create' => 'admin.products.create',

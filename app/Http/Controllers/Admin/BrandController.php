@@ -42,12 +42,19 @@ class BrandController extends Controller
             'scatid' => 'required|integer',
         ]);
 
-        Brand::create([
+        $brand = Brand::create([
             'brand_name' => $request->input('brand_name'),
             'catid' => $request->input('catid'),
             'scatid' => $request->input('scatid'),
             'brand_status' => 1,
         ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'brand' => $brand
+            ]);
+        }
 
         return redirect()->route('admin.brands.index')->with('success', 'Brand successfully created!');
     }

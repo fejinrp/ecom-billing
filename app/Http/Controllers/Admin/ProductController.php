@@ -29,16 +29,17 @@ class ProductController extends Controller
         return view('admin.products.index', compact('products', 'categories', 'subcategories', 'brands'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = Category::where('status', 1)->orderBy('cat_name', 'asc')->get();
         $subcategories = Subcategory::where('status', 1)->orderBy('subcategoryname', 'asc')->get();
         $brands = Brand::where('brand_status', 1)->orderBy('brand_name', 'asc')->get();
+        $suppliers = \App\Models\Supplier::where('status', 1)->orderBy('name', 'asc')->get();
 
-        return view('admin.products.create', compact('categories', 'subcategories', 'brands'));
+        $nextId = (Product::max('id') ?? 0) + 1;
+        $nextCode = 'PRD-' . str_pad($nextId, 6, '0', STR_PAD_LEFT);
+
+        return view('admin.products.create', compact('categories', 'subcategories', 'brands', 'suppliers', 'nextCode'));
     }
 
     /**
@@ -459,6 +460,36 @@ class ProductController extends Controller
                 'dprice' => $product->dprice,
                 'sdprice' => $product->sdprice,
             ]
+        ]);
+    }
+
+    public function checkDuplicate(Request $request)
+    {
+        $field = $request->input('field');
+        $value = trim($request->input('value'));
+        $excludeId = $request->input('exclude_id');
+
+        if (!in_array($field, ['productname', 'pcode'])) {
+            return response()->json(['exists' => false, 'matches' => []]);
+        }
+
+        // Similar matches query (limited to 3)
+        $matchesQuery = Product::where($field, 'like', "%{$value}%")->where('status', 1);
+        if ($excludeId) {
+            $matchesQuery->where('id', '!=', $excludeId);
+        }
+        $matches = $matchesQuery->limit(3)->get(['id', 'productname', 'pcode']);
+
+        // Exact match query
+        $exactQuery = Product::where($field, $value)->where('status', 1);
+        if ($excludeId) {
+            $exactQuery->where('id', '!=', $excludeId);
+        }
+        $exists = $exactQuery->exists();
+
+        return response()->json([
+            'exists' => $exists,
+            'matches' => $matches
         ]);
     }
 }

@@ -49,6 +49,7 @@
                         <th class="px-4 py-4">Code</th>
                         <th class="px-4 py-4">Qty</th>
                         <th class="px-4 py-4">MRP</th>
+                        <th class="px-4 py-4">Super Dealer P.</th>
                         <th class="px-4 py-4">Dealer P.</th>
                         <th class="px-4 py-4">Cust P.</th>
                         <th class="px-4 py-4">Image</th>
@@ -98,6 +99,12 @@
                                 <span class="font-bold text-slate-700 dark:text-slate-300">₹{{ number_format($prod->mrp, 2) }}</span>
                             </td>
 
+                            <!-- Super Dealer Price -->
+                            <td class="py-2 lg:px-4 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none">
+                                <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Super Dealer P.</span>
+                                <span class="font-bold text-indigo-600 dark:text-indigo-400">₹{{ number_format($prod->sdprice, 2) }}</span>
+                            </td>
+
                             <!-- Dealer Price -->
                             <td class="py-2 lg:px-4 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none">
                                 <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Dealer P.</span>
@@ -137,7 +144,7 @@
                         </tr>
                     @empty
                         <tr class="block lg:table-row w-full bg-white dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/60 rounded-2xl p-6 lg:p-0">
-                            <td colspan="10" class="px-4 py-8 text-center text-slate-500 font-medium block lg:table-cell w-full">No products found. Click 'Add Product' to get started.</td>
+                            <td colspan="11" class="px-4 py-8 text-center text-slate-500 font-medium block lg:table-cell w-full">No products found. Click 'Add Product' to get started.</td>
                         </tr>
                     @endforelse
                 </tbody>

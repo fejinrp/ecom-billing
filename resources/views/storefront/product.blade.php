@@ -148,6 +148,35 @@
                     @endif
                 </div>
 
+                @if ($product->sdprice || $product->dprice || $product->cprice)
+                <div class="grid grid-cols-3 gap-2 py-2.5 border-t border-slate-150/60 dark:border-slate-800/80">
+                    @if ($product->sdprice)
+                    <div>
+                        <span class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Super Dealer P.</span>
+                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-400 font-mono">
+                            Rs. {{ \App\Helpers\NumberHelper::indianFormat($product->sdprice) }}
+                        </span>
+                    </div>
+                    @endif
+                    @if ($product->dprice)
+                    <div>
+                        <span class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dealer Price</span>
+                        <span class="text-xs font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                            Rs. {{ \App\Helpers\NumberHelper::indianFormat($product->dprice) }}
+                        </span>
+                    </div>
+                    @endif
+                    @if ($product->cprice)
+                    <div>
+                        <span class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Customer Price</span>
+                        <span class="text-xs font-black text-purple-600 dark:text-purple-400 font-mono">
+                            Rs. {{ \App\Helpers\NumberHelper::indianFormat($product->cprice) }}
+                        </span>
+                    </div>
+                    @endif
+                </div>
+                @endif
+
                 <div class="text-[11px] text-slate-500 space-y-1 border-t border-slate-100 dark:border-slate-800 pt-3">
                     <p>Inclusive of {{ $gstRate }}% GST (CGST/SGST/IGST credit invoice available)</p>
                     <p>Free Delivery across all Indian states and pin codes.</p>

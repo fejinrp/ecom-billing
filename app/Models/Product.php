@@ -79,7 +79,7 @@ class Product extends Model
             return null;
         }
 
-        return asset('productimage/' . $this->id . '/' . rawurlencode($this->pimagef));
+        return asset('storage/productimage/' . $this->id . '/' . rawurlencode($this->pimagef));
     }
 
     public function getDisplayPriceAttribute()

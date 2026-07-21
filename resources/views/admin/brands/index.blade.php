@@ -30,8 +30,8 @@
     
     openEditModal(brand) {
         this.editBrandId = brand.brand_id;
-        this.editCatId = brand.catid;
-        this.editScatId = brand.scatid;
+        this.editCatId = brand.catid || '';
+        this.editScatId = brand.scatid || '';
         this.editBrandName = brand.brand_name;
         this.showEditModal = true;
     },
@@ -42,7 +42,7 @@
     }
 }" class="space-y-8 animate-fadeIn">
 
-    <x-admin.header title="Manage Brands" description="Configure and manage product brands linked to categories and subcategories." glass="true">
+    <x-admin.header title="Manage Brands" description="Configure master brand registry with global or category-specific scope." glass="true">
         <x-slot:action>
             <x-admin.button @click="showAddModal = true" icon="fa-solid fa-plus-circle">
                 Add Brand
@@ -54,9 +54,9 @@
     @php
     $tableHeaders = [
         ['label' => 'No'],
-        ['label' => 'Category Name'],
-        ['label' => 'Sub Category Name'],
         ['label' => 'Brand Name'],
+        ['label' => 'Category Scope'],
+        ['label' => 'Sub Category Scope'],
         ['label' => 'Actions', 'align' => 'right']
     ];
     @endphp
@@ -70,22 +70,30 @@
                     <span>#{{ $brands->firstItem() + $index }}</span>
                 </td>
 
-                <!-- Category Name -->
+                <!-- Brand Name -->
+                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none">
+                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Brand Name</span>
+                    <span class="font-bold text-slate-100 text-sm">{{ $brand->brand_name }}</span>
+                </td>
+
+                <!-- Category Scope -->
                 <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none">
                     <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Category</span>
-                    <span class="font-semibold text-slate-200">{{ $brand->category ? $brand->category->cat_name : 'No Category' }}</span>
+                    @if($brand->category)
+                        <span class="font-semibold text-slate-300 text-xs">{{ $brand->category->cat_name }}</span>
+                    @else
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Global (All Categories)</span>
+                    @endif
                 </td>
 
-                <!-- Sub Category Name -->
-                <td class="py-2 lg:px-6 lg:py-4 col-span-1 block lg:table-cell lg:col-span-none">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Sub Category</span>
-                    <span class="text-slate-300">{{ $brand->subcategory ? $brand->subcategory->subcategoryname : 'No Subcategory' }}</span>
-                </td>
-
-                <!-- Brand Name -->
+                <!-- Sub Category Scope -->
                 <td class="py-2 lg:px-6 lg:py-4 col-span-2 block lg:table-cell lg:col-span-none">
-                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Brand Name</span>
-                    <span class="font-bold text-indigo-400">{{ $brand->brand_name }}</span>
+                    <span class="block lg:hidden text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Sub Category</span>
+                    @if($brand->subcategory)
+                        <span class="text-slate-300 text-xs">{{ $brand->subcategory->subcategoryname }}</span>
+                    @else
+                        <span class="text-[10px] font-semibold text-slate-500">All Subcategories</span>
+                    @endif
                 </td>
 
                 <!-- Actions -->
@@ -109,52 +117,51 @@
     </x-admin.table>
 
     <!-- 1. Add Brand Modal -->
-    <x-admin.modal id="showAddModal" title="Add Brand" icon="fa-solid fa-plus-circle">
+    <x-admin.modal id="showAddModal" title="Add Master Brand" icon="fa-solid fa-plus-circle">
         <form method="POST" action="{{ route('admin.brands.store') }}" class="space-y-4">
             @csrf
 
-            <!-- Category -->
+            <!-- Brand Name -->
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Category</label>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Brand Name <span class="text-rose-500">*</span></label>
+                <input type="text" 
+                       name="brand_name" 
+                       required 
+                       x-model="addBrandName"
+                       placeholder="e.g. Samsung, Apple, Sony"
+                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+            </div>
+
+            <!-- Optional Category Scope -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Category Scope (Optional)</label>
                 <select name="catid" 
                         x-model="addCatId"
-                        required
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                    <option value="">~ Select Category ~</option>
+                    <option value="">~ Global (Available Across All Categories) ~</option>
                     <template x-for="cat in categories" :key="cat.cat_id">
                         <option :value="cat.cat_id" x-text="cat.cat_name"></option>
                     </template>
                 </select>
             </div>
 
-            <!-- Subcategory -->
+            <!-- Optional Subcategory Scope -->
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sub Category</label>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sub Category Scope (Optional)</label>
                 <select name="scatid" 
                         x-model="addScatId"
-                        required
                         :disabled="!addCatId"
                         class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed">
-                    <option value="">~ Select Subcategory ~</option>
+                    <option value="">~ All Subcategories ~</option>
                     <template x-for="sub in getFilteredSubcategories(addCatId)" :key="sub.id">
                         <option :value="sub.id" x-text="sub.subcategoryname"></option>
                     </template>
                 </select>
             </div>
 
-            <!-- Brand Name -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Brand Name</label>
-                <input type="text" 
-                       name="brand_name" 
-                       required 
-                       placeholder="Enter brand name"
-                       class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-            </div>
-
             <div class="flex gap-4 pt-4 border-t border-slate-850">
                 <button type="button" @click="showAddModal = false" class="flex-1 py-3 px-4 rounded-xl border border-slate-800 hover:bg-slate-800/50 text-slate-300 font-semibold text-sm transition-all">Cancel</button>
-                <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm shadow-xl shadow-orange-600/10 hover:shadow-orange-600/25 transition-all">Save Brand</button>
+                <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-xl shadow-indigo-600/10 hover:shadow-indigo-600/25 transition-all">Save Brand</button>
             </div>
         </form>
     </x-admin.modal>
@@ -165,44 +172,42 @@
             @csrf
             @method('PUT')
 
-            <!-- Category -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Category</label>
-                <select name="catid" 
-                        x-model="editCatId"
-                        required
-                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                    <option value="">~ Select Category ~</option>
-                    <template x-for="cat in categories" :key="cat.cat_id">
-                        <option :value="cat.cat_id" x-text="cat.cat_name"></option>
-                    </template>
-                </select>
-            </div>
-
-            <!-- Subcategory -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sub Category</label>
-                <select name="scatid" 
-                        x-model="editScatId"
-                        required
-                        :disabled="!editCatId"
-                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed">
-                    <option value="">~ Select Subcategory ~</option>
-                    <template x-for="sub in getFilteredSubcategories(editCatId)" :key="sub.id">
-                        <option :value="sub.id" x-text="sub.subcategoryname"></option>
-                    </template>
-                </select>
-            </div>
-
             <!-- Brand Name -->
             <div>
-                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Brand Name</label>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Brand Name <span class="text-rose-500">*</span></label>
                 <input type="text" 
                        name="brand_name" 
                        required 
                        x-model="editBrandName"
                        placeholder="Enter brand name"
                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+            </div>
+
+            <!-- Optional Category Scope -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Category Scope (Optional)</label>
+                <select name="catid" 
+                        x-model="editCatId"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <option value="">~ Global (Available Across All Categories) ~</option>
+                    <template x-for="cat in categories" :key="cat.cat_id">
+                        <option :value="cat.cat_id" x-text="cat.cat_name"></option>
+                    </template>
+                </select>
+            </div>
+
+            <!-- Optional Subcategory Scope -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sub Category Scope (Optional)</label>
+                <select name="scatid" 
+                        x-model="editScatId"
+                        :disabled="!editCatId"
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <option value="">~ All Subcategories ~</option>
+                    <template x-for="sub in getFilteredSubcategories(editCatId)" :key="sub.id">
+                        <option :value="sub.id" x-text="sub.subcategoryname"></option>
+                    </template>
+                </select>
             </div>
 
             <div class="flex gap-4 pt-4 border-t border-slate-850">

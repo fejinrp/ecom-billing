@@ -257,6 +257,7 @@
         </div>
     </div>
 
+    @if($autoPrint ?? true)
     <!-- Auto-print trigger -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -265,5 +266,6 @@
             }, 800);
         });
     </script>
+    @endif
 </body>
 </html>

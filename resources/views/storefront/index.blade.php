@@ -249,7 +249,7 @@
                     @php
                         $color = $colors[$index % count($colors)];
                     @endphp
-                    <a href="{{ route('storefront.index', ['search' => $sub->subcategoryname]) }}" class="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-950/40 border border-slate-150 dark:border-slate-800/80 hover:border-indigo-500/20 dark:hover:border-indigo-500/30 p-3 rounded-2xl w-44 h-16 flex items-center gap-3 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 shrink-0 group">
+                    <a href="{{ $sub->category ? route('storefront.category', [$sub->category->cat_name, 'subcatid' => $sub->id]) : route('storefront.shop', ['subcatid' => $sub->id]) }}" class="bg-gradient-to-br from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-950/40 border border-slate-150 dark:border-slate-800/80 hover:border-indigo-500/20 dark:hover:border-indigo-500/30 p-3 rounded-2xl w-44 h-16 flex items-center gap-3 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 shrink-0 group">
                         <!-- Centered Category Icon Badge -->
                         <div class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 {{ $color['lightBg'] }}">
                             <i class="fa-solid {{ $icon }} text-xs {{ $color['text'] }}"></i>

@@ -126,6 +126,9 @@ Route::prefix('admin')->group(function () {
             'destroy' => 'admin.categories.destroy',
         ])->except(['create', 'show', 'edit']);
 
+        Route::get('subcategories/tree', [SubcategoryController::class, 'tree'])->name('admin.subcategories.tree');
+        Route::get('subcategories/{id}/children', [SubcategoryController::class, 'getChildren'])->name('admin.subcategories.children');
+        Route::post('subcategories/{id}/move', [SubcategoryController::class, 'move'])->name('admin.subcategories.move');
         Route::resource('subcategories', SubcategoryController::class)->names([
             'index' => 'admin.subcategories.index',
             'store' => 'admin.subcategories.store',

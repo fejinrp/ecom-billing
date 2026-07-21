@@ -22,14 +22,37 @@ class StorefrontController extends Controller
     public function index(Request $request)
     {
         $categories = Category::orderBy('cat_name', 'asc')->get();
-        $subcategories = Subcategory::with('category')->where('status', 1)->orderBy('subcategoryname', 'asc')->get();
+        $subcategories = Subcategory::with('category')
+            ->where('status', 1)
+            ->whereNull('parent_subcategory_id')
+            ->orderBy('subcategoryname', 'asc')
+            ->get();
         
         $query = Product::where('status', 1);
         
         if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('productname', 'like', "%{$search}%")
+            $search = trim($request->input('search'));
+            
+            $catIds = Category::where('cat_name', 'like', "%{$search}%")->pluck('cat_id')->toArray();
+            
+            $subcatIds = [];
+            $matchingSubcats = Subcategory::where('subcategoryname', 'like', "%{$search}%")->get();
+            foreach ($matchingSubcats as $sc) {
+                $subcatIds = array_merge($subcatIds, $sc->getAllDescendantIds());
+            }
+            $subcatIds = array_unique($subcatIds);
+
+            $query->where(function($q) use ($search, $catIds, $subcatIds) {
+                $q->where('productname', 'like', "%{$search}%")
                   ->orWhere('productdes', 'like', "%{$search}%");
+                
+                if (!empty($catIds)) {
+                    $q->orWhereIn('catid', $catIds);
+                }
+                if (!empty($subcatIds)) {
+                    $q->orWhereIn('subcatid', $subcatIds);
+                }
+            });
         }
         
         $products = $query->orderBy('id', 'desc')->paginate(12);
@@ -177,12 +200,32 @@ class StorefrontController extends Controller
      */
     public function category($catName, Request $request)
     {
-        $categories = Category::orderBy('cat_name', 'asc')->get();
+        $categories = Category::with(['rootSubcategories.allChildren'])
+            ->where('status', 1)
+            ->orderBy('cat_name', 'asc')
+            ->get();
         
         // Find category
         $category = Category::where('cat_name', $catName)->firstOrFail();
+
+        // Fetch subcategories tree for this category
+        $subcategories = Subcategory::with('allChildren')
+            ->where('status', 1)
+            ->where('catid', $category->cat_id)
+            ->whereNull('parent_subcategory_id')
+            ->orderBy('subcategoryname', 'asc')
+            ->get();
         
         $query = Product::where('status', 1)->where('catid', $category->cat_id);
+
+        $selectedSubcatId = $request->input('subcatid') ?: $request->input('subcategory_id');
+        if ($selectedSubcatId) {
+            $subcat = Subcategory::find((int)$selectedSubcatId);
+            if ($subcat) {
+                $descendantIds = $subcat->getAllDescendantIds();
+                $query->whereIn('subcatid', $descendantIds);
+            }
+        }
         
         if ($request->filled('price_range')) {
             $range = $request->input('price_range');
@@ -206,7 +249,7 @@ class StorefrontController extends Controller
         
         $products = $query->paginate(16);
             
-        return view('storefront.category', compact('categories', 'category', 'products'));
+        return view('storefront.category', compact('categories', 'category', 'subcategories', 'products', 'selectedSubcatId'));
     }
 
     /**
@@ -214,7 +257,7 @@ class StorefrontController extends Controller
      */
     public function shop(Request $request)
     {
-        $categories = Category::orderBy('cat_name', 'asc')->get();
+        $categories = Category::with(['rootSubcategories.allChildren'])->where('status', 1)->orderBy('cat_name', 'asc')->get();
         
         $query = Product::where('status', 1);
         
@@ -224,6 +267,15 @@ class StorefrontController extends Controller
                 $q->where('productname', 'like', "%{$search}%")
                   ->orWhere('productdes', 'like', "%{$search}%");
             });
+        }
+
+        if ($request->filled('subcategory_id') || $request->filled('subcatid')) {
+            $subcatId = (int)($request->input('subcategory_id') ?: $request->input('subcatid'));
+            $subcat = Subcategory::find($subcatId);
+            if ($subcat) {
+                $descendantIds = $subcat->getAllDescendantIds();
+                $query->whereIn('subcatid', $descendantIds);
+            }
         }
         
         if ($request->filled('price_range')) {

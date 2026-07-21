@@ -25,20 +25,43 @@
              LEFT COLUMN: Filters Sidebar (3 cols on lg)
              ============================================================ -->
         <div class="lg:col-span-3 space-y-4 hidden lg:block">
-            <!-- Categories Filter -->
+            <!-- Categories & Subcategories Accordion Tree Filter -->
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
                 <div class="border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center justify-between">
-                    <span class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Categories</span>
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Categories & Subcategories</span>
+                    @if(!empty($selectedSubcatId))
+                        <a href="{{ route('storefront.category', $category->cat_name) }}" class="text-[10px] font-bold text-rose-500 hover:underline">Clear Filter</a>
+                    @endif
                 </div>
-                <ul class="space-y-1 max-h-56 overflow-y-auto custom-scrollbar">
+                <ul class="space-y-1 max-h-96 overflow-y-auto custom-scrollbar">
                     @if ($categoryItems->count() > 0)
                         @foreach ($categoryItems as $cat)
-                            <li>
-                                <a href="{{ route('storefront.category', $cat->cat_name) }}" 
-                                   class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all {{ $category->cat_id == $cat->cat_id ? 'text-[#0059e3] font-bold bg-[#0059e3]/5' : 'text-slate-600 dark:text-slate-400 hover:text-[#0059e3]' }}">
-                                    <span class="truncate">{{ $cat->cat_name }}</span>
-                                    <i class="fa-solid fa-chevron-right text-[7px]"></i>
-                                </a>
+                            @php
+                                $isCurrentCat = $category->cat_id == $cat->cat_id;
+                                $hasSub = $cat->rootSubcategories && $cat->rootSubcategories->count() > 0;
+                            @endphp
+                            <li x-data="{ open: {{ $isCurrentCat ? 'true' : 'false' }} }" class="space-y-1">
+                                <div class="flex items-center justify-between group rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                                    <a href="{{ route('storefront.category', $cat->cat_name) }}" 
+                                       class="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all {{ $isCurrentCat && empty($selectedSubcatId) ? 'text-[#0059e3] font-bold bg-[#0059e3]/5' : 'text-slate-700 dark:text-slate-200 hover:text-[#0059e3]' }}">
+                                        <i class="fa-solid fa-folder text-[10px] {{ $isCurrentCat ? 'text-[#0059e3]' : 'text-slate-400' }}"></i>
+                                        <span class="truncate">{{ $cat->cat_name }}</span>
+                                    </a>
+
+                                    @if($hasSub)
+                                        <button type="button" @click.prevent.stop="open = !open" class="px-2.5 py-1.5 text-slate-400 hover:text-[#0059e3] dark:hover:text-slate-200 transition-colors flex items-center justify-center">
+                                            <i class="fa-solid" :class="open ? 'fa-chevron-down text-[9px]' : 'fa-chevron-right text-[9px]'"></i>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                @if($hasSub)
+                                    <ul x-show="open" x-collapse class="ml-3 pl-2 border-l border-slate-200 dark:border-slate-800/80 space-y-1">
+                                        @foreach($cat->rootSubcategories as $sub)
+                                            <x-storefront.subcategory-tree-item :sub="$sub" :selectedSubcatId="$selectedSubcatId ?? null" />
+                                        @endforeach
+                                    </ul>
+                                @endif
                             </li>
                         @endforeach
                     @endif

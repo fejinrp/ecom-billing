@@ -24,7 +24,7 @@ class ProductController extends Controller
             ->get();
 
         $categories = Category::where('status', 1)->orderBy('cat_name', 'asc')->get();
-        $subcategories = Subcategory::where('status', 1)->orderBy('subcategoryname', 'asc')->get();
+        $subcategories = Subcategory::getTreeOptions();
         $brands = Brand::where('brand_status', 1)->orderBy('brand_name', 'asc')->get();
 
         return view('admin.products.index', compact('products', 'categories', 'subcategories', 'brands'));
@@ -33,7 +33,7 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::where('status', 1)->orderBy('cat_name', 'asc')->get();
-        $subcategories = Subcategory::where('status', 1)->orderBy('subcategoryname', 'asc')->get();
+        $subcategories = Subcategory::getTreeOptions();
         $brands = Brand::where('brand_status', 1)->orderBy('brand_name', 'asc')->get();
         $suppliers = \App\Models\Supplier::where('status', 1)->orderBy('name', 'asc')->get();
 
@@ -50,7 +50,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $categories = Category::where('status', 1)->orderBy('cat_name', 'asc')->get();
-        $subcategories = Subcategory::where('status', 1)->orderBy('subcategoryname', 'asc')->get();
+        $subcategories = Subcategory::getTreeOptions();
         $brands = Brand::where('brand_status', 1)->orderBy('brand_name', 'asc')->get();
 
         return view('admin.products.edit', compact('product', 'categories', 'subcategories', 'brands'));

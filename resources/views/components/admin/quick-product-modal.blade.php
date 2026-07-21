@@ -163,23 +163,10 @@
 
                 <!-- Group 2: Categorization & Brand -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Category *</label>
-                        <select x-model="catid" required class="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
-                            <option value="">-- Choose Category --</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->cat_id }}">{{ $cat->cat_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Subcategory *</label>
-                        <select x-model="subcatid" required class="w-full px-3 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
-                            <option value="">-- Choose Subcategory --</option>
-                            @foreach($subcategories as $scat)
-                                <option value="{{ $scat->id }}">{{ $scat->subcategoryname }}</option>
-                            @endforeach
-                        </select>
+                    <div class="md:col-span-2">
+                        <x-admin.category-tree-select 
+                            @category-tree-changed="catid = $event.detail.catId; subcatid = $event.detail.subcatId"
+                        />
                     </div>
                     <div class="space-y-1.5">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Brand *</label>

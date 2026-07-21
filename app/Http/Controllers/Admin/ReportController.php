@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Expname;
 use App\Models\Expdetail;
 use App\Models\Product;
+use App\Models\Subcategory;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Uorder;
@@ -647,6 +648,7 @@ class ReportController extends Controller
         $stock = $request->input('report');
         $bname = $request->input('bname');
         $cname = $request->input('cname');
+        $subcatid = $request->input('subcatid');
         $qty = $request->input('tno');
 
         $query = Product::with(['brand', 'category'])->where('status', 1);
@@ -669,6 +671,13 @@ class ReportController extends Controller
                 $stockType = 'HIGH STOCK DETAILS';
             }
             $query->orderBy('catid')->orderBy('tqty');
+        } elseif ($subcatid && $subcatid !== '0') {
+            $subcat = Subcategory::find($subcatid);
+            if ($subcat) {
+                $descendantIds = $subcat->getAllDescendantIds();
+                $query->whereIn('subcatid', $descendantIds)->orderBy('tqty');
+                $stockType = 'STOCK DETAILS FOR SUBCATEGORY: ' . strtoupper($subcat->subcategoryname);
+            }
         } elseif ($bname && $bname !== '0') {
             $query->where('brandid', $bname)->orderBy('tqty');
             $brand = DB::table('brands')->where('brand_id', $bname)->first();
@@ -690,8 +699,9 @@ class ReportController extends Controller
         }
 
         $products = $query->get();
+        $autoPrint = $request->input('auto_print', '1') == '1';
 
-        return view('admin.reports.stock_print', compact('products', 'stockType', 'isStockLevelReport'));
+        return view('admin.reports.stock_print', compact('products', 'stockType', 'isStockLevelReport', 'autoPrint'));
     }
 
     /**

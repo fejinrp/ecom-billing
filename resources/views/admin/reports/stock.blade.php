@@ -50,16 +50,14 @@
                         </select>
                     </div>
 
-                    <!-- Categories -->
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-semibold text-slate-550 dark:text-slate-400 uppercase tracking-wider">Category Name</label>
-                        <select name="cname" id="categorySelect" onchange="resetOthers('category')"
-                            class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
-                            <option value="0" class="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-300">Select Category Name</option>
-                            @foreach ($categories as $cat)
-                                <option value="{{ $cat->cat_id }}" class="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-300">{{ $cat->cat_name }}</option>
-                            @endforeach
-                        </select>
+                    <!-- Category & Subcategory Multi-Level Tree Select -->
+                    <div class="space-y-1.5" @category-tree-changed="resetOthers('tree')">
+                        <x-admin.category-tree-select 
+                            catName="cname" 
+                            subcatName="subcatid" 
+                            label="Category & Subcategory Hierarchy (Optional)" 
+                            :required="false" 
+                        />
                     </div>
 
                     <!-- Quantity Bounds -->
@@ -69,10 +67,18 @@
                             class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
                     </div>
 
-                    <div class="pt-2">
-                        <x-admin.button type="submit" variant="primary" icon="fa-solid fa-print text-lg" class="w-full">
-                            Print Stock Report
-                        </x-admin.button>
+                    <input type="hidden" name="auto_print" id="autoPrintInput" value="1">
+
+                    <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                        <button type="submit" onclick="document.getElementById('autoPrintInput').value='0';" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700">
+                            <i class="fa-solid fa-eye text-indigo-500 text-sm"></i>
+                            <span>Preview Report</span>
+                        </button>
+
+                        <button type="submit" onclick="document.getElementById('autoPrintInput').value='1';" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20">
+                            <i class="fa-solid fa-print text-sm"></i>
+                            <span>Print Report</span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -163,25 +169,21 @@
     function resetOthers(source) {
         const report = document.getElementById('reportSelect');
         const brand = document.getElementById('brandSelect');
-        const category = document.getElementById('categorySelect');
         const qty = document.getElementById('qtyInput');
 
         if (source === 'report' && report.value !== '0') {
-            brand.value = '0';
-            category.value = '0';
-            qty.value = '';
+            if (brand) brand.value = '0';
+            if (qty) qty.value = '';
         } else if (source === 'brand' && brand.value !== '0') {
-            report.value = '0';
-            category.value = '0';
-            qty.value = '';
-        } else if (source === 'category' && category.value !== '0') {
-            report.value = '0';
-            brand.value = '0';
-            qty.value = '';
+            if (report) report.value = '0';
+            if (qty) qty.value = '';
+        } else if (source === 'tree') {
+            if (report) report.value = '0';
+            if (brand) brand.value = '0';
+            if (qty) qty.value = '';
         } else if (source === 'qty' && qty.value.trim() !== '') {
-            report.value = '0';
-            brand.value = '0';
-            category.value = '0';
+            if (report) report.value = '0';
+            if (brand) brand.value = '0';
         }
     }
 </script>

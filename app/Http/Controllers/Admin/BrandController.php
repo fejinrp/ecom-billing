@@ -18,7 +18,7 @@ class BrandController extends Controller
         $brands = Brand::with(['category', 'subcategory'])
             ->where('brand_status', 1)
             ->orderBy('brand_name', 'asc')
-            ->paginate(15);
+            ->paginate(20);
 
         $categories = Category::where('status', 1)
             ->orderBy('cat_name', 'asc')
@@ -32,22 +32,33 @@ class BrandController extends Controller
     }
 
     /**
-     * Store a newly created brand.
+     * Store a newly created brand (with deduplication check).
      */
     public function store(Request $request)
     {
         $request->validate([
             'brand_name' => 'required|string|max:255',
-            'catid' => 'required|integer',
-            'scatid' => 'required|integer',
+            'catid' => 'nullable|integer',
+            'scatid' => 'nullable|integer',
         ]);
 
-        $brand = Brand::create([
-            'brand_name' => $request->input('brand_name'),
-            'catid' => $request->input('catid'),
-            'scatid' => $request->input('scatid'),
-            'brand_status' => 1,
-        ]);
+        $brandName = trim($request->input('brand_name'));
+
+        // Deduplication check: if a brand with this clean name already exists, reuse it
+        $existingBrand = Brand::whereRaw('LOWER(TRIM(brand_name)) = ?', [strtolower($brandName)])
+            ->where('brand_status', 1)
+            ->first();
+
+        if ($existingBrand) {
+            $brand = $existingBrand;
+        } else {
+            $brand = Brand::create([
+                'brand_name' => $brandName,
+                'catid' => $request->input('catid'),
+                'scatid' => $request->input('scatid'),
+                'brand_status' => 1,
+            ]);
+        }
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
@@ -66,16 +77,23 @@ class BrandController extends Controller
     {
         $request->validate([
             'brand_name' => 'required|string|max:255',
-            'catid' => 'required|integer',
-            'scatid' => 'required|integer',
+            'catid' => 'nullable|integer',
+            'scatid' => 'nullable|integer',
         ]);
 
         $brand = Brand::findOrFail($id);
         $brand->update([
-            'brand_name' => $request->input('brand_name'),
+            'brand_name' => trim($request->input('brand_name')),
             'catid' => $request->input('catid'),
             'scatid' => $request->input('scatid'),
         ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'brand' => $brand
+            ]);
+        }
 
         return redirect()->route('admin.brands.index')->with('success', 'Brand successfully updated!');
     }

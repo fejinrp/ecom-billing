@@ -73,7 +73,13 @@
     brands: @js($brands),
     selectedCat: '{{ $product->catid }}',
     selectedSubcat: '{{ $product->subcatid }}',
-    selectedBrand: '{{ $product->brandid }}'
+    selectedBrand: '{{ $product->brandid }}',
+
+    get availableBrands() {
+        if (!this.selectedCat) return this.brands;
+        const list = this.brands.filter(b => !b.catid || b.catid == 0 || b.catid == this.selectedCat);
+        return list.length > 0 ? list : this.brands;
+    }
 }">
     <!-- Header Section -->
     <x-admin.header 
@@ -170,29 +176,18 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Category <span class="text-rose-500">*</span></label>
-                    <select name="catid" id="catid_select" x-model="selectedCat" required class="select2-select w-full">
-                        <option value="">~ Select Category ~</option>
-                        <template x-for="cat in categories" :key="cat.cat_id">
-                            <option :value="cat.cat_id" x-text="cat.cat_name"></option>
-                        </template>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Sub Category <span class="text-rose-500">*</span></label>
-                    <select name="subcatid" id="subcatid_select" x-model="selectedSubcat" :disabled="!selectedCat" required class="select2-select w-full">
-                        <option value="">~ Select Subcategory ~</option>
-                        <template x-for="sub in subcategories.filter(s => s.catid == selectedCat)" :key="sub.id">
-                            <option :value="sub.id" x-text="sub.subcategoryname"></option>
-                        </template>
-                    </select>
+                <div class="md:col-span-2">
+                    <x-admin.category-tree-select 
+                        :selectedCat="old('catid', $product->catid)" 
+                        :selectedSubcat="old('subcatid', $product->subcatid)" 
+                        @category-tree-changed="selectedCat = $event.detail.catId; selectedSubcat = $event.detail.subcatId"
+                    />
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Brand <span class="text-rose-500">*</span></label>
-                    <select name="brandid" id="brandid_select" x-model="selectedBrand" :disabled="!selectedSubcat" required class="select2-select w-full">
+                    <select name="brandid" id="brandid_select" x-model="selectedBrand" :disabled="!selectedCat" required class="select2-select w-full">
                         <option value="">~ Select Brand ~</option>
-                        <template x-for="b in brands.filter(br => br.catid == selectedCat && br.scatid == selectedSubcat)" :key="b.brand_id">
+                        <template x-for="b in availableBrands" :key="b.brand_id">
                             <option :value="b.brand_id" x-text="b.brand_name"></option>
                         </template>
                     </select>
@@ -340,28 +335,45 @@
             }, 100);
         }, 100);
 
-        // Sync dropdown selectors with Alpine state when select2 changes value
-        $('#catid_select').on('change', function(e) {
-            if (e.originalEvent) return;
-            this.dispatchEvent(new Event('change'));
+        // Handle category-tree-select component changes for Select2 brand synchronization
+        window.addEventListener('category-tree-changed', function(e) {
+            const catId = e.detail ? e.detail.catId : '';
+            const subcatId = e.detail ? e.detail.subcatId : '';
 
-            setTimeout(() => {
-                $('#subcatid_select').val('').trigger('change');
-            }, 50);
-        });
+            // Update Alpine parent state
+            const wrapper = document.querySelector('[x-data]');
+            if (wrapper && window.Alpine) {
+                try {
+                    const alpineData = window.Alpine.$data(wrapper);
+                    if (alpineData) {
+                        alpineData.selectedCat = catId;
+                        alpineData.selectedSubcat = subcatId;
+                    }
+                } catch(err) {}
+            }
 
-        $('#subcatid_select').on('change', function(e) {
-            if (e.originalEvent) return;
-            this.dispatchEvent(new Event('change'));
+            const brandSelect = $('#brandid_select');
+            if (brandSelect.length) {
+                const currentBrand = brandSelect.val();
+                brandSelect.empty().append('<option value="">~ Select Brand ~</option>');
 
-            setTimeout(() => {
-                $('#brandid_select').val('').trigger('change');
-            }, 50);
-        });
+                const allBrands = @js($brands);
 
-        $('#brandid_select').on('change', function(e) {
-            if (e.originalEvent) return;
-            this.dispatchEvent(new Event('change'));
+                if (catId) {
+                    const matchingBrands = allBrands.filter(b => !b.catid || b.catid == 0 || b.catid == catId);
+                    const listToRender = matchingBrands.length > 0 ? matchingBrands : allBrands;
+                    
+                    listToRender.forEach(b => {
+                        const selectedAttr = (currentBrand == b.brand_id) ? 'selected' : '';
+                        brandSelect.append(`<option value="${b.brand_id}" ${selectedAttr}>${b.brand_name}</option>`);
+                    });
+                    brandSelect.prop('disabled', false);
+                } else {
+                    brandSelect.prop('disabled', true);
+                }
+
+                brandSelect.trigger('change.select2');
+            }
         });
     });
 </script>

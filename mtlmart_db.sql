@@ -17992,3 +17992,20 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+
+ALTER TABLE `subcategory`
+  ADD COLUMN `parent_subcategory_id` INT NULL DEFAULT NULL AFTER `catid`,
+  ADD INDEX `idx_parent_subcategory_id` (`parent_subcategory_id`),
+  ADD CONSTRAINT `fk_subcategory_parent` 
+    FOREIGN KEY (`parent_subcategory_id`) 
+    REFERENCES `subcategory` (`id`) 
+    ON DELETE SET NULL 
+    ON UPDATE CASCADE;
+    
+    
+ALTER TABLE brands 
+  MODIFY COLUMN catid INT NULL DEFAULT NULL,
+  MODIFY COLUMN scatid INT NULL DEFAULT NULL;
